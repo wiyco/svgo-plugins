@@ -1,5 +1,8 @@
 # svgo-plugins
 
+[![Coverage](docs/assets/coverage.svg)](docs/assets/coverage.svg)
+[![Code to Test Ratio](docs/assets/code-to-test-ratio.svg)](docs/assets/code-to-test-ratio.svg)
+
 A workspace for SVGO plugins aimed at SVG-to-React workflows.
 
 The first package in this repository, `svgo-plugin-hoist-stroke-width`, hoists descendant `stroke-width` attributes to the root `<svg>` when the effective stroke width is uniform across the SVG.

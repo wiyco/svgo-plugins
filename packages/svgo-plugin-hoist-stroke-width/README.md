@@ -36,10 +36,12 @@ import { createHoistStrokeWidthPlugin } from "@wiyco/svgo-plugin-hoist-stroke-wi
 export default defineConfig({
   plugins: [
     svgr({
-      plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx"],
-      svgo: true,
-      svgoConfig: {
-        plugins: [createHoistStrokeWidthPlugin()],
+      svgrOptions: {
+        plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx"],
+        svgo: true,
+        svgoConfig: {
+          plugins: [createHoistStrokeWidthPlugin()],
+        },
       },
     }),
   ],

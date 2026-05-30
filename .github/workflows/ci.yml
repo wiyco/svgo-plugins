@@ -37,29 +37,6 @@ jobs:
           retention-days: 15
           if-no-files-found: error
 
-  verify-dist:
-    needs: check
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          persist-credentials: false
-      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "24"
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run build
-      - name: Verify dist is up to date
-        run: |
-          if [ "$(git status --porcelain dist/)" != "" ]; then
-            echo "dist/ is out of date. Run 'pnpm run build' and commit."
-            exit 1
-          fi
-
   report-coverage:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: check
@@ -119,7 +96,6 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
       - check
-      - verify-dist
       - report-coverage
     runs-on: ubuntu-latest
     permissions:

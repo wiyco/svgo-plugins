@@ -1,0 +1,59 @@
+lefthook: pnpm exec lefthook
+glob_matcher: doublestar
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: root
+      group:
+        piped: true
+        jobs:
+          - name: lint root
+            root: "."
+            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
+            run: pnpm exec oxlint -c .oxlintrc.json --fix {staged_files}
+            stage_fixed: true
+          - name: format root
+            root: "."
+            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
+            run: pnpm exec oxfmt -c .oxfmtrc.json {staged_files}
+            stage_fixed: true
+
+    - name: packages
+      group:
+        piped: true
+        jobs:
+          - name: lint packages
+            root: "packages/"
+            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
+            run: pnpm exec oxlint -c .oxlintrc.json --fix {staged_files}
+            stage_fixed: true
+          - name: format packages
+            root: "packages/"
+            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
+            run: pnpm exec oxfmt -c .oxfmtrc.json {staged_files}
+            stage_fixed: true
+
+    - name: apps
+      group:
+        piped: true
+        jobs:
+          - name: lint apps
+            root: "apps/"
+            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
+            run: pnpm exec oxlint -c .oxlintrc.json --fix {staged_files}
+            stage_fixed: true
+          - name: format apps
+            root: "apps/"
+            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
+            run: pnpm exec oxfmt -c .oxfmtrc.json {staged_files}
+            stage_fixed: true
+
+    - name: typecheck
+      run: pnpm exec tsc -b
+
+post-merge:
+  jobs:
+    - name: install deps
+      run: pnpm install --frozen-lockfile
+      glob: pnpm-lock.yaml

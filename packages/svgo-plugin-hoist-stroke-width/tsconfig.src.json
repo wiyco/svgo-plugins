@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declarationDir": "./node_modules/.cache/types/src",
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.src.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*.ts"]
+}

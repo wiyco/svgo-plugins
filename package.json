@@ -1,0 +1,31 @@
+{
+  "name": "svgo-plugins-workspace",
+  "private": true,
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "build": "pnpm -r build",
+    "lint": "oxlint -c .oxlintrc.json .",
+    "lint:fix": "oxlint -c .oxlintrc.json --fix .",
+    "format": "oxfmt -c .oxfmtrc.json .",
+    "format:check": "oxfmt -c .oxfmtrc.json --check .",
+    "check": "pnpm run lint && pnpm run format:check",
+    "check:fix": "pnpm run lint:fix && pnpm run format",
+    "test": "pnpm -r test",
+    "test:coverage": "pnpm -r test:coverage",
+    "all": "pnpm run typecheck && pnpm run lint && pnpm run test:coverage"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.4",
+    "@vitest/coverage-v8": "^4.1.7",
+    "lefthook": "^2.1.9",
+    "oxfmt": "0.52.0",
+    "oxlint": "1.67.0",
+    "tsdown": "0.22.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.33.4"
+}

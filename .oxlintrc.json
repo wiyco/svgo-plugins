@@ -1,0 +1,30 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "import", "typescript", "node", "vitest"],
+  "env": {
+    "builtin": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    "**/pnpm-lock.yaml",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**"
+  ],
+  "options": {
+    "denyWarnings": true
+  },
+  "rules": {
+    "eqeqeq": "error",
+    "import/no-cycle": "error",
+    "typescript/consistent-type-imports": "error"
+  },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*.ts", "**/*.test.ts", "**/*.test.tsx"],
+      "env": {
+        "vitest": true
+      }
+    }
+  ]
+}

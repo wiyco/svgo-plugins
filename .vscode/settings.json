@@ -1,0 +1,17 @@
+{
+  "files.eol": "\n",
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.format.oxc": "explicit",
+    "source.fixAll.oxc": "explicit"
+  },
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "oxc.configPath": ".oxlintrc.json",
+  "oxc.disableNestedConfig": true,
+  "oxc.fmt.configPath": ".oxfmtrc.json",
+  "oxc.fixKind": "safe_fix"
+}

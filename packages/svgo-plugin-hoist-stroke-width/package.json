@@ -1,0 +1,53 @@
+{
+  "name": "@wiyco/svgo-plugin-hoist-stroke-width",
+  "version": "0.1.0",
+  "description": "SVGO plugin that hoists uniform descendant stroke-width values to the root <svg> so SVGR-generated React components can override them.",
+  "keywords": [
+    "react",
+    "stroke-width",
+    "svg",
+    "svgo",
+    "svgr",
+    "tailwindcss"
+  ],
+  "homepage": "https://github.com/wiyco/svgo-plugins/tree/main/packages/svgo-plugin-hoist-stroke-width#readme",
+  "bugs": {
+    "url": "https://github.com/wiyco/svgo-plugins/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wiyco/svgo-plugins.git",
+    "directory": "packages/svgo-plugin-hoist-stroke-width"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc -b tsconfig.json",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "svgo": "^4.0.1"
+  },
+  "peerDependencies": {
+    "svgo": "^4.0.1"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

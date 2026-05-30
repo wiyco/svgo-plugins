@@ -2,7 +2,7 @@
   "name": "svgo-plugins-workspace",
   "private": true,
   "scripts": {
-    "typecheck": "pnpm -r typecheck",
+    "typecheck": "tsc -b",
     "build": "pnpm -r build",
     "lint": "oxlint -c .oxlintrc.json .",
     "lint:fix": "oxlint -c .oxlintrc.json --fix .",
@@ -10,9 +10,10 @@
     "format:check": "oxfmt -c .oxfmtrc.json --check .",
     "check": "pnpm run lint && pnpm run format:check",
     "check:fix": "pnpm run lint:fix && pnpm run format",
-    "test": "pnpm -r test",
-    "test:coverage": "pnpm -r test:coverage",
-    "all": "pnpm run typecheck && pnpm run lint && pnpm run test:coverage"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "all": "pnpm run typecheck && pnpm run check && pnpm run test:coverage"
   },
   "devDependencies": {
     "@types/node": "^24.12.4",

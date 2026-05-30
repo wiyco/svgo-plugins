@@ -1,14 +1,8 @@
-import { defineConfig } from "vitest/config";
+import { defineProject } from "vitest/config";
 
-export default defineConfig({
+export default defineProject({
   test: {
+    name: "svgo-plugin-hoist-stroke-width",
     environment: "node",
-    include: ["__tests__/**/*.test.ts"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "lcov"],
-      include: ["src/**/*.ts"],
-      exclude: ["src/**/index.ts", "src/**/*.d.ts"],
-    },
   },
 });

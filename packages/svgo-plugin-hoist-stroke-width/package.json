@@ -36,10 +36,7 @@
   },
   "scripts": {
     "typecheck": "tsc -b tsconfig.json",
-    "build": "tsdown",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
+    "build": "tsdown"
   },
   "devDependencies": {
     "svgo": "^4.0.1"

@@ -6,11 +6,13 @@ coverage:
     path: docs/assets/coverage.svg
 codeToTestRatio:
   code:
-    - "src/**/*.ts"
-    - "!src/main.ts"
-    - "!src/shared/types.ts"
+    - "packages/*/src/**/*.{ts,tsx}"
+    - "apps/*/src/**/*.{ts,tsx}"
+    - "!**/src/**/index.ts"
+    - "!**/*.d.ts"
   test:
-    - "__tests__/**/*.test.ts"
+    - "packages/*/__tests__/**/*.test.{ts,tsx}"
+    - "apps/*/__tests__/**/*.test.{ts,tsx}"
   badge:
     path: docs/assets/code-to-test-ratio.svg
 testExecutionTime:

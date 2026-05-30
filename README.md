@@ -17,19 +17,6 @@ That makes stroke width much easier to override on SVGR-generated React componen
 
 > `apps/*` is reserved for future playgrounds and end-to-end fixtures. For now, the repository only contains the package intended for publication.
 
-## Scripts
-
-```bash
-pnpm install
-pnpm format
-pnpm lint
-pnpm typecheck
-pnpm build
-pnpm test
-pnpm test:coverage
-pnpm check
-```
-
 ## Package
 
 - [`svgo-plugin-hoist-stroke-width`](packages/svgo-plugin-hoist-stroke-width) (`@wiyco/svgo-plugin-hoist-stroke-width`)

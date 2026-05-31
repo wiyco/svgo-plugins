@@ -5,9 +5,11 @@
 
 A workspace for SVGO plugins aimed at SVG-to-React workflows.
 
-The first package in this repository, `svgo-plugin-hoist-stroke-width`, hoists descendant `stroke-width` attributes to the root `<svg>` when the effective stroke width is uniform across the SVG.
+## Package
 
-That makes stroke width much easier to override on SVGR-generated React components, whether through a `strokeWidth` prop or Tailwind CSS utilities such as `stroke-2`.
+- [`svgo-plugin-hoist-stroke-width`](packages/svgo-plugin-hoist-stroke-width) (`@wiyco/svgo-plugin-hoist-stroke-width`)
+
+See the package README for the public API and usage examples.
 
 ## Workspace
 
@@ -19,9 +21,3 @@ That makes stroke width much easier to override on SVGR-generated React componen
 ```
 
 > `apps/*` is reserved for future playgrounds and end-to-end fixtures. For now, the repository only contains the package intended for publication.
-
-## Package
-
-- [`svgo-plugin-hoist-stroke-width`](packages/svgo-plugin-hoist-stroke-width) (`@wiyco/svgo-plugin-hoist-stroke-width`)
-
-See the package README for the public API and usage examples.

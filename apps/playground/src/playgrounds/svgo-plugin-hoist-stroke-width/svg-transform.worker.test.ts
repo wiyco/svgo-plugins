@@ -53,9 +53,6 @@ describe("svg-transform.worker", () => {
     const response = {
       kind: "success" as const,
       optimizedSvg: "<svg data-optimized />",
-      previewCode:
-        'const SvgComponent = () => React.createElement("svg", null);',
-      reactSource: "const SvgComponent = () => <svg />;",
     };
 
     transformSvgRequest.mockResolvedValue(response);

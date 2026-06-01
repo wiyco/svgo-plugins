@@ -77,9 +77,6 @@ describe("svg-transform-worker-client", () => {
     const payload = {
       kind: "success",
       optimizedSvg: "<svg data-optimized />",
-      previewCode:
-        'const SvgComponent = () => React.createElement("svg", null);',
-      reactSource: "const SvgComponent = () => <svg />;",
     } as const;
     const resultPromise = client.transform({
       svg: "<svg />",

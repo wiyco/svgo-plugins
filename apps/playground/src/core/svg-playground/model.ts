@@ -1,7 +1,3 @@
-import type { ComponentType, SVGProps } from "react";
-
-export type PreviewComponent = ComponentType<SVGProps<SVGSVGElement>>;
-
 export type SvgPreset = {
   description: string;
   id: string;
@@ -35,8 +31,6 @@ export type SvgTransformRequest = {
 export type SvgTransformSuccess = {
   kind: "success";
   optimizedSvg: string;
-  previewCode: string;
-  reactSource: string;
 };
 
 export type SvgTransformUnsafe = {

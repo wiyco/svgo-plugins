@@ -20,9 +20,7 @@ const flush = async (): Promise<void> => {
 const createSuccessResult = (presetName: "mixed" | "uniform") => {
   return {
     kind: "success" as const,
-    optimizedSvg: `<svg data-optimized="${presetName}" />`,
-    previewCode: `const SvgComponent = (props) => React.createElement("svg", { "data-preview": "${presetName}", ...props });`,
-    reactSource: `const SvgComponent = (props) => <svg data-source="${presetName}" {...props} />;`,
+    optimizedSvg: `<svg data-optimized="${presetName}" data-source="${presetName}" />`,
   };
 };
 
@@ -138,7 +136,7 @@ describe("hoist stroke width playground", () => {
     );
     const optimizedPanel = renderedApp.container.textContent;
     const previewSvg = renderedApp.container.querySelector<SVGSVGElement>(
-      'svg[data-preview="mixed"]',
+      'svg[data-optimized="mixed"]',
     );
 
     expect(textarea?.value).toContain('stroke-width="2.5"');
@@ -249,9 +247,6 @@ describe("hoist stroke width playground", () => {
       return {
         kind: "success",
         optimizedSvg: "<svg />",
-        previewCode:
-          'const SvgComponent = () => React.createElement("svg", null);',
-        reactSource: "const SvgComponent = () => <svg />;",
       };
     };
 
@@ -359,7 +354,7 @@ describe("hoist stroke width playground", () => {
     );
     expect(
       renderedApp.container.querySelector<SVGSVGElement>(
-        'svg[data-preview="mixed"]',
+        'svg[data-optimized="mixed"]',
       ),
     ).not.toBeNull();
   });
@@ -433,6 +428,24 @@ describe("hoist stroke width playground", () => {
     expect(
       renderedApp.container.querySelector('[role="alert"]')?.textContent,
     ).toContain("Transform failed.");
+  });
+
+  it("shows source and preview fallbacks when optimized svg has no root svg element", async () => {
+    const transform: TransformFn = async () => {
+      return {
+        kind: "success",
+        optimizedSvg: "<g />",
+      };
+    };
+
+    renderedApp = await renderPlayground(transform);
+
+    expect(renderedApp.container.textContent).toContain(
+      "Expected optimized SVG to contain a root <svg> element.",
+    );
+    expect(
+      renderedApp.container.querySelector('[role="alert"]')?.textContent,
+    ).toContain("Preview render failed.");
   });
 
   it("shows thrown Error messages from transform failures", async () => {
@@ -558,13 +571,13 @@ describe("hoist stroke width playground", () => {
     });
 
     const previewSvg = renderedApp.container.querySelector<SVGSVGElement>(
-      'svg[data-preview="uniform"]',
+      'svg[data-optimized="uniform"]',
     );
 
     expect(previewSvg?.getAttribute("stroke-width")).toBe("2.5");
     expect(previewSvg?.getAttribute("height")).toBe("256");
     expect(previewSvg?.getAttribute("width")).toBe("256");
-    expect(previewSvg?.style.color).toBe("#ff6600");
+    expect(previewSvg?.getAttribute("style")).toContain("color: #ff6600");
   });
 
   it("clamps strokeWidth updates to the configured bounds", async () => {

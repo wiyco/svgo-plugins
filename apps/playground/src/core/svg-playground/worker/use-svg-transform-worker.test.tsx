@@ -33,9 +33,6 @@ const createTransformStub = (): TransformFn => {
     return {
       kind: "success",
       optimizedSvg: "<svg />",
-      previewCode:
-        'const SvgComponent = () => React.createElement("svg", null);',
-      reactSource: "const SvgComponent = () => <svg />;",
     };
   };
 };

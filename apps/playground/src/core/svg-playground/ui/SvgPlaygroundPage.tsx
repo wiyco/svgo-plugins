@@ -13,13 +13,14 @@ import {
 
 import type {
   PlaygroundQueryState,
-  PreviewComponent,
   SvgPlaygroundDefinition,
   SvgPreset,
   TransformFn,
 } from "../model";
 
-import { createPreviewComponentFromJs } from "../preview/create-preview-component";
+import { createPreviewMarkup } from "../preview/create-preview-markup";
+import { createReactSource } from "../source/create-react-source";
+import { getErrorMessage } from "../utils/get-error-message";
 import { useWorkerTransform } from "../worker/use-svg-transform-worker";
 
 const PREVIEW_BLOCKED_MESSAGE = "Preview disabled for unsafe SVG input.";
@@ -36,10 +37,6 @@ type SvgPlaygroundPageProps = {
 type SvgPlaygroundAppProps = {
   definition: SvgPlaygroundDefinition;
   workerUrl: URL;
-};
-
-const createEmptyPreview = (): PreviewComponent | null => {
-  return null;
 };
 
 const getPresetIdForSvg = (
@@ -80,9 +77,6 @@ export const SvgPlaygroundPage = ({
   });
   const [copyStatus, setCopyStatus] = useState("");
   const [optimizedSvg, setOptimizedSvg] = useState("");
-  const [previewComponent, setPreviewComponent] =
-    useState<PreviewComponent | null>(createEmptyPreview);
-  const [reactSource, setReactSource] = useState("");
   const [status, setStatus] = useState<
     "error" | "idle" | "loading" | "success" | "unsafe"
   >("idle");
@@ -101,21 +95,13 @@ export const SvgPlaygroundPage = ({
         }
 
         if (result.kind === "success") {
-          const nextPreviewComponent = createPreviewComponentFromJs(
-            result.previewCode,
-          );
-
           setOptimizedSvg(result.optimizedSvg);
-          setPreviewComponent(() => nextPreviewComponent);
-          setReactSource(result.reactSource);
           setStatus("success");
           setStatusMessage("");
           return;
         }
 
         setOptimizedSvg("");
-        setPreviewComponent(createEmptyPreview);
-        setReactSource("");
         setStatus(result.kind);
         setStatusMessage(
           result.kind === "unsafe" ? result.reason : result.message,
@@ -126,8 +112,6 @@ export const SvgPlaygroundPage = ({
         }
 
         setOptimizedSvg("");
-        setPreviewComponent(createEmptyPreview);
-        setReactSource("");
         setStatus("error");
         setStatusMessage(
           error instanceof Error
@@ -150,8 +134,6 @@ export const SvgPlaygroundPage = ({
 
     if (svg.length === 0) {
       setOptimizedSvg("");
-      setPreviewComponent(createEmptyPreview);
-      setReactSource("");
       setStatus("idle");
       setStatusMessage("");
       return;
@@ -210,10 +192,51 @@ export const SvgPlaygroundPage = ({
     }
   }, []);
 
-  const Preview = previewComponent;
-  const previewStyle = useMemo(() => {
-    return { color: queryState.color };
-  }, [queryState.color]);
+  const previewMarkup = useMemo(() => {
+    if (optimizedSvg.length === 0) {
+      return null;
+    }
+
+    try {
+      return createPreviewMarkup(optimizedSvg, {
+        ariaLabel: "Live preview",
+        color: queryState.color,
+        size: queryState.size,
+        strokeWidth: queryState.strokeWidth,
+      });
+    } catch {
+      return null;
+    }
+  }, [optimizedSvg, queryState.color, queryState.size, queryState.strokeWidth]);
+  const reactSourceState = useMemo(() => {
+    if (optimizedSvg.length === 0) {
+      return {
+        error: "",
+        source: "",
+      };
+    }
+
+    try {
+      return {
+        error: "",
+        source: createReactSource(optimizedSvg),
+      };
+    } catch (error) {
+      return {
+        error: getErrorMessage(error, "Unable to generate React source."),
+        source: "",
+      };
+    }
+  }, [optimizedSvg]);
+  const previewHtml = useMemo(() => {
+    if (previewMarkup === null) {
+      return null;
+    }
+
+    return {
+      __html: previewMarkup,
+    };
+  }, [previewMarkup]);
 
   const handleCopyShareUrlClick = useCallback((): void => {
     void copyShareUrl();
@@ -430,8 +453,10 @@ export const SvgPlaygroundPage = ({
               <h2>Generated React source</h2>
             </div>
           </div>
-          {status === "success" && reactSource.length > 0 ? (
-            <pre className="code-panel">{reactSource}</pre>
+          {status === "success" && reactSourceState.source.length > 0 ? (
+            <pre className="code-panel">{reactSourceState.source}</pre>
+          ) : status === "success" && reactSourceState.error.length > 0 ? (
+            renderPanelFallback(reactSourceState.error)
           ) : status === "loading" ? (
             renderPanelFallback("Rebuilding React component source…")
           ) : status === "unsafe" ? (
@@ -453,14 +478,15 @@ export const SvgPlaygroundPage = ({
             </div>
           </div>
           <div className="preview-stage">
-            {status === "success" && Preview !== null ? (
-              <Preview
-                aria-label="Live preview"
-                height={queryState.size}
-                strokeWidth={queryState.strokeWidth}
-                style={previewStyle}
-                width={queryState.size}
-              />
+            {status === "success" && previewHtml !== null ? (
+              <div dangerouslySetInnerHTML={previewHtml} />
+            ) : status === "success" ? (
+              <div className="preview-warning" role="alert">
+                <strong>Preview render failed.</strong>
+                <span>
+                  Expected optimized SVG to contain a root svg element.
+                </span>
+              </div>
             ) : status === "unsafe" ? (
               <div className="preview-warning" role="status">
                 <strong>{PREVIEW_BLOCKED_MESSAGE}</strong>

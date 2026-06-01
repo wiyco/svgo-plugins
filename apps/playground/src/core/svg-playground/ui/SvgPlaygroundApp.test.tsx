@@ -29,9 +29,6 @@ const createTransformStub = (): TransformFn => {
     return {
       kind: "success",
       optimizedSvg: "<svg data-optimized />",
-      previewCode:
-        'const SvgComponent = (props) => React.createElement("svg", props);',
-      reactSource: "const SvgComponent = (props) => <svg {...props} />;",
     };
   };
 };

@@ -1,11 +1,12 @@
 {
-  "name": "@wiyco/svgo-plugins-playground",
+  "name": "svgo-plugins-playground",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "typecheck": "tsc -b tsconfig.json"
+    "typecheck": "tsgo -b tsconfig.json",
+    "typecheck:tsc": "tsc -b tsconfig.json"
   },
   "dependencies": {
     "@babel/core": "^7.29.7",
@@ -25,7 +26,6 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "6.0.2",
     "happy-dom": "20.9.0",
-    "typescript": "^6.0.3",
     "vite": "8.0.14",
     "vitest": "^4.1.7"
   },

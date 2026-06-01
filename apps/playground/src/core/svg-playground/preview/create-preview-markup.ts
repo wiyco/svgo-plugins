@@ -33,8 +33,10 @@ const appendStyleDeclaration = (
 
 export const createPreviewMarkup = (
   optimizedSvg: string,
-  { ariaLabel, color, size, strokeWidth }: PreviewMarkupOptions,
+  options: PreviewMarkupOptions,
 ): string => {
+  const { ariaLabel, color, size, strokeWidth } = options;
+
   const rootElement = getRootSvgElement(optimizedSvg);
 
   rootElement.setAttribute("aria-label", ariaLabel);

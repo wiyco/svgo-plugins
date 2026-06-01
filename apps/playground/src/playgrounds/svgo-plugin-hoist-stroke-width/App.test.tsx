@@ -2,8 +2,9 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { SvgPlayground } from "./App";
-import type { TransformFn } from "./lib/types";
+import type { TransformFn } from "../../core/svg-playground/model";
+import { SvgPlaygroundPage } from "../../core/svg-playground/ui/SvgPlaygroundPage";
+import { hoistStrokeWidthPlayground } from "./definition";
 
 type RenderedApp = {
   container: HTMLDivElement;
@@ -44,7 +45,12 @@ const renderPlayground = async (
   document.body.append(container);
 
   await act(async () => {
-    root.render(<SvgPlayground transform={transform} />);
+    root.render(
+      <SvgPlaygroundPage
+        definition={hoistStrokeWidthPlayground}
+        transform={transform}
+      />,
+    );
     await flush();
   });
 
@@ -76,7 +82,7 @@ afterEach(async () => {
   renderedApp = null;
 });
 
-describe("SvgPlayground", () => {
+describe("hoist stroke width playground", () => {
   it("updates all four panels when the preset changes", async () => {
     renderedApp = await renderPlayground(createTransformStub());
 

@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     projects: [
       "packages/*/vitest.config.ts",
-      "apps/playground/*/vitest.config.ts",
+      "apps/playground/vitest.config.ts",
     ],
     coverage: {
       provider: "v8",
@@ -12,7 +12,7 @@ export default defineConfig({
       reportsDirectory: "./coverage",
       include: [
         "packages/*/src/**/*.{ts,tsx}",
-        "apps/playground/*/src/**/*.{ts,tsx}",
+        "apps/playground/src/**/*.{ts,tsx}",
       ],
       exclude: ["**/src/**/index.ts", "**/*.d.ts"],
     },

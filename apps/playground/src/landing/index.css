@@ -1,0 +1,99 @@
+:root {
+  color-scheme: light;
+  --landing-bg: #f6f6f0;
+  --landing-ink: #102033;
+  --landing-muted: #55657a;
+  --landing-card: rgba(255, 255, 255, 0.84);
+  --landing-border: rgba(16, 32, 51, 0.12);
+  --landing-accent: #0f766e;
+  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--landing-ink);
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(15, 118, 110, 0.22),
+      transparent 34%
+    ),
+    linear-gradient(180deg, #fffef8, var(--landing-bg));
+}
+
+a {
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.landing-shell {
+  width: min(960px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 72px 0 96px;
+}
+
+.landing-hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  line-height: 0.95;
+}
+
+.landing-kicker {
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  color: var(--landing-accent);
+}
+
+.landing-copy {
+  max-width: 54rem;
+  margin: 0 0 32px;
+  color: var(--landing-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.landing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.landing-card a {
+  display: grid;
+  gap: 10px;
+  min-height: 160px;
+  padding: 20px;
+  border: 1px solid var(--landing-border);
+  border-radius: 24px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--landing-card);
+  backdrop-filter: blur(16px);
+}
+
+.landing-card strong {
+  font-size: 1.1rem;
+}
+
+.landing-card span {
+  color: var(--landing-muted);
+  line-height: 1.6;
+}
+
+.landing-card a:hover {
+  border-color: rgba(15, 118, 110, 0.34);
+  transform: translateY(-1px);
+}

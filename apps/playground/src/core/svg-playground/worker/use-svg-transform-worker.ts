@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
-import type { TransformFn } from "./types";
-import { createTransformWorkerClient } from "./worker-client";
+import type { TransformFn } from "../model";
+import { createTransformWorkerClient } from "./svg-transform-worker-client";
 
-export const useWorkerTransform = (): TransformFn | null => {
+export const useWorkerTransform = (workerUrl: URL): TransformFn | null => {
   const [transform, setTransform] = useState<TransformFn | null>(null);
 
   useEffect(() => {
-    const client = createTransformWorkerClient();
+    const client = createTransformWorkerClient(workerUrl);
 
     setTransform(() => {
       return client.transform;
@@ -16,7 +16,7 @@ export const useWorkerTransform = (): TransformFn | null => {
     return () => {
       client.dispose();
     };
-  }, []);
+  }, [workerUrl]);
 
   return transform;
 };

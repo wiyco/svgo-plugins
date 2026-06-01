@@ -2,13 +2,15 @@ import { transformSync } from "@babel/core";
 import transformReactJsx from "@babel/plugin-transform-react-jsx";
 import { transform as transformSvgToComponent } from "@svgr/core";
 import jsxPlugin from "@svgr/plugin-jsx";
-import { createHoistStrokeWidthPlugin } from "@wiyco/svgo-plugin-hoist-stroke-width";
-import { optimize } from "svgo/browser";
 
-import { createPreviewComponentFromJs } from "./preview-component";
+import type { SvgTransformRequest, SvgTransformResult } from "../model";
+import { createPreviewComponentFromJs } from "../preview/create-preview-component";
 import { createBareComponentTemplate } from "./svgr-template";
-import type { SvgTransformRequest, SvgTransformResult } from "./types";
 import { getUnsafeSvgReason } from "./unsafe-svg";
+
+type SvgTransformPipeline = {
+  optimizeSvg: (svg: string) => Promise<string> | string;
+};
 
 const getErrorMessage = (error: unknown): string => {
   if (error instanceof Error) {
@@ -16,12 +18,6 @@ const getErrorMessage = (error: unknown): string => {
   }
 
   return "Unexpected transform failure.";
-};
-
-export const optimizeSvgMarkup = (svg: string): string => {
-  return optimize(svg, {
-    plugins: [createHoistStrokeWidthPlugin()],
-  }).data;
 };
 
 export const svgToReactSource = async (svg: string): Promise<string> => {
@@ -71,35 +67,35 @@ export const jsxToPreviewModule = (reactSource: string): string => {
   return transformed.code?.trim() ?? "";
 };
 
-export const transformSvgRequest = async ({
-  svg,
-}: SvgTransformRequest): Promise<SvgTransformResult> => {
-  const unsafeReason = getUnsafeSvgReason(svg);
+export const createSvgTransformRequestHandler =
+  ({ optimizeSvg }: SvgTransformPipeline) =>
+  async ({ svg }: SvgTransformRequest): Promise<SvgTransformResult> => {
+    const unsafeReason = getUnsafeSvgReason(svg);
 
-  if (unsafeReason !== null) {
-    return {
-      kind: "unsafe",
-      reason: unsafeReason,
-    };
-  }
+    if (unsafeReason !== null) {
+      return {
+        kind: "unsafe",
+        reason: unsafeReason,
+      };
+    }
 
-  try {
-    const optimizedSvg = optimizeSvgMarkup(svg);
-    const reactSource = await svgToReactSource(optimizedSvg);
-    const previewCode = jsxToPreviewModule(reactSource);
+    try {
+      const optimizedSvg = await optimizeSvg(svg);
+      const reactSource = await svgToReactSource(optimizedSvg);
+      const previewCode = jsxToPreviewModule(reactSource);
 
-    createPreviewComponentFromJs(previewCode);
+      createPreviewComponentFromJs(previewCode);
 
-    return {
-      kind: "success",
-      optimizedSvg,
-      previewCode,
-      reactSource,
-    };
-  } catch (error) {
-    return {
-      kind: "error",
-      message: getErrorMessage(error),
-    };
-  }
-};
+      return {
+        kind: "success",
+        optimizedSvg,
+        previewCode,
+        reactSource,
+      };
+    } catch (error) {
+      return {
+        kind: "error",
+        message: getErrorMessage(error),
+      };
+    }
+  };

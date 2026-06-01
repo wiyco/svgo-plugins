@@ -1,8 +1,8 @@
 import { createRoot } from "react-dom/client";
 
-import App from "./App";
+import { LandingPage } from "../landing/LandingPage";
 
-import "./index.css";
+import "../landing/index.css";
 
 const rootElement = document.getElementById("root");
 
@@ -10,4 +10,4 @@ if (rootElement === null) {
   throw new Error("Missing #root element");
 }
 
-createRoot(rootElement).render(<App />);
+createRoot(rootElement).render(<LandingPage />);

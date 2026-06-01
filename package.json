@@ -3,10 +3,10 @@
   "private": true,
   "scripts": {
     "typecheck": "tsc -b",
-    "typecheck:playgrounds": "pnpm --filter \"./apps/playground/*\" typecheck",
-    "dev:playground:svgo-plugin-hoist-stroke-width": "pnpm --filter @wiyco/playground-svgo-plugin-hoist-stroke-width dev",
+    "typecheck:playground": "pnpm --filter ./apps/playground typecheck",
+    "dev:playground": "pnpm --filter ./apps/playground dev",
     "build": "pnpm -r build",
-    "build:playgrounds": "node ./scripts/build-playgrounds.mjs",
+    "build:playground": "node ./scripts/build-playground.mjs",
     "lint": "oxlint -c .oxlintrc.json .",
     "lint:fix": "oxlint -c .oxlintrc.json --fix .",
     "format": "oxfmt -c .oxfmtrc.json .",

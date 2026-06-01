@@ -1,11 +1,9 @@
-import type { PlaygroundQueryState } from "./types";
-
-export type SvgPreset = {
-  description: string;
-  id: string;
-  label: string;
-  svg: string;
-};
+import type {
+  PlaygroundQueryState,
+  SvgPlaygroundDefinition,
+  SvgPreset,
+} from "../../core/svg-playground/model";
+import { createPlaygroundStateCodec } from "../../core/svg-playground/state/playground-state-codec";
 
 export const SVG_PRESETS: SvgPreset[] = [
   {
@@ -51,18 +49,18 @@ export const DEFAULT_QUERY_STATE: PlaygroundQueryState = {
   strokeWidth: 2,
 };
 
-export const findPresetById = (presetId: string): SvgPreset | null => {
-  return (
-    SVG_PRESETS.find((preset) => {
-      return preset.id === presetId;
-    }) ?? null
-  );
-};
+const playgroundStateCodec = createPlaygroundStateCodec(DEFAULT_QUERY_STATE);
 
-export const getPresetIdForSvg = (svg: string): string | null => {
-  return (
-    SVG_PRESETS.find((preset) => {
-      return preset.svg === svg;
-    })?.id ?? null
-  );
+export const hoistStrokeWidthPlayground: SvgPlaygroundDefinition = {
+  defaultState: DEFAULT_QUERY_STATE,
+  description:
+    "Built from the shared apps/playground app and published at a slug-based URL. Paste SVG, swap presets, and inspect the full runtime pipeline from SVGO through live React preview.",
+  eyebrow: "Package Playground",
+  parseState: playgroundStateCodec.parse,
+  presets: SVG_PRESETS,
+  serializeState: playgroundStateCodec.serialize,
+  slug: "svgo-plugin-hoist-stroke-width",
+  summary:
+    "Try the hoist-stroke-width plugin against raw SVG input and inspect the optimized output, generated React source, and live preview.",
+  title: "SVGO plugin playground for hoisting stroke width",
 };

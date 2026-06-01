@@ -2,6 +2,25 @@ import type { ComponentType, SVGProps } from "react";
 
 export type PreviewComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
+export type SvgPreset = {
+  description: string;
+  id: string;
+  label: string;
+  svg: string;
+};
+
+export type SvgPlaygroundDefinition = {
+  defaultState: PlaygroundQueryState;
+  description: string;
+  eyebrow: string;
+  presets: SvgPreset[];
+  slug: string;
+  summary: string;
+  title: string;
+  parseState: (search: string) => PlaygroundQueryState;
+  serializeState: (state: PlaygroundQueryState) => string;
+};
+
 export type PlaygroundQueryState = {
   svg: string;
   color: string;

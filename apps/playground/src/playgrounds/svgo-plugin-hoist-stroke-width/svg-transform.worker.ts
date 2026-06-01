@@ -1,7 +1,10 @@
 /// <reference lib="webworker" />
 
-import { transformSvgRequest } from "./lib/transform-pipeline";
-import type { WorkerRequestMessage, WorkerResponseMessage } from "./lib/types";
+import type {
+  WorkerRequestMessage,
+  WorkerResponseMessage,
+} from "../../core/svg-playground/model";
+import { transformSvgRequest } from "./transform-svg-request";
 
 const workerScope = self as DedicatedWorkerGlobalScope;
 

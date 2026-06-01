@@ -7,40 +7,61 @@ import {
   useState,
 } from "react";
 
-import {
-  DEFAULT_QUERY_STATE,
-  findPresetById,
-  getPresetIdForSvg,
-  SVG_PRESETS,
-} from "./lib/presets";
-import { createPreviewComponentFromJs } from "./lib/preview-component";
 import type {
   PlaygroundQueryState,
   PreviewComponent,
+  SvgPlaygroundDefinition,
   TransformFn,
-} from "./lib/types";
-import {
-  parsePlaygroundState,
-  serializePlaygroundState,
-} from "./lib/url-state";
-import { useWorkerTransform } from "./lib/use-worker-transform";
+} from "../model";
+import { createPreviewComponentFromJs } from "../preview/create-preview-component";
+import { useWorkerTransform } from "../worker/use-svg-transform-worker";
 
 const PREVIEW_BLOCKED_MESSAGE = "Preview disabled for unsafe SVG input.";
 
-type SvgPlaygroundProps = {
+type SvgPlaygroundPageProps = {
+  definition: SvgPlaygroundDefinition;
   transform: TransformFn;
+};
+
+type SvgPlaygroundAppProps = {
+  definition: SvgPlaygroundDefinition;
+  workerUrl: URL;
 };
 
 const createEmptyPreview = (): PreviewComponent | null => {
   return null;
 };
 
-const loadInitialState = (): PlaygroundQueryState => {
+const findPresetById = (
+  definition: SvgPlaygroundDefinition,
+  presetId: string,
+) => {
+  return (
+    definition.presets.find((preset) => {
+      return preset.id === presetId;
+    }) ?? null
+  );
+};
+
+const getPresetIdForSvg = (
+  definition: SvgPlaygroundDefinition,
+  svg: string,
+): string | null => {
+  return (
+    definition.presets.find((preset) => {
+      return preset.svg === svg;
+    })?.id ?? null
+  );
+};
+
+const loadInitialState = (
+  definition: SvgPlaygroundDefinition,
+): PlaygroundQueryState => {
   if (typeof window === "undefined") {
-    return DEFAULT_QUERY_STATE;
+    return definition.defaultState;
   }
 
-  return parsePlaygroundState(window.location.search);
+  return definition.parseState(window.location.search);
 };
 
 const formatNumberLabel = (value: number): string => {
@@ -55,9 +76,13 @@ const renderPanelFallback = (message: string) => {
   return <p className="panel-empty">{message}</p>;
 };
 
-export const SvgPlayground = ({ transform }: SvgPlaygroundProps) => {
-  const [queryState, setQueryState] =
-    useState<PlaygroundQueryState>(loadInitialState);
+export const SvgPlaygroundPage = ({
+  definition,
+  transform,
+}: SvgPlaygroundPageProps) => {
+  const [queryState, setQueryState] = useState<PlaygroundQueryState>(() => {
+    return loadInitialState(definition);
+  });
   const [copyStatus, setCopyStatus] = useState("");
   const [optimizedSvg, setOptimizedSvg] = useState("");
   const [previewComponent, setPreviewComponent] =
@@ -69,7 +94,7 @@ export const SvgPlayground = ({ transform }: SvgPlaygroundProps) => {
   const [statusMessage, setStatusMessage] = useState("");
   const deferredSvg = useDeferredValue(queryState.svg);
   const latestRequestIdRef = useRef(0);
-  const activePresetId = getPresetIdForSvg(queryState.svg);
+  const activePresetId = getPresetIdForSvg(definition, queryState.svg);
 
   const applyTransform = useEffectEvent(
     async (svg: string, requestId: number) => {
@@ -123,11 +148,11 @@ export const SvgPlayground = ({ transform }: SvgPlaygroundProps) => {
       return;
     }
 
-    const search = serializePlaygroundState(queryState);
+    const search = definition.serializeState(queryState);
     const nextUrl = search ? `?${search}` : window.location.pathname;
 
     window.history.replaceState(null, "", nextUrl);
-  }, [queryState]);
+  }, [definition, queryState]);
 
   useEffect(() => {
     const svg = deferredSvg.trim();
@@ -167,7 +192,7 @@ export const SvgPlayground = ({ transform }: SvgPlaygroundProps) => {
   };
 
   const handlePresetSelect = (presetId: string): void => {
-    const preset = findPresetById(presetId);
+    const preset = findPresetById(definition, presetId);
 
     if (preset === null) {
       return;
@@ -200,15 +225,9 @@ export const SvgPlayground = ({ transform }: SvgPlaygroundProps) => {
     <main className="app-shell">
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">Package Playground</p>
-          <h1>SVGO plugin playground for hoisting stroke width</h1>
-          <p className="hero-body">
-            The app lives under{" "}
-            <code>apps/playground/svgo-plugin-hoist-stroke-width</code>
-            while its published URL stays slug-based. Paste SVG, swap presets,
-            and inspect the full runtime pipeline from SVGO through live React
-            preview.
-          </p>
+          <p className="eyebrow">{definition.eyebrow}</p>
+          <h1>{definition.title}</h1>
+          <p className="hero-body">{definition.description}</p>
         </div>
         <div className="hero-actions">
           <button
@@ -228,7 +247,7 @@ export const SvgPlayground = ({ transform }: SvgPlaygroundProps) => {
         <div className="preset-cluster">
           <span className="controls-label">Presets</span>
           <div className="preset-list">
-            {SVG_PRESETS.map((preset) => {
+            {definition.presets.map((preset) => {
               return (
                 <button
                   key={preset.id}
@@ -432,8 +451,11 @@ export const SvgPlayground = ({ transform }: SvgPlaygroundProps) => {
   );
 };
 
-const App = () => {
-  const transform = useWorkerTransform();
+export const SvgPlaygroundApp = ({
+  definition,
+  workerUrl,
+}: SvgPlaygroundAppProps) => {
+  const transform = useWorkerTransform(workerUrl);
 
   if (transform === null) {
     return (
@@ -447,7 +469,5 @@ const App = () => {
     );
   }
 
-  return <SvgPlayground transform={transform} />;
+  return <SvgPlaygroundPage definition={definition} transform={transform} />;
 };
-
-export default App;

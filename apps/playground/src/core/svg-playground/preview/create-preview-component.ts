@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import type { PreviewComponent } from "./types";
+import type { PreviewComponent } from "../model";
 
 export const PREVIEW_COMPONENT_NAME = "SvgComponent";
 

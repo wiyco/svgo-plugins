@@ -2,20 +2,17 @@ import type {
   WorkerRequestMessage,
   WorkerResponseMessage,
   WorkerTransformClient,
-} from "./types";
+} from "../model";
 
 type PendingRequest = {
   reject: (reason?: unknown) => void;
   resolve: (value: WorkerResponseMessage["payload"]) => void;
 };
 
-export const createTransformWorkerClient = (): WorkerTransformClient => {
-  const worker = new Worker(
-    new URL("../transform.worker.ts", import.meta.url),
-    {
-      type: "module",
-    },
-  );
+export const createTransformWorkerClient = (
+  workerUrl: URL,
+): WorkerTransformClient => {
+  const worker = new Worker(workerUrl, { type: "module" });
   let nextRequestId = 0;
   const pendingRequests = new Map<number, PendingRequest>();
 

@@ -8,7 +8,7 @@ export const createPlaygroundPackageSourceAliases = (configFileUrl, slugs) => {
     slugs.map((slug) => {
       return [
         `@wiyco/${slug}`,
-        resolve(appDir, `../../../packages/${slug}/src/index.ts`),
+        resolve(appDir, `../../packages/${slug}/src/index.ts`),
       ];
     }),
   );

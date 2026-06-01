@@ -6,7 +6,7 @@ export default mergeConfig(
   viteConfig,
   defineProject({
     test: {
-      name: "playground-svgo-plugin-hoist-stroke-width",
+      name: "playground",
       environment: "happy-dom",
       include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     },

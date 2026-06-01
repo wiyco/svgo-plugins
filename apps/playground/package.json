@@ -1,5 +1,5 @@
 {
-  "name": "@wiyco/playground-svgo-plugin-hoist-stroke-width",
+  "name": "@wiyco/svgo-plugins-playground",
   "private": true,
   "type": "module",
   "scripts": {

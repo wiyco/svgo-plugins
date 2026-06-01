@@ -1,0 +1,35 @@
+{
+  "name": "svgo-plugins-playground",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc -b tsconfig.json"
+  },
+  "dependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/plugin-transform-react-jsx": "^7.29.7",
+    "@svgr/core": "8.1.0",
+    "@svgr/plugin-jsx": "8.1.0",
+    "@svgr/plugin-svgo": "8.1.0",
+    "@wiyco/svgo-plugin-hoist-stroke-width": "workspace:*",
+    "lz-string": "^1.5.0",
+    "oxc-transform": "0.133.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "svgo": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "happy-dom": "20.9.0",
+    "typescript": "^6.0.3",
+    "vite": "8.0.14",
+    "vitest": "^4.1.7"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

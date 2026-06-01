@@ -38,6 +38,22 @@ describe("svg-transform-pipeline", () => {
     expect(optimizeSvg).not.toHaveBeenCalled();
   });
 
+  it("blocks remote URLs before running the rest of the pipeline", async () => {
+    const optimizeSvg = vi.fn<(svg: string) => string>((svg) => svg);
+    const transformSvgRequest = createSvgTransformRequestHandler({
+      optimizeSvg,
+    });
+    const result = await transformSvgRequest({
+      svg: `<svg viewBox="0 0 24 24"><image href="https://example.com/icon.svg" /></svg>`,
+    });
+
+    expect(result).toMatchObject({
+      kind: "unsafe",
+      reason: expect.stringContaining("Remote URLs"),
+    });
+    expect(optimizeSvg).not.toHaveBeenCalled();
+  });
+
   it("returns the original error message when optimization fails", async () => {
     const transformSvgRequest = createSvgTransformRequestHandler({
       optimizeSvg: () => {

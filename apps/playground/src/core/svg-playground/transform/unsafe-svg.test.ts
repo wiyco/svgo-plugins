@@ -17,6 +17,11 @@ describe("unsafe-svg", () => {
     [`<svg><path onclick="alert(1)" /></svg>`, "Inline event handlers"],
     [`<svg><a href="javascript:alert(1)">x</a></svg>`, "javascript: URLs"],
     [`<svg><a href="data:text/html;base64,WA==">x</a></svg>`, "HTML data URLs"],
+    [`<svg><image href="https://example.com/icon.svg" /></svg>`, "Remote URLs"],
+    [
+      `<svg><use xlink:href="//example.com/sprite.svg#icon" /></svg>`,
+      "Remote URLs",
+    ],
   ])("flags unsafe markup: %s", (svg, messageFragment) => {
     expect(getUnsafeSvgReason(svg)).toContain(messageFragment);
   });

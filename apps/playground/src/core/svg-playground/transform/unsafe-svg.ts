@@ -20,6 +20,10 @@ const UNSAFE_SVG_RULES = [
     reason: "HTML data URLs are blocked in the playground preview.",
     pattern: /\b(?:href|xlink:href)\s*=\s*['"]?\s*data:text\/html/i,
   },
+  {
+    reason: "Remote URLs are blocked in the playground preview.",
+    pattern: /\b(?:href|xlink:href)\s*=\s*['"]?\s*(?:https?:)?\/\//i,
+  },
 ];
 
 export const getUnsafeSvgReason = (svg: string): string | null => {

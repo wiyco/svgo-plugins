@@ -147,6 +147,58 @@ describe("hoist stroke width playground", () => {
     expect(previewSvg).not.toBeNull();
   });
 
+  it("ignores preset clicks when the clicked button has no preset id", async () => {
+    renderedApp = await renderPlayground(createTransformStub());
+
+    const mixedPresetButton = Array.from(
+      renderedApp.container.querySelectorAll<HTMLButtonElement>(
+        ".preset-button",
+      ),
+    ).find((button) => {
+      return button.textContent?.includes("Mixed Weights") ?? false;
+    });
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
+    const initialSvg = textarea?.value;
+
+    mixedPresetButton?.removeAttribute("data-preset-id");
+
+    await act(async () => {
+      mixedPresetButton?.click();
+      await flush();
+    });
+
+    expect(textarea?.value).toBe(initialSvg);
+    expect(textarea?.value).not.toContain('stroke-width="2.5"');
+  });
+
+  it("ignores preset clicks when the preset id does not exist", async () => {
+    renderedApp = await renderPlayground(createTransformStub());
+
+    const mixedPresetButton = Array.from(
+      renderedApp.container.querySelectorAll<HTMLButtonElement>(
+        ".preset-button",
+      ),
+    ).find((button) => {
+      return button.textContent?.includes("Mixed Weights") ?? false;
+    });
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
+    const initialSvg = textarea?.value;
+
+    mixedPresetButton?.setAttribute("data-preset-id", "missing-preset");
+
+    await act(async () => {
+      mixedPresetButton?.click();
+      await flush();
+    });
+
+    expect(textarea?.value).toBe(initialSvg);
+    expect(textarea?.value).not.toContain('stroke-width="2.5"');
+  });
+
   it("loads its initial state from the query string and keeps the URL in sync", async () => {
     const serialized = hoistStrokeWidthPlayground.serializeState({
       color: "#0f766e",

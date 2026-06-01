@@ -18,6 +18,8 @@ See the package README for the public API and usage examples.
 ├─ packages/
 │  └─ svgo-plugin-hoist-stroke-width/
 └─ apps/
+   └─ playground/
+      └─ svgo-plugin-hoist-stroke-width/
 ```
 
-> `apps/*` is reserved for future playgrounds and end-to-end fixtures. For now, the repository only contains the package intended for publication.
+`packages/<slug>` and `apps/playground/<slug>` are paired 1:1. The repository path for each playground stays nested under `apps/playground/`, while the published GitHub Pages URL remains slug-based at `/<slug>/`.

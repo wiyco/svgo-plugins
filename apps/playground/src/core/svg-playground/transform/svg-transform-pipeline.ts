@@ -4,6 +4,7 @@ import { transform as transformSvgToComponent } from "@svgr/core";
 import jsxPlugin from "@svgr/plugin-jsx";
 
 import type { SvgTransformRequest, SvgTransformResult } from "../model";
+
 import { createPreviewComponentFromJs } from "../preview/create-preview-component";
 import { createBareComponentTemplate } from "./svgr-template";
 import { getUnsafeSvgReason } from "./unsafe-svg";

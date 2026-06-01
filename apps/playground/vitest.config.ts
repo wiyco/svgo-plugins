@@ -1,4 +1,4 @@
-import { mergeConfig, defineProject } from "vitest/config";
+import { defineProject, mergeConfig } from "vitest/config";
 
 import viteConfig from "./vite.config";
 

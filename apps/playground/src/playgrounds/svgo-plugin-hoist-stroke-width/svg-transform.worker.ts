@@ -4,6 +4,7 @@ import type {
   WorkerRequestMessage,
   WorkerResponseMessage,
 } from "../../core/svg-playground/model";
+
 import { transformSvgRequest } from "./transform-svg-request";
 
 const workerScope = self as DedicatedWorkerGlobalScope;

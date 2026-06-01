@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { WorkerRequestMessage, WorkerResponseMessage } from "../model";
+
 import { createTransformWorkerClient } from "./svg-transform-worker-client";
 
 type WorkerListener = (event: MessageEvent<WorkerResponseMessage>) => void;

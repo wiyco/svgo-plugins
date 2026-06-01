@@ -1,8 +1,9 @@
 import { act } from "react";
-import { createRoot, type Root } from "react-dom/client";
+import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TransformFn } from "../../core/svg-playground/model";
+
 import { SvgPlaygroundPage } from "../../core/svg-playground/ui/SvgPlaygroundPage";
 import { hoistStrokeWidthPlayground } from "./definition";
 

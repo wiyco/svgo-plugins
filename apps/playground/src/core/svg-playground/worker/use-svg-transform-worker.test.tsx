@@ -1,8 +1,10 @@
 import { act } from "react";
-import { createRoot, type Root } from "react-dom/client";
+import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TransformFn, WorkerTransformClient } from "../model";
+
+import { useWorkerTransform } from "./use-svg-transform-worker";
 
 const { createTransformWorkerClient } = vi.hoisted(() => {
   return {
@@ -16,8 +18,6 @@ vi.mock("./svg-transform-worker-client", () => {
     createTransformWorkerClient,
   };
 });
-
-import { useWorkerTransform } from "./use-svg-transform-worker";
 
 type HarnessProps = {
   workerUrl: URL;

@@ -1,9 +1,11 @@
 import { act } from "react";
-import { createRoot, type Root } from "react-dom/client";
+import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { hoistStrokeWidthPlayground } from "../../../playgrounds/svgo-plugin-hoist-stroke-width/definition";
 import type { TransformFn } from "../model";
+
+import { hoistStrokeWidthPlayground } from "../../../playgrounds/svgo-plugin-hoist-stroke-width/definition";
+import { SvgPlaygroundApp } from "./SvgPlaygroundPage";
 
 const { useWorkerTransform } = vi.hoisted(() => {
   return {
@@ -16,8 +18,6 @@ vi.mock("../worker/use-svg-transform-worker", () => {
     useWorkerTransform,
   };
 });
-
-import { SvgPlaygroundApp } from "./SvgPlaygroundPage";
 
 const flush = async (): Promise<void> => {
   await Promise.resolve();

@@ -3,6 +3,7 @@ import type {
   SvgPlaygroundDefinition,
   SvgPreset,
 } from "../../core/svg-playground/model";
+
 import { createPlaygroundStateCodec } from "../../core/svg-playground/state/playground-state-codec";
 
 export const SVG_PRESETS = [

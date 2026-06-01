@@ -1,8 +1,10 @@
 import { act } from "react";
-import { createRoot, type Root } from "react-dom/client";
+import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SvgPlaygroundDefinition } from "../../core/svg-playground/model";
+
+import App from "./App";
 import { hoistStrokeWidthPlayground } from "./definition";
 
 const { SvgPlaygroundApp } = vi.hoisted(() => {
@@ -23,8 +25,6 @@ vi.mock("../../core/svg-playground/ui/SvgPlaygroundPage", () => {
     SvgPlaygroundApp,
   };
 });
-
-import App from "./App";
 
 const flush = async (): Promise<void> => {
   await Promise.resolve();

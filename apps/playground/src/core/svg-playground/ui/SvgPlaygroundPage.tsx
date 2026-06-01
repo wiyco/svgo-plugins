@@ -1,8 +1,12 @@
+import type { ChangeEvent, MouseEvent } from "react";
+
 import {
   startTransition,
+  useCallback,
   useDeferredValue,
   useEffect,
   useEffectEvent,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -14,10 +18,15 @@ import type {
   SvgPreset,
   TransformFn,
 } from "../model";
+
 import { createPreviewComponentFromJs } from "../preview/create-preview-component";
 import { useWorkerTransform } from "../worker/use-svg-transform-worker";
 
 const PREVIEW_BLOCKED_MESSAGE = "Preview disabled for unsafe SVG input.";
+const INPUT_PANEL_STYLE = { animationDelay: "0ms" };
+const OPTIMIZED_PANEL_STYLE = { animationDelay: "70ms" };
+const REACT_SOURCE_PANEL_STYLE = { animationDelay: "140ms" };
+const PREVIEW_PANEL_STYLE = { animationDelay: "210ms" };
 
 type SvgPlaygroundPageProps = {
   definition: SvgPlaygroundDefinition;
@@ -155,33 +164,39 @@ export const SvgPlaygroundPage = ({
     void applyTransform(svg, requestId);
   }, [deferredSvg, transform]);
 
-  const updateQueryState = (nextState: Partial<PlaygroundQueryState>): void => {
-    setQueryState((currentState) => {
-      return {
-        ...currentState,
-        ...nextState,
-      };
-    });
-  };
+  const updateQueryState = useCallback(
+    (nextState: Partial<PlaygroundQueryState>): void => {
+      setQueryState((currentState) => {
+        return {
+          ...currentState,
+          ...nextState,
+        };
+      });
+    },
+    [],
+  );
 
-  const adjustStrokeWidth = (delta: number): void => {
+  const adjustStrokeWidth = useCallback((delta: number): void => {
     setQueryState((currentState) => {
       return {
         ...currentState,
         strokeWidth: clamp(currentState.strokeWidth + delta, 0.5, 8),
       };
     });
-  };
+  }, []);
 
-  const handlePresetSelect = (preset: SvgPreset): void => {
-    startTransition(() => {
-      updateQueryState({
-        svg: preset.svg,
+  const handlePresetSelect = useCallback(
+    (preset: SvgPreset): void => {
+      startTransition(() => {
+        updateQueryState({
+          svg: preset.svg,
+        });
       });
-    });
-  };
+    },
+    [updateQueryState],
+  );
 
-  const copyShareUrl = async (): Promise<void> => {
+  const copyShareUrl = useCallback(async (): Promise<void> => {
     if (navigator.clipboard?.writeText === undefined) {
       setCopyStatus("Clipboard unavailable");
       return;
@@ -193,9 +208,79 @@ export const SvgPlaygroundPage = ({
     } catch {
       setCopyStatus("Copy failed");
     }
-  };
+  }, []);
 
   const Preview = previewComponent;
+  const previewStyle = useMemo(() => {
+    return { color: queryState.color };
+  }, [queryState.color]);
+
+  const handleCopyShareUrlClick = useCallback((): void => {
+    void copyShareUrl();
+  }, [copyShareUrl]);
+
+  const handlePresetButtonClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>): void => {
+      const presetId = event.currentTarget.dataset.presetId;
+
+      if (presetId === undefined) {
+        return;
+      }
+
+      const preset = definition.presets.find((candidate) => {
+        return candidate.id === presetId;
+      });
+
+      if (preset !== undefined) {
+        handlePresetSelect(preset);
+      }
+    },
+    [definition.presets, handlePresetSelect],
+  );
+
+  const handleDecreaseStrokeWidthClick = useCallback((): void => {
+    adjustStrokeWidth(-0.5);
+  }, [adjustStrokeWidth]);
+
+  const handleIncreaseStrokeWidthClick = useCallback((): void => {
+    adjustStrokeWidth(0.5);
+  }, [adjustStrokeWidth]);
+
+  const handleStrokeWidthChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      updateQueryState({
+        strokeWidth: clamp(Number(event.currentTarget.value), 0.5, 8),
+      });
+    },
+    [updateQueryState],
+  );
+
+  const handleSizeChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      updateQueryState({
+        size: Number(event.currentTarget.value),
+      });
+    },
+    [updateQueryState],
+  );
+
+  const handleColorChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      updateQueryState({
+        color: event.currentTarget.value,
+      });
+    },
+    [updateQueryState],
+  );
+
+  const handleSvgChange = useCallback(
+    (event: ChangeEvent<HTMLTextAreaElement>): void => {
+      updateQueryState({
+        svg: event.currentTarget.value,
+      });
+    },
+    [updateQueryState],
+  );
 
   return (
     <main className="app-shell">
@@ -209,7 +294,7 @@ export const SvgPlaygroundPage = ({
           <button
             className="share-button"
             type="button"
-            onClick={() => void copyShareUrl()}
+            onClick={handleCopyShareUrlClick}
           >
             Copy share URL
           </button>
@@ -229,10 +314,9 @@ export const SvgPlaygroundPage = ({
                   key={preset.id}
                   aria-pressed={activePresetId === preset.id}
                   className="preset-button"
+                  data-preset-id={preset.id}
                   type="button"
-                  onClick={() => {
-                    handlePresetSelect(preset);
-                  }}
+                  onClick={handlePresetButtonClick}
                 >
                   <span>{preset.label}</span>
                   <small>{preset.description}</small>
@@ -249,9 +333,7 @@ export const SvgPlaygroundPage = ({
               <button
                 aria-label="Decrease strokeWidth"
                 type="button"
-                onClick={() => {
-                  adjustStrokeWidth(-0.5);
-                }}
+                onClick={handleDecreaseStrokeWidthClick}
               >
                 -
               </button>
@@ -263,22 +345,12 @@ export const SvgPlaygroundPage = ({
                 step="0.5"
                 type="number"
                 value={queryState.strokeWidth}
-                onChange={(event) => {
-                  updateQueryState({
-                    strokeWidth: clamp(
-                      Number(event.currentTarget.value),
-                      0.5,
-                      8,
-                    ),
-                  });
-                }}
+                onChange={handleStrokeWidthChange}
               />
               <button
                 aria-label="Increase strokeWidth"
                 type="button"
-                onClick={() => {
-                  adjustStrokeWidth(0.5);
-                }}
+                onClick={handleIncreaseStrokeWidthClick}
               >
                 +
               </button>
@@ -295,11 +367,7 @@ export const SvgPlaygroundPage = ({
               step="4"
               type="range"
               value={queryState.size}
-              onChange={(event) => {
-                updateQueryState({
-                  size: Number(event.currentTarget.value),
-                });
-              }}
+              onChange={handleSizeChange}
             />
             <output>{Math.round(queryState.size)}px</output>
           </label>
@@ -310,11 +378,7 @@ export const SvgPlaygroundPage = ({
               aria-label="color"
               type="color"
               value={queryState.color}
-              onChange={(event) => {
-                updateQueryState({
-                  color: event.currentTarget.value,
-                });
-              }}
+              onChange={handleColorChange}
             />
             <code>{queryState.color}</code>
           </label>
@@ -322,7 +386,7 @@ export const SvgPlaygroundPage = ({
       </section>
 
       <section className="panel-grid" aria-label="Playground panels">
-        <article className="panel" style={{ animationDelay: "0ms" }}>
+        <article className="panel" style={INPUT_PANEL_STYLE}>
           <div className="panel-header">
             <div>
               <p className="panel-kicker">Input</p>
@@ -334,15 +398,11 @@ export const SvgPlaygroundPage = ({
             className="svg-textarea"
             spellCheck={false}
             value={queryState.svg}
-            onChange={(event) => {
-              updateQueryState({
-                svg: event.currentTarget.value,
-              });
-            }}
+            onChange={handleSvgChange}
           />
         </article>
 
-        <article className="panel" style={{ animationDelay: "70ms" }}>
+        <article className="panel" style={OPTIMIZED_PANEL_STYLE}>
           <div className="panel-header">
             <div>
               <p className="panel-kicker">Output</p>
@@ -363,7 +423,7 @@ export const SvgPlaygroundPage = ({
           )}
         </article>
 
-        <article className="panel" style={{ animationDelay: "140ms" }}>
+        <article className="panel" style={REACT_SOURCE_PANEL_STYLE}>
           <div className="panel-header">
             <div>
               <p className="panel-kicker">Output</p>
@@ -385,7 +445,7 @@ export const SvgPlaygroundPage = ({
           )}
         </article>
 
-        <article className="panel" style={{ animationDelay: "210ms" }}>
+        <article className="panel" style={PREVIEW_PANEL_STYLE}>
           <div className="panel-header">
             <div>
               <p className="panel-kicker">Preview</p>
@@ -398,7 +458,7 @@ export const SvgPlaygroundPage = ({
                 aria-label="Live preview"
                 height={queryState.size}
                 strokeWidth={queryState.strokeWidth}
-                style={{ color: queryState.color }}
+                style={previewStyle}
                 width={queryState.size}
               />
             ) : status === "unsafe" ? (

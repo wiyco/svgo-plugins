@@ -62,6 +62,28 @@ describe("svg-controls", () => {
     ).toBe(false);
   });
 
+  it("can preserve mixed stroke-width values while still applying size and color", () => {
+    const nextSvg = applyControlsToSvg(
+      '<svg viewBox="0 0 24 24"><path d="M0 0L24 24" stroke-width="1.25" /><path d="M24 0L0 24" stroke-width="2.5" /></svg>',
+      {
+        color: "#ff6600",
+        size: 256,
+        strokeWidth: 4,
+      },
+      {
+        preserveStrokeWidthVariations: true,
+      },
+    );
+    const rootElement = parseSvg(nextSvg);
+    const paths = rootElement.querySelectorAll("path");
+
+    expect(rootElement.getAttribute("width")).toBe("256");
+    expect(rootElement.getAttribute("height")).toBe("256");
+    expect(rootElement.getAttribute("style")).toContain("color: #ff6600");
+    expect(paths[0]?.getAttribute("stroke-width")).toBe("1.25");
+    expect(paths[1]?.getAttribute("stroke-width")).toBe("2.5");
+  });
+
   it("extracts root width, style color, and uniform stroke width", () => {
     expect(
       extractControlsFromSvg(

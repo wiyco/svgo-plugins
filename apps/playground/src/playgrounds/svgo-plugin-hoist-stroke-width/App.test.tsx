@@ -431,6 +431,59 @@ describe("hoist stroke width playground", () => {
     );
   });
 
+  it("preserves mixed stroke widths when switching to the mixed preset", async () => {
+    renderedApp = await renderPlayground(createTransformStub());
+
+    const increaseButton =
+      renderedApp.container.querySelector<HTMLButtonElement>(
+        'button[aria-label="Increase strokeWidth"]',
+      );
+    const sizeInput = renderedApp.container.querySelector<HTMLInputElement>(
+      'input[aria-label="size"]',
+    );
+    const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
+      'input[aria-label="color"]',
+    );
+    const mixedPresetButton = findPresetButton(renderedApp.container, "Mixed");
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
+
+    await act(async () => {
+      increaseButton?.click();
+      increaseButton?.click();
+      if (sizeInput !== null) {
+        changeFieldValue(sizeInput, "256");
+      }
+      if (colorInput !== null) {
+        changeFieldValue(colorInput, "#ff6600");
+      }
+      mixedPresetButton?.click();
+      await flush();
+    });
+
+    expect(textarea?.value).toBe(
+      applyControlsToSvg(
+        hoistStrokeWidthPlayground.presets[2]?.svg ?? "",
+        {
+          ...hoistStrokeWidthPlayground.defaultState,
+          color: "#ff6600",
+          size: 256,
+          strokeWidth: 2.5,
+        },
+        {
+          preserveStrokeWidthVariations: true,
+        },
+      ),
+    );
+    expect(textarea?.value).toContain('stroke-width="1.25"');
+    expect(textarea?.value).toContain('stroke-width="2"');
+    expect(textarea?.value).toContain('stroke-width="3"');
+    expect(mixedPresetButton?.getAttribute("aria-pressed")).toBe("true");
+    expect(renderedApp.container.textContent).toContain('data-optimized="mixed"');
+    expect(renderedApp.container.textContent).toContain('data-source="mixed"');
+  });
+
   it("shows loading placeholders first and falls back to idle placeholders for empty input", async () => {
     let resolveTransform: () => void = () => undefined;
     const transform: TransformFn = async () => {

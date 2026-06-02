@@ -29,6 +29,15 @@ const MAX_SIZE = 320;
 const MIN_STROKE_WIDTH = 0.5;
 const MAX_STROKE_WIDTH = 8;
 
+const applyRenderableControlsToSvg = (
+  svg: string,
+  queryState: PlaygroundQueryState,
+): string => {
+  return applyControlsToSvg(svg, queryState, {
+    preserveStrokeWidthVariations: true,
+  });
+};
+
 const getPresetIdForSvg = (
   definition: SvgPlaygroundDefinition,
   svg: string,
@@ -44,7 +53,7 @@ const getPresetIdForSvg = (
 
   return (
     definition.presets.find((preset) => {
-      return applyControlsToSvg(preset.svg, queryState) === svg;
+      return applyRenderableControlsToSvg(preset.svg, queryState) === svg;
     })?.id ?? null
   );
 };
@@ -70,7 +79,7 @@ const normalizeSvgQueryState = (
 ): PlaygroundQueryState => {
   return {
     ...queryState,
-    svg: applyControlsToSvg(queryState.svg, queryState),
+    svg: applyRenderableControlsToSvg(queryState.svg, queryState),
   };
 };
 
@@ -151,7 +160,7 @@ export const useSvgPlaygroundController = (
     }
 
     if (
-      applyControlsToSvg(selectedPreset.svg, renderedQueryState) !==
+      applyRenderableControlsToSvg(selectedPreset.svg, renderedQueryState) !==
       renderedQueryState.svg
     ) {
       setSelectedPresetId(matchedPresetId);
@@ -178,7 +187,7 @@ export const useSvgPlaygroundController = (
 
       return {
         ...normalizedState,
-        svg: applyControlsToSvg(preset.svg, normalizedState),
+        svg: applyRenderableControlsToSvg(preset.svg, normalizedState),
       };
     });
   };
@@ -231,10 +240,16 @@ export const useSvgPlaygroundController = (
       return {
         ...normalizedState,
         size: nextSize,
-        svg: applyControlsToSvg(normalizedState.svg, {
-          ...normalizedState,
-          size: nextSize,
-        }),
+        svg: applyControlsToSvg(
+          normalizedState.svg,
+          {
+            ...normalizedState,
+            size: nextSize,
+          },
+          {
+            preserveStrokeWidthVariations: true,
+          },
+        ),
       };
     });
   };
@@ -246,10 +261,16 @@ export const useSvgPlaygroundController = (
       return {
         ...normalizedState,
         color,
-        svg: applyControlsToSvg(normalizedState.svg, {
-          ...normalizedState,
-          color,
-        }),
+        svg: applyControlsToSvg(
+          normalizedState.svg,
+          {
+            ...normalizedState,
+            color,
+          },
+          {
+            preserveStrokeWidthVariations: true,
+          },
+        ),
       };
     });
   };

@@ -5,6 +5,10 @@ export type SvgControls = Pick<
   "color" | "size" | "strokeWidth"
 >;
 
+type ApplyControlsToSvgOptions = {
+  preserveStrokeWidthVariations?: boolean;
+};
+
 type StyleDeclaration = {
   property: string;
   value: string;
@@ -155,9 +159,31 @@ const getStrokeWidthTargets = (rootElement: Element): Element[] => {
   ];
 };
 
+const hasMixedStrokeWidthValues = (
+  strokeWidthTargets: readonly Element[],
+): boolean => {
+  if (strokeWidthTargets.length <= 1) {
+    return false;
+  }
+
+  const parsedStrokeWidths = strokeWidthTargets.map((target) => {
+    return parseStrokeWidthNumber(target.getAttribute("stroke-width"));
+  });
+  const firstStrokeWidth = parsedStrokeWidths[0] ?? null;
+
+  if (firstStrokeWidth === null) {
+    return true;
+  }
+
+  return parsedStrokeWidths.some((value) => {
+    return value === null || value !== firstStrokeWidth;
+  });
+};
+
 export const applyControlsToSvg = (
   svg: string,
   controls: SvgControls,
+  options: ApplyControlsToSvgOptions = {},
 ): string => {
   const rootElement = getRootSvgElement(svg);
 
@@ -178,6 +204,13 @@ export const applyControlsToSvg = (
   rootElement.removeAttribute("color");
 
   const strokeWidthTargets = getStrokeWidthTargets(rootElement);
+  const shouldPreserveStrokeWidthVariations =
+    options.preserveStrokeWidthVariations === true &&
+    hasMixedStrokeWidthValues(strokeWidthTargets);
+
+  if (shouldPreserveStrokeWidthVariations) {
+    return new XMLSerializer().serializeToString(rootElement);
+  }
 
   if (strokeWidthTargets.length === 0) {
     rootElement.setAttribute("stroke-width", `${controls.strokeWidth}`);

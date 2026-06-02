@@ -15,6 +15,7 @@ const App = () => {
   return null;
 };
 const schedulePlaygroundWarmup = vi.fn<() => void>();
+const installViewTransitionErrorFilter = vi.fn<() => void>();
 
 const mockReactDomClient = () => {
   createRoot.mockReturnValue({
@@ -32,6 +33,7 @@ beforeEach(() => {
   createRoot.mockReset();
   render.mockReset();
   schedulePlaygroundWarmup.mockReset();
+  installViewTransitionErrorFilter.mockReset();
 });
 
 afterEach(() => {
@@ -40,6 +42,7 @@ afterEach(() => {
   vi.doUnmock("../landing/LandingPage");
   vi.doUnmock("../playgrounds/preload-registry");
   vi.doUnmock("../playgrounds/svgo-plugin-hoist-stroke-width/App");
+  vi.doUnmock("../view-transition-runtime");
 });
 
 describe("playground entrypoints", () => {
@@ -55,11 +58,17 @@ describe("playground entrypoints", () => {
         schedulePlaygroundWarmup,
       };
     });
+    vi.doMock("../view-transition-runtime", () => {
+      return {
+        installViewTransitionErrorFilter,
+      };
+    });
 
     document.body.innerHTML = '<div id="root"></div>';
 
     await import("./landing");
 
+    expect(installViewTransitionErrorFilter).toHaveBeenCalledTimes(1);
     expect(createRoot).toHaveBeenCalledWith(document.getElementById("root"));
     expect(render).toHaveBeenCalledTimes(1);
     expect(
@@ -75,6 +84,11 @@ describe("playground entrypoints", () => {
         LandingPage,
       };
     });
+    vi.doMock("../view-transition-runtime", () => {
+      return {
+        installViewTransitionErrorFilter,
+      };
+    });
 
     await expect(import("./landing")).rejects.toThrow("Missing #root element");
   });
@@ -86,11 +100,17 @@ describe("playground entrypoints", () => {
         default: App,
       };
     });
+    vi.doMock("../view-transition-runtime", () => {
+      return {
+        installViewTransitionErrorFilter,
+      };
+    });
 
     document.body.innerHTML = '<div id="root"></div>';
 
     await import("./svgo-plugin-hoist-stroke-width");
 
+    expect(installViewTransitionErrorFilter).toHaveBeenCalledTimes(1);
     expect(createRoot).toHaveBeenCalledWith(document.getElementById("root"));
     expect(render).toHaveBeenCalledTimes(1);
     expect(
@@ -103,6 +123,11 @@ describe("playground entrypoints", () => {
     vi.doMock("../playgrounds/svgo-plugin-hoist-stroke-width/App", () => {
       return {
         default: App,
+      };
+    });
+    vi.doMock("../view-transition-runtime", () => {
+      return {
+        installViewTransitionErrorFilter,
       };
     });
 

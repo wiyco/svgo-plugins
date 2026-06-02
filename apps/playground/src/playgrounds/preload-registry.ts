@@ -8,7 +8,6 @@ type PlaygroundWarmupDefinition = {
 };
 
 type WarmupLinkOptions = {
-  as?: string;
   href: string;
   kind: string;
   rel: string;
@@ -34,7 +33,7 @@ const playgroundWarmupDefinitions: Record<string, PlaygroundWarmupDefinition> =
 const warmupPromises = new Map<string, Promise<void>>();
 
 const ensureWarmupLink = (options: WarmupLinkOptions): HTMLLinkElement => {
-  const { as, href, kind, rel, slug } = options;
+  const { href, kind, rel, slug } = options;
   const selector = [
     `link[data-playground-warmup="${slug}"]`,
     `[data-warmup-kind="${kind}"]`,
@@ -52,10 +51,6 @@ const ensureWarmupLink = (options: WarmupLinkOptions): HTMLLinkElement => {
   link.dataset.playgroundWarmup = slug;
   link.dataset.warmupKind = kind;
 
-  if (as !== undefined) {
-    link.as = as;
-  }
-
   if (rel === "modulepreload") {
     link.crossOrigin = "";
   }
@@ -67,7 +62,6 @@ const ensureWarmupLink = (options: WarmupLinkOptions): HTMLLinkElement => {
 
 const ensurePlaygroundDocumentPrefetch = (slug: string): void => {
   ensureWarmupLink({
-    as: "document",
     href: new URL(`${slug}/`, window.location.href).toString(),
     kind: "document",
     rel: "prefetch",
@@ -80,10 +74,9 @@ const ensurePlaygroundAssetWarmupLinks = (slug: string): void => {
 
   if (definition?.stylesheetHref !== undefined) {
     ensureWarmupLink({
-      as: "style",
       href: definition.stylesheetHref,
       kind: "style",
-      rel: "preload",
+      rel: "prefetch",
       slug,
     });
   }

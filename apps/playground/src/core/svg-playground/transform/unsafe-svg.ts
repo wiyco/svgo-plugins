@@ -22,18 +22,52 @@ const BLOCKED_ELEMENT_REASONS = {
 } as const;
 
 const CSS_URL_PATTERN = /url\(\s*(['"]?)(.*?)\1\s*\)/giu;
-const EVENT_HANDLER_ATTRIBUTE_PATTERN = /^on/i;
+const EVENT_HANDLER_ATTRIBUTE_NAME_PATTERN = /^on/i;
+const EVENT_HANDLER_ATTRIBUTE_PATTERN = /\son[a-z0-9:_-]*\s*=/iu;
 const REFERENCE_ATTRIBUTE_NAMES = new Set(["href", "src", "xlink:href"]);
+const REFERENCE_ATTRIBUTE_PATTERN =
+  /\b(?:href|src|xlink:href)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+)/giu;
+const SVG_ROOT_PATTERN = /<\s*svg\b/iu;
+const BLOCKED_ELEMENT_PATTERNS = [
+  {
+    pattern: /<\s*script\b/iu,
+    reason: SCRIPT_ELEMENT_REASON,
+  },
+  {
+    pattern: /<\s*foreignobject\b/iu,
+    reason: FOREIGN_OBJECT_REASON,
+  },
+  {
+    pattern: /<\s*style\b/iu,
+    reason: STYLE_ELEMENT_REASON,
+  },
+] as const;
+
+const stripWrappingQuotes = (value: string): string => {
+  return value.replace(/^(['"])(.*)\1$/u, "$2");
+};
+
+const extractReferenceAttributeValue = (
+  attributeExpression: string,
+): string => {
+  return stripWrappingQuotes(attributeExpression.replace(/^[^=]*=\s*/u, ""));
+};
 
 const extractCssUrlValue = (cssUrlExpression: string): string => {
-  return cssUrlExpression
-    .replace(/^url\(\s*/iu, "")
-    .replace(/\s*\)$/u, "")
-    .replace(/^(['"])(.*)\1$/u, "$2");
+  return stripWrappingQuotes(
+    cssUrlExpression.replace(/^url\(\s*/iu, "").replace(/\s*\)$/u, ""),
+  );
 };
 
 const getRootSvgElement = (svg: string): Element | null => {
-  const document = new DOMParser().parseFromString(svg, "image/svg+xml");
+  if (typeof globalThis.DOMParser !== "function") {
+    return null;
+  }
+
+  const document = new globalThis.DOMParser().parseFromString(
+    svg,
+    "image/svg+xml",
+  );
   const rootElement = document.documentElement;
 
   return rootElement.tagName.toLowerCase() === "svg" ? rootElement : null;
@@ -85,7 +119,7 @@ const getUnsafeCssUrlReason = (value: string): string | null => {
 const getUnsafeAttributeReason = (attribute: Attr): string | null => {
   const attributeName = attribute.name.toLowerCase();
 
-  if (EVENT_HANDLER_ATTRIBUTE_PATTERN.test(attributeName)) {
+  if (EVENT_HANDLER_ATTRIBUTE_NAME_PATTERN.test(attributeName)) {
     return INLINE_EVENT_HANDLER_REASON;
   }
 
@@ -125,12 +159,39 @@ const getUnsafeElementReason = (element: Element): string | null => {
   return null;
 };
 
-export const getUnsafeSvgReason = (svg: string): string | null => {
-  const rootElement = getRootSvgElement(svg);
-
-  if (rootElement === null) {
+const getFallbackUnsafeSvgReason = (svg: string): string | null => {
+  if (!SVG_ROOT_PATTERN.test(svg)) {
     return null;
   }
 
-  return getUnsafeElementReason(rootElement);
+  for (const { pattern, reason } of BLOCKED_ELEMENT_PATTERNS) {
+    if (pattern.test(svg)) {
+      return reason;
+    }
+  }
+
+  if (EVENT_HANDLER_ATTRIBUTE_PATTERN.test(svg)) {
+    return INLINE_EVENT_HANDLER_REASON;
+  }
+
+  for (const match of svg.matchAll(REFERENCE_ATTRIBUTE_PATTERN)) {
+    const attributeValue = extractReferenceAttributeValue(match[0]);
+    const unsafeReason = getUnsafeReferenceReason(attributeValue);
+
+    if (unsafeReason !== null) {
+      return unsafeReason;
+    }
+  }
+
+  return getUnsafeCssUrlReason(svg);
+};
+
+export const getUnsafeSvgReason = (svg: string): string | null => {
+  const rootElement = getRootSvgElement(svg);
+
+  if (rootElement !== null) {
+    return getUnsafeElementReason(rootElement);
+  }
+
+  return getFallbackUnsafeSvgReason(svg);
 };

@@ -1,6 +1,6 @@
 import { act } from "react";
 import { type Root, createRoot } from "react-dom/client";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SvgPlaygroundDefinition, TransformFn } from "../../model";
 import type { SvgPlaygroundViewModel } from "./svg-playground-controller-types";
@@ -470,6 +470,37 @@ describe("use-svg-playground-controller", () => {
       kind: "unsafe",
       message: "Remote URLs are blocked in the playground preview.",
       optimizedSvg: '<svg><image href="https://example.com/asset.svg" /></svg>',
+    });
+  });
+
+  it("short-circuits worker transforms for unsafe input svg", async () => {
+    const transform = vi.fn<TransformFn>(successTransform);
+    const definition = createDefinition({
+      defaultState: {
+        ...DEFAULT_QUERY_STATE,
+        svg: `<svg><script>alert("blocked")</script></svg>`,
+      },
+      presets: [SVG_PRESETS[3]],
+    });
+
+    window.history.replaceState(
+      {},
+      "",
+      `/?${definition.serializeState(definition.defaultState)}`,
+    );
+
+    await act(async () => {
+      root.render(
+        <ControllerHarness definition={definition} transform={transform} />,
+      );
+      await flush();
+    });
+
+    expect(transform).not.toHaveBeenCalled();
+    expect(latestCanShareUrl).toBe(false);
+    expect(latestTransformState).toEqual({
+      kind: "unsafe",
+      message: "Script elements are blocked in the playground preview.",
     });
   });
 });

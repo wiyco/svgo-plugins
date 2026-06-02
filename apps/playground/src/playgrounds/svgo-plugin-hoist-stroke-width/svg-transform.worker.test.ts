@@ -83,4 +83,31 @@ describe("svg-transform.worker", () => {
       payload: response,
     });
   });
+
+  it("posts error responses when the transform throws", async () => {
+    transformSvgRequest.mockRejectedValue(
+      new Error("Worker parser unavailable"),
+    );
+
+    await import("./svg-transform.worker");
+
+    messageHandler?.({
+      data: {
+        id: 8,
+        payload: {
+          svg: "<svg />",
+        },
+      },
+    } as MessageEvent<WorkerRequestMessage>);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(workerScope.postMessage).toHaveBeenCalledWith({
+      id: 8,
+      payload: {
+        kind: "error",
+        message: "Worker parser unavailable",
+      },
+    });
+  });
 });

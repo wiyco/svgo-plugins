@@ -235,10 +235,9 @@ export const useSvgPlaygroundController = (
   const inputUnsafeReason = useMemo(() => {
     return getUnsafeSvgReason(renderedQueryState.svg);
   }, [renderedQueryState.svg]);
-  const rawTransformState = useSvgTransformState(
-    renderedQueryState.svg,
-    transform,
-  );
+  const transformInputSvg =
+    inputUnsafeReason === null ? renderedQueryState.svg : "";
+  const rawTransformState = useSvgTransformState(transformInputSvg, transform);
   const optimizedSvg =
     rawTransformState.kind === "success" ? rawTransformState.optimizedSvg : "";
   const optimizedSvgUnsafeReason = useMemo(() => {
@@ -271,6 +270,13 @@ export const useSvgPlaygroundController = (
     resolveShareUrl,
   });
   const transformState = useMemo(() => {
+    if (inputUnsafeReason !== null) {
+      return {
+        kind: "unsafe" as const,
+        message: inputUnsafeReason,
+      };
+    }
+
     if (
       rawTransformState.kind === "success" &&
       optimizedSvgUnsafeReason !== null
@@ -283,7 +289,12 @@ export const useSvgPlaygroundController = (
     }
 
     return rawTransformState;
-  }, [optimizedSvg, optimizedSvgUnsafeReason, rawTransformState]);
+  }, [
+    inputUnsafeReason,
+    optimizedSvg,
+    optimizedSvgUnsafeReason,
+    rawTransformState,
+  ]);
   const activePresetId = getActivePresetId({
     definition,
     matchedPresetId,

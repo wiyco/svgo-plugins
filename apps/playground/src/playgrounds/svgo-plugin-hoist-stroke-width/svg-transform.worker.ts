@@ -5,6 +5,7 @@ import type {
   WorkerResponseMessage,
 } from "../../core/svg-playground/model";
 
+import { getErrorMessage } from "../../core/svg-playground/utils/get-error-message";
 import { transformSvgRequest } from "./transform-svg-request";
 
 const workerScope = self as DedicatedWorkerGlobalScope;
@@ -13,12 +14,22 @@ const handleRequest = async ({
   id,
   payload,
 }: WorkerRequestMessage): Promise<void> => {
-  const response = await transformSvgRequest(payload);
+  try {
+    const response = await transformSvgRequest(payload);
 
-  workerScope.postMessage({
-    id,
-    payload: response,
-  } satisfies WorkerResponseMessage);
+    workerScope.postMessage({
+      id,
+      payload: response,
+    } satisfies WorkerResponseMessage);
+  } catch (error) {
+    workerScope.postMessage({
+      id,
+      payload: {
+        kind: "error",
+        message: getErrorMessage(error, "Unexpected transform failure."),
+      },
+    } satisfies WorkerResponseMessage);
+  }
 };
 
 workerScope.addEventListener(

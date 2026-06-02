@@ -109,6 +109,13 @@ themes:
     component-stepper-button-active-background: "rgba(10, 132, 255, 0.08)"
     component-stepper-button-active-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.58)"
     component-stepper-input-background: "rgba(255, 255, 255, 0.88)"
+    component-color-well-background: "rgba(255, 255, 255, 0.92)"
+    component-color-well-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.72)"
+    component-color-well-hover-border-color: "rgba(10, 132, 255, 0.14)"
+    component-color-well-hover-background: "rgba(255, 255, 255, 0.98)"
+    component-color-well-hover-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 8px 18px rgba(16, 20, 24, 0.05)"
+    component-color-well-focus-shadow: "0 0 0 4px var(--color-focus-ring), inset 0 1px 0 rgba(255, 255, 255, 0.82)"
+    component-color-well-swatch-shadow: "inset 0 0 0 1px rgba(16, 20, 24, 0.08)"
     component-slider-track-background: "rgba(16, 20, 24, 0.10)"
     component-slider-thumb-background: "rgba(255, 255, 255, 0.98)"
     component-slider-thumb-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 4px 12px rgba(16, 20, 24, 0.16)"
@@ -213,6 +220,13 @@ themes:
     component-stepper-button-active-background: "rgba(10, 132, 255, 0.16)"
     component-stepper-button-active-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.16)"
     component-stepper-input-background: "rgba(255, 255, 255, 0.12)"
+    component-color-well-background: "rgba(36, 42, 50, 0.92)"
+    component-color-well-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08)"
+    component-color-well-hover-border-color: "rgba(53, 160, 255, 0.28)"
+    component-color-well-hover-background: "rgba(40, 46, 55, 0.98)"
+    component-color-well-hover-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 22px rgba(0, 0, 0, 0.24)"
+    component-color-well-focus-shadow: "0 0 0 4px var(--color-focus-ring), inset 0 1px 0 rgba(255, 255, 255, 0.16)"
+    component-color-well-swatch-shadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.12)"
     component-slider-track-background: "rgba(255, 255, 255, 0.16)"
     component-slider-thumb-background: "rgba(36, 42, 50, 0.98)"
     component-slider-thumb-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 18px rgba(0, 0, 0, 0.34)"
@@ -281,6 +295,7 @@ components:
   component-share-button-padding: "10px 14px"
   component-share-button-icon-size: "14px"
   component-control-row-height: "34px"
+  component-color-well-padding: "3px"
   component-control-title-size: "0.75rem"
   component-control-value-size: "0.8rem"
   component-status-pill-font-size: "0.72rem"
@@ -320,6 +335,7 @@ components:
 - `success` and `unavailable` share the same blue informational family on the share button.
 - `failed` stays high-emphasis danger, while `unsafe` stays muted danger to signal blocked sharing without competing with hard failures.
 - Theme semantic tokens own app-wide meaning such as canvas, raised surface, emphasis wash, outline strength, focus ring, and stage glow. Component tokens consume those semantics rather than repeating raw values in view CSS.
+- The custom web color control should behave like a compact color well: one rounded outer surface, one concentric inner swatch, and a clear active highlight.
 
 ## Token Sync
 

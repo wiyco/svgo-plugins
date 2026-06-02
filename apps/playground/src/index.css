@@ -208,6 +208,7 @@ textarea {
 .preset-button,
 .number-stepper button,
 .number-stepper input,
+.color-swatch-row,
 .color-swatch-row input,
 .svg-textarea,
 .panel,
@@ -626,7 +627,7 @@ textarea {
 }
 
 .number-stepper input,
-.color-swatch-row input,
+.color-swatch-row,
 .svg-textarea,
 .code-panel,
 .preview-stage {
@@ -744,16 +745,61 @@ textarea {
 .color-swatch-row {
   display: flex;
   align-items: center;
-  min-block-size: var(--component-control-row-height);
+  block-size: var(--component-control-row-height);
+  padding: var(--component-color-well-padding);
+  border: 1px solid var(--color-outline);
+  border-radius: calc(var(--radius-panel) - 4px);
+  background: var(--component-color-well-background);
+  box-shadow: var(--component-color-well-shadow);
+}
+
+.color-swatch-row:hover {
+  border-color: var(--component-color-well-hover-border-color);
+  background: var(--component-color-well-hover-background);
+  box-shadow: var(--component-color-well-hover-shadow);
+}
+
+.color-swatch-row:focus-within {
+  border-color: var(--component-color-well-hover-border-color);
+  box-shadow: var(--component-color-well-focus-shadow);
 }
 
 .color-swatch-row input {
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: calc(
+    var(--radius-panel) - 4px - var(--component-color-well-padding)
+  );
   background: transparent;
+  box-shadow: none;
   cursor: pointer;
+  overflow: hidden;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.color-swatch-row input:focus {
+  outline: none;
+}
+
+.color-swatch-row input::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: inherit;
+}
+
+.color-swatch-row input::-webkit-color-swatch {
+  border: 0;
+  border-radius: inherit;
+  box-shadow: var(--component-color-well-swatch-shadow);
+}
+
+.color-swatch-row input::-moz-color-swatch {
+  border: 0;
+  border-radius: inherit;
+  box-shadow: var(--component-color-well-swatch-shadow);
 }
 
 .workbench-grid {
@@ -1090,6 +1136,7 @@ textarea {
   .preset-button,
   .number-stepper button,
   .number-stepper input,
+  .color-swatch-row,
   .color-swatch-row input,
   .svg-textarea,
   .panel,

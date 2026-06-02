@@ -82,9 +82,9 @@ describe("preload-registry", () => {
     ).toBeNull();
   });
 
-  it("swallows preload failures after creating the warmup links", async () => {
+  it("warms route assets without importing the playground app module", async () => {
     vi.doMock("./svgo-plugin-hoist-stroke-width/App", () => {
-      throw new Error("preload failed");
+      throw new Error("App module should not be imported during warmup");
     });
 
     const { warmPlaygroundRoute } = await import("./preload-registry");

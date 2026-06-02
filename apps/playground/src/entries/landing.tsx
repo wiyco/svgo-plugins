@@ -1,7 +1,6 @@
 import { createRoot } from "react-dom/client";
 
 import { LandingPage } from "../landing/LandingPage";
-import { schedulePlaygroundWarmup } from "../playgrounds/preload-registry";
 import { installViewTransitionErrorFilter } from "../view-transition-runtime";
 import "../landing/index.css";
 
@@ -13,4 +12,3 @@ if (rootElement === null) {
 
 installViewTransitionErrorFilter();
 createRoot(rootElement).render(<LandingPage />);
-schedulePlaygroundWarmup();

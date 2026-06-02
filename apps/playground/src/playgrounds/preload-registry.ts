@@ -1,9 +1,8 @@
 import playgroundStylesheetHref from "../index.css?url";
-import { PLAYGROUNDS } from "./registry";
+import { PLAYGROUND_CATALOG } from "./catalog";
 
 type PlaygroundWarmupDefinition = {
   modulePreloadHrefs?: readonly string[];
-  preload?: () => Promise<void>;
   stylesheetHref?: string;
 };
 
@@ -23,14 +22,9 @@ const playgroundWarmupDefinitions: Record<string, PlaygroundWarmupDefinition> =
           import.meta.url,
         ).href,
       ],
-      preload: async () => {
-        await import("./svgo-plugin-hoist-stroke-width/App");
-      },
       stylesheetHref: playgroundStylesheetHref,
     },
   };
-
-const warmupPromises = new Map<string, Promise<void>>();
 
 const ensureWarmupLink = (options: WarmupLinkOptions): HTMLLinkElement => {
   const { href, kind, rel, slug } = options;
@@ -94,20 +88,6 @@ const ensurePlaygroundAssetWarmupLinks = (slug: string): void => {
 export const warmPlaygroundRoute = async (slug: string): Promise<void> => {
   ensurePlaygroundDocumentPrefetch(slug);
   ensurePlaygroundAssetWarmupLinks(slug);
-
-  const existingPromise = warmupPromises.get(slug);
-
-  if (existingPromise !== undefined) {
-    await existingPromise;
-    return;
-  }
-
-  const warmupPromise =
-    playgroundWarmupDefinitions[slug]?.preload?.().catch(() => undefined) ??
-    Promise.resolve();
-
-  warmupPromises.set(slug, warmupPromise);
-  await warmupPromise;
 };
 
 export const warmPlaygroundRoutes = async (
@@ -121,7 +101,7 @@ export const warmPlaygroundRoutes = async (
 };
 
 export const schedulePlaygroundWarmup = (
-  slugs: readonly string[] = PLAYGROUNDS.map(({ slug }) => slug),
+  slugs: readonly string[] = PLAYGROUND_CATALOG.map(({ slug }) => slug),
 ): void => {
   const runWarmup = () => {
     void warmPlaygroundRoutes(slugs);

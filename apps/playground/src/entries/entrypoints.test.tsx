@@ -14,7 +14,6 @@ const LandingPage = () => {
 const App = () => {
   return null;
 };
-const schedulePlaygroundWarmup = vi.fn<() => void>();
 const installViewTransitionErrorFilter = vi.fn<() => void>();
 
 const mockReactDomClient = () => {
@@ -32,7 +31,6 @@ beforeEach(() => {
   document.body.innerHTML = "";
   createRoot.mockReset();
   render.mockReset();
-  schedulePlaygroundWarmup.mockReset();
   installViewTransitionErrorFilter.mockReset();
 });
 
@@ -40,7 +38,6 @@ afterEach(() => {
   vi.resetModules();
   vi.doUnmock("react-dom/client");
   vi.doUnmock("../landing/LandingPage");
-  vi.doUnmock("../playgrounds/preload-registry");
   vi.doUnmock("../playgrounds/svgo-plugin-hoist-stroke-width/App");
   vi.doUnmock("../view-transition-runtime");
 });
@@ -51,11 +48,6 @@ describe("playground entrypoints", () => {
     vi.doMock("../landing/LandingPage", () => {
       return {
         LandingPage,
-      };
-    });
-    vi.doMock("../playgrounds/preload-registry", () => {
-      return {
-        schedulePlaygroundWarmup,
       };
     });
     vi.doMock("../view-transition-runtime", () => {
@@ -74,7 +66,6 @@ describe("playground entrypoints", () => {
     expect(
       (render.mock.calls[0]?.[0] as { type: unknown } | undefined)?.type,
     ).toBe(LandingPage);
-    expect(schedulePlaygroundWarmup).toHaveBeenCalledTimes(1);
   });
 
   it("throws when the landing entry is missing #root", async () => {

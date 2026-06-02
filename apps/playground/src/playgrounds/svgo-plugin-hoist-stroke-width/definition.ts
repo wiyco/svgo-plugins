@@ -5,6 +5,7 @@ import type {
 } from "../../core/svg-playground/model";
 
 import { createPlaygroundStateCodec } from "../../core/svg-playground/state/playground-state-codec";
+import { HOIST_STROKE_WIDTH_PLAYGROUND_METADATA } from "./metadata";
 
 export const SVG_PRESETS = [
   {
@@ -71,8 +72,7 @@ export const hoistStrokeWidthPlayground = {
   parseState: playgroundStateCodec.parse,
   presets: SVG_PRESETS,
   serializeState: playgroundStateCodec.serialize,
-  slug: "svgo-plugin-hoist-stroke-width",
-  summary:
-    "Try the hoist-stroke-width plugin against raw SVG input and inspect the optimized output, generated React source, and live preview.",
-  title: "SVGO plugin playground for hoisting stroke width",
+  slug: HOIST_STROKE_WIDTH_PLAYGROUND_METADATA.slug,
+  summary: HOIST_STROKE_WIDTH_PLAYGROUND_METADATA.summary,
+  title: HOIST_STROKE_WIDTH_PLAYGROUND_METADATA.title,
 } as const satisfies Readonly<SvgPlaygroundDefinition>;

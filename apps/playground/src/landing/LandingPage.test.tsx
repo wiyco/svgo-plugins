@@ -2,15 +2,47 @@ import { act } from "react";
 import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { LandingPageViewModel } from "./landing-page-view-model";
+
 const flush = async (): Promise<void> => {
   await Promise.resolve();
 };
+
+const mocks = vi.hoisted(() => {
+  const presenterSpy =
+    vi.fn<(props: { viewModel: LandingPageViewModel }) => void>();
+  const createLandingPageViewModel =
+    vi.fn<(catalog: readonly { slug: string }[]) => LandingPageViewModel>();
+
+  return {
+    createLandingPageViewModel,
+    presenterSpy,
+  };
+});
+
+vi.mock("./LandingPagePresenter", () => {
+  return {
+    LandingPagePresenter: (props: { viewModel: LandingPageViewModel }) => {
+      mocks.presenterSpy(props);
+
+      return <div data-slot="landing-page-presenter" />;
+    },
+  };
+});
+
+vi.mock("./landing-page-view-model", () => {
+  return {
+    createLandingPageViewModel: mocks.createLandingPageViewModel,
+  };
+});
 
 let container: HTMLDivElement;
 let root: Root;
 
 beforeEach(() => {
   vi.resetModules();
+  mocks.createLandingPageViewModel.mockReset();
+  mocks.presenterSpy.mockReset();
   container = document.createElement("div");
   root = createRoot(container);
   document.body.innerHTML = "";
@@ -26,80 +58,41 @@ afterEach(async () => {
     await flush();
   });
 
-  vi.doUnmock("../playgrounds/registry");
+  vi.doUnmock("../playgrounds/catalog");
 });
 
 describe("LandingPage", () => {
-  it("renders the compact slug registry", async () => {
-    const { LandingPage } = await import("./LandingPage");
-
-    await act(async () => {
-      root.render(<LandingPage />);
-      await flush();
-    });
-
-    const playgroundLink = container.querySelector<HTMLAnchorElement>(
-      'a[href="./svgo-plugin-hoist-stroke-width/"]',
-    );
-    const meta = container.querySelector<HTMLElement>(".landing-item-meta");
-    const slugChip = container.querySelector<HTMLElement>(".landing-item-slug");
-    const title = container.querySelector<HTMLElement>(".landing-item-title");
-    const presetCount = container.querySelector<HTMLElement>(
-      ".landing-item-count",
-    );
-
-    expect(container.textContent).toContain("Slug registry");
-    expect(playgroundLink?.textContent).toContain(
-      "svgo-plugin-hoist-stroke-width",
-    );
-    expect(playgroundLink?.textContent).toContain(
-      "@wiyco/svgo-plugin-hoist-stroke-width",
-    );
-    expect(playgroundLink?.textContent).toContain("3 presets");
-    expect(playgroundLink?.textContent).toContain(
-      "Try the hoist-stroke-width plugin",
-    );
-    expect(container.textContent).toContain("Open a slug to paste SVG");
-    expect(container.querySelector(".landing-kicker")).toBeNull();
-    expect(slugChip?.getAttribute("data-view-transition-name")).toContain(
-      "playground-slug-svgo-plugin-hoist-stroke-width",
-    );
-    expect(title?.getAttribute("data-view-transition-name")).toContain(
-      "playground-title-svgo-plugin-hoist-stroke-width",
-    );
-    expect(meta?.contains(presetCount ?? null)).toBe(true);
-    expect(container.querySelector(".landing-item-arrow")).toBeNull();
-  });
-
-  it("uses the singular preset label and omits the package chip when no mapping exists", async () => {
-    vi.doMock("../playgrounds/registry", () => {
-      return {
-        PLAYGROUNDS: [
-          {
-            defaultState: {
-              color: "#000000",
-              size: 128,
-              strokeWidth: 2,
-              svg: "<svg />",
-            },
-            presets: [
-              {
-                id: "single-safe-preset",
-                label: "Single Safe Preset",
-                svg: "<svg viewBox='0 0 24 24' />",
-              },
-            ],
-            serializeState: () => "",
-            slug: "custom-playground",
-            summary: "A custom playground summary",
-            title: "Custom playground",
-          },
-        ],
-        getPlaygroundPackageName: () => {
-          return null;
+  it("builds a view model from the catalog and passes it to the presenter", async () => {
+    const catalog = [
+      {
+        packageName: "@scope/example-playground",
+        presetCount: 2,
+        slug: "example-playground",
+        summary: "Example summary",
+        title: "Example title",
+      },
+    ] as const;
+    const viewModel: LandingPageViewModel = {
+      playgrounds: [
+        {
+          href: "./example-playground/",
+          packageName: "@scope/example-playground",
+          presetCountLabel: "2 presets",
+          slug: "example-playground",
+          slugTransitionName: "playground-slug-example-playground",
+          summary: "Example summary",
+          title: "Example title",
+          titleTransitionName: "playground-title-example-playground",
         },
+      ],
+    };
+
+    vi.doMock("../playgrounds/catalog", () => {
+      return {
+        PLAYGROUND_CATALOG: catalog,
       };
     });
+    mocks.createLandingPageViewModel.mockReturnValue(viewModel);
 
     const { LandingPage } = await import("./LandingPage");
 
@@ -108,12 +101,12 @@ describe("LandingPage", () => {
       await flush();
     });
 
-    const playgroundLink = container.querySelector<HTMLAnchorElement>(
-      'a[href="./custom-playground/"]',
-    );
-
-    expect(playgroundLink?.textContent).toContain("1 preset");
-    expect(playgroundLink?.textContent).not.toContain("1 presets");
-    expect(container.querySelector(".landing-item-package")).toBeNull();
+    expect(mocks.createLandingPageViewModel).toHaveBeenCalledTimes(1);
+    expect(mocks.createLandingPageViewModel).toHaveBeenCalledWith(catalog);
+    expect(mocks.presenterSpy).toHaveBeenCalledTimes(1);
+    expect(mocks.presenterSpy).toHaveBeenCalledWith({ viewModel });
+    expect(
+      container.querySelector('[data-slot="landing-page-presenter"]'),
+    ).not.toBeNull();
   });
 });

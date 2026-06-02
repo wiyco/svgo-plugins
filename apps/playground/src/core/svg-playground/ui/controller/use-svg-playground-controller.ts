@@ -9,6 +9,7 @@ import type { SvgPlaygroundViewModel } from "./svg-playground-controller-types";
 
 import { createPreviewMarkup } from "../../preview/create-preview-markup";
 import { createReactSource } from "../../source/create-react-source";
+import { getUnsafeSvgReason } from "../../transform/unsafe-svg";
 import { getErrorMessage } from "../../utils/get-error-message";
 import { useCopyShareUrl } from "./use-copy-share-url";
 import { usePlaygroundQueryState } from "./use-playground-query-state";
@@ -56,9 +57,22 @@ export const useSvgPlaygroundController = (
   const { definition, transform } = options;
 
   const [queryState, setQueryState] = usePlaygroundQueryState(definition);
-  const { copyShareUrl, copyStatus } = useCopyShareUrl();
+  const canShareUrl = getUnsafeSvgReason(queryState.svg) === null;
+  const {
+    copyShareUrl,
+    shareAnnouncement,
+    shareButtonLabel,
+    shareButtonState,
+  } = useCopyShareUrl({
+    canShare: canShareUrl,
+  });
   const transformState = useSvgTransformState(queryState.svg, transform);
   const activePresetId = getPresetIdForSvg(definition, queryState.svg);
+  const visiblePresets = useMemo(() => {
+    return definition.presets.filter((preset) => {
+      return getUnsafeSvgReason(preset.svg) === null;
+    });
+  }, [definition.presets]);
   const optimizedSvg =
     transformState.kind === "success" ? transformState.optimizedSvg : "";
 
@@ -159,17 +173,21 @@ export const useSvgPlaygroundController = (
 
   return {
     activePresetId,
+    canShareUrl,
     copyShareUrl,
-    copyStatus,
     previewHtml,
     queryState,
     reactSourceState,
     selectPreset,
     setColor,
     setSize,
+    shareAnnouncement,
+    shareButtonLabel,
+    shareButtonState,
     setStrokeWidth,
     setSvg,
     stepStrokeWidth,
     transformState,
+    visiblePresets,
   };
 };

@@ -2,22 +2,47 @@ import { act } from "react";
 import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useCopyShareUrl } from "./use-copy-share-url";
+import {
+  CLIPBOARD_UNAVAILABLE_LABEL,
+  COPIED_SHARE_BUTTON_LABEL,
+  COPY_FAILED_LABEL,
+  DEFAULT_SHARE_BUTTON_LABEL,
+  SHARE_FEEDBACK_RESET_DELAY_MS,
+  SHARE_URL_COPIED_ANNOUNCEMENT,
+  UNSAFE_SHARE_MESSAGE,
+  useCopyShareUrl,
+} from "./use-copy-share-url";
 
 const flush = async (): Promise<void> => {
   await Promise.resolve();
   await Promise.resolve();
 };
 
-const CopyShareUrlHarness = () => {
-  const { copyShareUrl, copyStatus } = useCopyShareUrl();
+type CopyShareUrlHarnessProps = {
+  canShare?: boolean;
+};
+
+const CopyShareUrlHarness = (props: CopyShareUrlHarnessProps) => {
+  const { canShare = true } = props;
+  const {
+    copyShareUrl,
+    shareAnnouncement,
+    shareButtonLabel,
+    shareButtonState,
+  } = useCopyShareUrl({
+    canShare,
+  });
 
   return (
     <div>
-      <button type="button" onClick={copyShareUrl}>
-        Copy
+      <button
+        data-share-feedback-state={shareButtonState}
+        type="button"
+        onClick={copyShareUrl}
+      >
+        {shareButtonLabel}
       </button>
-      <output>{copyStatus}</output>
+      <output>{shareAnnouncement}</output>
     </div>
   );
 };
@@ -27,6 +52,7 @@ let root: Root;
 let originalClipboard: Clipboard | undefined;
 
 beforeEach(() => {
+  vi.useFakeTimers();
   container = document.createElement("div");
   root = createRoot(container);
   document.body.innerHTML = "";
@@ -47,10 +73,47 @@ afterEach(async () => {
     configurable: true,
     value: originalClipboard,
   });
+  vi.useRealTimers();
 });
 
 describe("use-copy-share-url", () => {
-  it("reports when the clipboard API is unavailable", async () => {
+  it("blocks clipboard writes when sharing is unavailable", async () => {
+    const writeText = vi.fn<(text: string) => Promise<void>>(
+      async () => undefined,
+    );
+
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText,
+      } as unknown as Clipboard,
+    });
+
+    await act(async () => {
+      root.render(<CopyShareUrlHarness canShare={false} />);
+      await flush();
+    });
+
+    await act(async () => {
+      container.querySelector("button")?.click();
+      await flush();
+    });
+
+    expect(writeText).not.toHaveBeenCalled();
+    expect(container.querySelector("button")?.textContent).toBe(
+      UNSAFE_SHARE_MESSAGE,
+    );
+    expect(
+      container
+        .querySelector("button")
+        ?.getAttribute("data-share-feedback-state"),
+    ).toBe("unsafe");
+    expect(container.querySelector("output")?.textContent).toBe(
+      UNSAFE_SHARE_MESSAGE,
+    );
+  });
+
+  it("reports when the clipboard API is unavailable and resets", async () => {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
       value: undefined,
@@ -66,9 +129,32 @@ describe("use-copy-share-url", () => {
       await flush();
     });
 
-    expect(container.querySelector("output")?.textContent).toBe(
-      "Clipboard unavailable",
+    expect(container.querySelector("button")?.textContent).toBe(
+      CLIPBOARD_UNAVAILABLE_LABEL,
     );
+    expect(
+      container
+        .querySelector("button")
+        ?.getAttribute("data-share-feedback-state"),
+    ).toBe("unavailable");
+    expect(container.querySelector("output")?.textContent).toBe(
+      CLIPBOARD_UNAVAILABLE_LABEL,
+    );
+
+    await act(async () => {
+      vi.advanceTimersByTime(SHARE_FEEDBACK_RESET_DELAY_MS);
+      await flush();
+    });
+
+    expect(container.querySelector("button")?.textContent).toBe(
+      DEFAULT_SHARE_BUTTON_LABEL,
+    );
+    expect(
+      container
+        .querySelector("button")
+        ?.getAttribute("data-share-feedback-state"),
+    ).toBe("idle");
+    expect(container.querySelector("output")?.textContent).toBe("");
   });
 
   it("reports success and failure from clipboard writes", async () => {
@@ -95,15 +181,43 @@ describe("use-copy-share-url", () => {
     });
 
     expect(writeText).toHaveBeenCalledWith(window.location.href);
-    expect(container.querySelector("output")?.textContent).toBe(
-      "Share URL copied",
+    expect(container.querySelector("button")?.textContent).toBe(
+      COPIED_SHARE_BUTTON_LABEL,
     );
+    expect(
+      container
+        .querySelector("button")
+        ?.getAttribute("data-share-feedback-state"),
+    ).toBe("success");
+    expect(container.querySelector("output")?.textContent).toBe(
+      SHARE_URL_COPIED_ANNOUNCEMENT,
+    );
+
+    await act(async () => {
+      vi.advanceTimersByTime(SHARE_FEEDBACK_RESET_DELAY_MS);
+      await flush();
+    });
+
+    expect(container.querySelector("button")?.textContent).toBe(
+      DEFAULT_SHARE_BUTTON_LABEL,
+    );
+    expect(container.querySelector("output")?.textContent).toBe("");
 
     await act(async () => {
       container.querySelector("button")?.click();
       await flush();
     });
 
-    expect(container.querySelector("output")?.textContent).toBe("Copy failed");
+    expect(container.querySelector("button")?.textContent).toBe(
+      COPY_FAILED_LABEL,
+    );
+    expect(
+      container
+        .querySelector("button")
+        ?.getAttribute("data-share-feedback-state"),
+    ).toBe("failed");
+    expect(container.querySelector("output")?.textContent).toBe(
+      COPY_FAILED_LABEL,
+    );
   });
 });

@@ -1,26 +1,24 @@
-import type { CSSProperties, ChangeEvent, MouseEvent } from "react";
-
-import { useCallback } from "react";
+import { DashIcon, PackageIcon, PlusIcon } from "@primer/octicons-react";
+import {
+  type CSSProperties,
+  type ChangeEvent,
+  useCallback,
+  useMemo,
+} from "react";
 
 import type { SvgPlaygroundDefinition } from "../model";
 import type { SvgPlaygroundViewModel } from "./use-svg-playground-controller";
 
+import { getPlaygroundPackageName } from "../../../playgrounds/registry";
+import { getPlaygroundViewTransitionNames } from "../../../view-transition-names";
+import { FloatingPresetTabBar } from "./FloatingPresetTabBar";
+import { usePressRipple } from "./use-press-ripple";
+import { useShareButton } from "./use-share-button";
+
 const PREVIEW_BLOCKED_MESSAGE = "Preview disabled for unsafe SVG input.";
-const INPUT_PANEL_STYLE = {
-  animationDelay: "0ms",
-} satisfies CSSProperties;
-const OPTIMIZED_PANEL_STYLE = {
-  animationDelay: "70ms",
-} satisfies CSSProperties;
-const REACT_SOURCE_PANEL_STYLE = {
-  animationDelay: "140ms",
-} satisfies CSSProperties;
-const PREVIEW_PANEL_STYLE = {
-  animationDelay: "210ms",
-} satisfies CSSProperties;
 
 const formatNumberLabel = (value: number): string => {
-  return value.toFixed(1).replace(/\.0$/, "");
+  return value.toFixed(2).replace(/\.?0+$/, "");
 };
 
 const renderPanelFallback = (message: string) => {
@@ -35,18 +33,22 @@ export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
   const {
     definition,
     activePresetId,
+    canShareUrl,
     copyShareUrl,
-    copyStatus,
     previewHtml,
     queryState,
     reactSourceState,
     selectPreset,
     setColor,
     setSize,
+    shareAnnouncement,
+    shareButtonLabel,
+    shareButtonState,
     setStrokeWidth,
     setSvg,
     stepStrokeWidth,
     transformState,
+    visiblePresets,
   } = props;
 
   const optimizedSvg =
@@ -56,24 +58,40 @@ export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
     transformState.kind === "error" || transformState.kind === "unsafe"
       ? transformState.message
       : "";
+  const rippleHandlers = usePressRipple();
+  const shareButton = useShareButton({
+    shareAnnouncement,
+    shareButtonLabel,
+    shareButtonState,
+  });
+  const packageName = getPlaygroundPackageName(definition.slug);
+  const transitionNames = getPlaygroundViewTransitionNames(definition.slug);
+  const titleTransitionStyle = useMemo<CSSProperties>(() => {
+    return {
+      viewTransitionName: transitionNames.title,
+    };
+  }, [transitionNames.title]);
+  const slugTransitionStyle = useMemo<CSSProperties>(() => {
+    return {
+      viewTransitionName: transitionNames.slug,
+    };
+  }, [transitionNames.slug]);
+  const sizeSliderStyle = useMemo<CSSProperties>(() => {
+    const minSize = 64;
+    const maxSize = 320;
+    const progress = ((queryState.size - minSize) / (maxSize - minSize)) * 100;
 
-  const handlePresetButtonClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>): void => {
-      const presetId = event.currentTarget.dataset.presetId;
-
-      if (presetId !== undefined) {
-        selectPreset(presetId);
-      }
-    },
-    [selectPreset],
-  );
+    return {
+      ["--slider-progress" as const]: `${progress}%`,
+    } as CSSProperties;
+  }, [queryState.size]);
 
   const handleDecreaseStrokeWidthClick = useCallback((): void => {
-    stepStrokeWidth(-0.5);
+    stepStrokeWidth(-0.25);
   }, [stepStrokeWidth]);
 
   const handleIncreaseStrokeWidthClick = useCallback((): void => {
-    stepStrokeWidth(0.5);
+    stepStrokeWidth(0.25);
   }, [stepStrokeWidth]);
 
   const handleStrokeWidthChange = useCallback(
@@ -105,176 +123,179 @@ export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
   );
 
   return (
-    <main className="app-shell">
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow">{definition.eyebrow}</p>
-          <h1>{definition.title}</h1>
-          <p className="hero-body">{definition.description}</p>
+    <main className="app-shell playground-shell">
+      <section className="intro-band">
+        <div className="intro-copy">
+          <h1
+            className="intro-title"
+            data-view-transition-name={transitionNames.title}
+            style={titleTransitionStyle}
+          >
+            {definition.title}
+          </h1>
+          <div className="intro-meta">
+            <a
+              className="slug-chip"
+              data-view-transition-name={transitionNames.slug}
+              href="../"
+              style={slugTransitionStyle}
+            >
+              /{definition.slug}
+            </a>
+            {packageName !== null ? (
+              <code className="package-chip">
+                <span aria-hidden="true" className="package-chip-icon">
+                  <PackageIcon size={12} />
+                </span>
+                <span>{packageName}</span>
+              </code>
+            ) : null}
+          </div>
         </div>
-        <div className="hero-actions">
-          <button className="share-button" type="button" onClick={copyShareUrl}>
-            Copy share URL
+
+        <div className="intro-actions">
+          <button
+            className="share-button ripple-surface"
+            data-share-feedback-state={shareButton.shareButtonState}
+            disabled={!canShareUrl}
+            ref={shareButton.shareButtonRef}
+            style={shareButton.shareButtonStyle}
+            type="button"
+            onClick={copyShareUrl}
+            {...rippleHandlers}
+          >
+            <span aria-hidden="true" className="share-button-icon-wrap">
+              {shareButton.shareButtonIcon}
+            </span>
+            <span
+              ref={shareButton.shareButtonLabelRef}
+              className="button-label share-button-text"
+            >
+              {shareButton.shareButtonLabel}
+            </span>
+            <span
+              aria-hidden="true"
+              ref={shareButton.shareButtonMeasureRef}
+              className="share-button-measure"
+            >
+              {shareButton.shareButtonLabel}
+            </span>
           </button>
-          <span className="share-status" aria-live="polite">
-            {copyStatus}
+          <span className="visually-hidden" aria-live="polite">
+            {shareButton.shareAnnouncement}
           </span>
         </div>
       </section>
 
-      <section className="controls-bar" aria-label="Preview controls">
-        <div className="preset-cluster">
-          <span className="controls-label">Presets</span>
-          <div className="preset-list">
-            {definition.presets.map((preset) => {
-              return (
-                <button
-                  key={preset.id}
-                  aria-pressed={activePresetId === preset.id}
-                  className="preset-button"
-                  data-preset-id={preset.id}
-                  type="button"
-                  onClick={handlePresetButtonClick}
-                >
-                  <span>{preset.label}</span>
-                  <small>{preset.description}</small>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      <FloatingPresetTabBar
+        activePresetId={activePresetId}
+        presets={visiblePresets}
+        selectPreset={selectPreset}
+      />
 
-        <div className="sliders">
-          <div className="slider-field">
-            <label htmlFor="stroke-width-input">strokeWidth</label>
+      <section className="command-dock" aria-label="Playground controls">
+        <div className="dock-row dock-row-controls">
+          <section className="control-pod">
+            <div className="control-pod-head">
+              <label className="control-title" htmlFor="stroke-width-input">
+                strokeWidth
+              </label>
+              <output className="control-value">
+                {formatNumberLabel(queryState.strokeWidth)}
+              </output>
+            </div>
             <div className="number-stepper">
               <button
                 aria-label="Decrease strokeWidth"
+                className="ripple-surface"
                 type="button"
                 onClick={handleDecreaseStrokeWidthClick}
+                {...rippleHandlers}
               >
-                -
+                <span aria-hidden="true" className="button-label button-icon">
+                  <DashIcon size={14} />
+                </span>
               </button>
               <input
                 aria-label="strokeWidth"
                 id="stroke-width-input"
                 max="8"
-                min="0.5"
-                step="0.5"
+                min="0.25"
+                step="0.25"
                 type="number"
                 value={queryState.strokeWidth}
                 onChange={handleStrokeWidthChange}
               />
               <button
                 aria-label="Increase strokeWidth"
+                className="ripple-surface"
                 type="button"
                 onClick={handleIncreaseStrokeWidthClick}
+                {...rippleHandlers}
               >
-                +
+                <span aria-hidden="true" className="button-label button-icon">
+                  <PlusIcon size={14} />
+                </span>
               </button>
             </div>
-            <output>{formatNumberLabel(queryState.strokeWidth)}</output>
-          </div>
+          </section>
 
-          <label className="slider-field">
-            <span>size</span>
+          <section className="control-pod">
+            <div className="control-pod-head">
+              <label className="control-title" htmlFor="size-input">
+                size
+              </label>
+              <output className="control-value">
+                {Math.round(queryState.size)}px
+              </output>
+            </div>
             <input
               aria-label="size"
+              className="size-slider"
+              id="size-input"
               max="320"
               min="64"
+              style={sizeSliderStyle}
               step="4"
               type="range"
               value={queryState.size}
               onChange={handleSizeChange}
             />
-            <output>{Math.round(queryState.size)}px</output>
-          </label>
+          </section>
 
-          <label className="color-field">
-            <span>color</span>
-            <input
-              aria-label="color"
-              type="color"
-              value={queryState.color}
-              onChange={handleColorChange}
-            />
-            <code>{queryState.color}</code>
-          </label>
+          <section className="control-pod">
+            <div className="control-pod-head">
+              <label className="control-title" htmlFor="color-input">
+                color
+              </label>
+              <code className="control-value">{queryState.color}</code>
+            </div>
+            <div className="color-swatch-row">
+              <input
+                aria-label="color"
+                id="color-input"
+                type="color"
+                value={queryState.color}
+                onChange={handleColorChange}
+              />
+            </div>
+          </section>
         </div>
       </section>
 
-      <section className="panel-grid" aria-label="Playground panels">
-        <article className="panel" style={INPUT_PANEL_STYLE}>
-          <div className="panel-header">
-            <div>
-              <p className="panel-kicker">Input</p>
-              <h2>Input SVG</h2>
-            </div>
-          </div>
-          <textarea
-            aria-label="Input SVG"
-            className="svg-textarea"
-            spellCheck={false}
-            value={queryState.svg}
-            onChange={handleSvgChange}
-          />
-        </article>
-
-        <article className="panel" style={OPTIMIZED_PANEL_STYLE}>
-          <div className="panel-header">
-            <div>
-              <p className="panel-kicker">Output</p>
-              <h2>Optimized SVG</h2>
-            </div>
+      <section className="workbench-grid" aria-label="Playground panels">
+        <article className="panel panel-preview">
+          <div className="panel-header panel-header-inline">
+            <h2>Preview</h2>
             <span className={`status-pill is-${status}`}>{status}</span>
           </div>
-          {status === "success" && optimizedSvg.length > 0 ? (
-            <pre className="code-panel">{optimizedSvg}</pre>
-          ) : status === "loading" ? (
-            renderPanelFallback("Rebuilding optimized SVG…")
-          ) : status === "unsafe" ? (
-            renderPanelFallback(statusMessage)
-          ) : status === "error" ? (
-            renderPanelFallback(statusMessage)
-          ) : (
-            renderPanelFallback("Paste or pick an SVG preset to begin.")
-          )}
-        </article>
 
-        <article className="panel" style={REACT_SOURCE_PANEL_STYLE}>
-          <div className="panel-header">
-            <div>
-              <p className="panel-kicker">Output</p>
-              <h2>Generated React source</h2>
-            </div>
-          </div>
-          {status === "success" && reactSourceState.source.length > 0 ? (
-            <pre className="code-panel">{reactSourceState.source}</pre>
-          ) : status === "success" && reactSourceState.error.length > 0 ? (
-            renderPanelFallback(reactSourceState.error)
-          ) : status === "loading" ? (
-            renderPanelFallback("Rebuilding React component source…")
-          ) : status === "unsafe" ? (
-            renderPanelFallback(statusMessage)
-          ) : status === "error" ? (
-            renderPanelFallback(statusMessage)
-          ) : (
-            renderPanelFallback(
-              "React source appears here after a successful transform.",
-            )
-          )}
-        </article>
-
-        <article className="panel" style={PREVIEW_PANEL_STYLE}>
-          <div className="panel-header">
-            <div>
-              <p className="panel-kicker">Preview</p>
-              <h2>Live preview</h2>
-            </div>
-          </div>
           <div className="preview-stage">
             {status === "success" && previewHtml !== null ? (
-              <div dangerouslySetInnerHTML={previewHtml} />
+              <div
+                className="preview-render"
+                dangerouslySetInnerHTML={previewHtml}
+              />
             ) : status === "success" ? (
               <div className="preview-warning" role="alert">
                 <strong>Preview render failed.</strong>
@@ -302,6 +323,58 @@ export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
               </div>
             )}
           </div>
+        </article>
+
+        <article className="panel panel-input">
+          <div className="panel-header panel-header-inline">
+            <h2>Input SVG</h2>
+            <span className="status-pill">Editable</span>
+          </div>
+          <textarea
+            aria-label="Input SVG"
+            className="svg-textarea"
+            spellCheck={false}
+            value={queryState.svg}
+            onChange={handleSvgChange}
+          />
+        </article>
+
+        <article className="panel panel-optimized">
+          <div className="panel-header">
+            <h2>Optimized SVG</h2>
+          </div>
+          {status === "success" && optimizedSvg.length > 0 ? (
+            <pre className="code-panel">{optimizedSvg}</pre>
+          ) : status === "loading" ? (
+            renderPanelFallback("Rebuilding optimized SVG…")
+          ) : status === "unsafe" ? (
+            renderPanelFallback(statusMessage)
+          ) : status === "error" ? (
+            renderPanelFallback(statusMessage)
+          ) : (
+            renderPanelFallback("Paste or pick an SVG preset to begin.")
+          )}
+        </article>
+
+        <article className="panel panel-react">
+          <div className="panel-header">
+            <h2>React source</h2>
+          </div>
+          {status === "success" && reactSourceState.source.length > 0 ? (
+            <pre className="code-panel">{reactSourceState.source}</pre>
+          ) : status === "success" && reactSourceState.error.length > 0 ? (
+            renderPanelFallback(reactSourceState.error)
+          ) : status === "loading" ? (
+            renderPanelFallback("Rebuilding React component source…")
+          ) : status === "unsafe" ? (
+            renderPanelFallback(statusMessage)
+          ) : status === "error" ? (
+            renderPanelFallback(statusMessage)
+          ) : (
+            renderPanelFallback(
+              "React source appears here after a successful transform.",
+            )
+          )}
         </article>
       </section>
     </main>

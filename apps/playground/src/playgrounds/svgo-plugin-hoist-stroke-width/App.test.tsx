@@ -17,7 +17,7 @@ const flush = async (): Promise<void> => {
   await Promise.resolve();
 };
 
-const createSuccessResult = (presetName: "mixed" | "uniform") => {
+const createSuccessResult = (presetName: "single" | "multiple" | "mixed") => {
   return {
     kind: "success" as const,
     optimizedSvg: `<svg data-optimized="${presetName}" data-source="${presetName}" />`,
@@ -40,7 +40,11 @@ const createTransformStub = (): TransformFn => {
       };
     }
 
-    const presetName = svg.includes('stroke-width="2.5"') ? "mixed" : "uniform";
+    const presetName = svg.includes('stroke-width="1.25"')
+      ? "mixed"
+      : svg.includes('stroke-width="2.0"')
+        ? "multiple"
+        : "single";
 
     return createSuccessResult(presetName);
   };
@@ -83,6 +87,29 @@ const renderPlayground = async (
   };
 };
 
+const getFloatingPresetBar = (container: HTMLElement): HTMLElement | null => {
+  return container.querySelector(
+    '.floating-preset-tabbar[aria-label="Playground presets"]',
+  );
+};
+
+const getPresetButtons = (container: HTMLElement): HTMLButtonElement[] => {
+  return Array.from(
+    getFloatingPresetBar(container)?.querySelectorAll<HTMLButtonElement>(
+      ".preset-button",
+    ) ?? [],
+  );
+};
+
+const findPresetButton = (
+  container: HTMLElement,
+  label: string,
+): HTMLButtonElement | undefined => {
+  return getPresetButtons(container).find((button) => {
+    return button.textContent?.includes(label) ?? false;
+  });
+};
+
 let renderedApp: RenderedApp | null = null;
 const originalClipboard = navigator.clipboard;
 
@@ -118,16 +145,34 @@ describe("hoist stroke width playground", () => {
   it("updates all four panels when the preset changes", async () => {
     renderedApp = await renderPlayground(createTransformStub());
 
-    const mixedPresetButton = Array.from(
-      renderedApp.container.querySelectorAll<HTMLButtonElement>(
-        ".preset-button",
-      ),
-    ).find((button) => {
-      return button.textContent?.includes("Mixed Weights") ?? false;
-    });
+    const presetBar = getFloatingPresetBar(renderedApp.container);
+    const singlePresetButton = findPresetButton(
+      renderedApp.container,
+      "Single",
+    );
+    const multiplePresetButton = findPresetButton(
+      renderedApp.container,
+      "Multiple",
+    );
+    const mixedPresetButton = findPresetButton(renderedApp.container, "Mixed");
+
+    expect(presetBar).not.toBeNull();
+    expect(presetBar?.textContent).toContain("Single");
+    expect(presetBar?.textContent).toContain("Multiple");
+    expect(presetBar?.textContent).toContain("Mixed");
+    expect(singlePresetButton?.getAttribute("aria-label")).toBe(
+      "Single Weight",
+    );
+    expect(multiplePresetButton?.getAttribute("aria-label")).toBe(
+      "Multiple Weights",
+    );
+    expect(mixedPresetButton?.getAttribute("aria-label")).toBe("Mixed Weights");
+    expect(singlePresetButton?.getAttribute("aria-pressed")).toBe("true");
+    expect(multiplePresetButton?.getAttribute("aria-pressed")).toBe("false");
+    expect(mixedPresetButton?.getAttribute("aria-pressed")).toBe("false");
 
     await act(async () => {
-      mixedPresetButton?.click();
+      multiplePresetButton?.click();
       await flush();
     });
 
@@ -136,51 +181,25 @@ describe("hoist stroke width playground", () => {
     );
     const optimizedPanel = renderedApp.container.textContent;
     const previewSvg = renderedApp.container.querySelector<SVGSVGElement>(
-      'svg[data-optimized="mixed"]',
+      'svg[data-optimized="multiple"]',
     );
+    const slugLink =
+      renderedApp.container.querySelector<HTMLAnchorElement>(".slug-chip");
 
-    expect(textarea?.value).toContain('stroke-width="2.5"');
-    expect(optimizedPanel).toContain('data-optimized="mixed"');
-    expect(optimizedPanel).toContain('data-source="mixed"');
+    expect(textarea?.value).toContain('stroke-width="2.0"');
+    expect(optimizedPanel).toContain('data-optimized="multiple"');
+    expect(optimizedPanel).toContain('data-source="multiple"');
     expect(previewSvg).not.toBeNull();
-  });
-
-  it("ignores preset clicks when the clicked button has no preset id", async () => {
-    renderedApp = await renderPlayground(createTransformStub());
-
-    const mixedPresetButton = Array.from(
-      renderedApp.container.querySelectorAll<HTMLButtonElement>(
-        ".preset-button",
-      ),
-    ).find((button) => {
-      return button.textContent?.includes("Mixed Weights") ?? false;
-    });
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
-    const initialSvg = textarea?.value;
-
-    mixedPresetButton?.removeAttribute("data-preset-id");
-
-    await act(async () => {
-      mixedPresetButton?.click();
-      await flush();
-    });
-
-    expect(textarea?.value).toBe(initialSvg);
-    expect(textarea?.value).not.toContain('stroke-width="2.5"');
+    expect(slugLink?.getAttribute("href")).toBe("../");
+    expect(multiplePresetButton?.className).toContain("ripple-surface");
+    expect(singlePresetButton?.getAttribute("aria-pressed")).toBe("false");
+    expect(multiplePresetButton?.getAttribute("aria-pressed")).toBe("true");
   });
 
   it("ignores preset clicks when the preset id does not exist", async () => {
     renderedApp = await renderPlayground(createTransformStub());
 
-    const mixedPresetButton = Array.from(
-      renderedApp.container.querySelectorAll<HTMLButtonElement>(
-        ".preset-button",
-      ),
-    ).find((button) => {
-      return button.textContent?.includes("Mixed Weights") ?? false;
-    });
+    const mixedPresetButton = findPresetButton(renderedApp.container, "Mixed");
     const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
       'textarea[aria-label="Input SVG"]',
     );
@@ -194,7 +213,7 @@ describe("hoist stroke width playground", () => {
     });
 
     expect(textarea?.value).toBe(initialSvg);
-    expect(textarea?.value).not.toContain('stroke-width="2.5"');
+    expect(textarea?.value).not.toContain('stroke-width="1.25"');
   });
 
   it("loads its initial state from the query string and keeps the URL in sync", async () => {
@@ -286,19 +305,39 @@ describe("hoist stroke width playground", () => {
     resolveTransform();
   });
 
+  it("shows only safe presets in the floating preset tab bar", async () => {
+    renderedApp = await renderPlayground(createTransformStub());
+
+    const presetBar = getFloatingPresetBar(renderedApp.container);
+    const presetButtons = getPresetButtons(renderedApp.container);
+    const commandDock =
+      renderedApp.container.querySelector<HTMLElement>(".command-dock");
+
+    expect(presetBar).not.toBeNull();
+    expect(presetButtons).toHaveLength(3);
+    expect(presetBar?.textContent).toContain("Single");
+    expect(presetBar?.textContent).toContain("Multiple");
+    expect(presetBar?.textContent).toContain("Mixed");
+    expect(presetBar?.textContent).not.toContain("Unsafe Script");
+    expect(commandDock?.textContent).not.toContain("Single");
+    expect(commandDock?.textContent).not.toContain("Multiple");
+    expect(commandDock?.textContent).not.toContain("Mixed");
+  });
+
   it("shows a preview warning for unsafe svg input", async () => {
     renderedApp = await renderPlayground(createTransformStub());
 
-    const unsafePresetButton = Array.from(
-      renderedApp.container.querySelectorAll<HTMLButtonElement>(
-        ".preset-button",
-      ),
-    ).find((button) => {
-      return button.textContent?.includes("Unsafe Script") ?? false;
-    });
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
 
     await act(async () => {
-      unsafePresetButton?.click();
+      if (textarea !== null) {
+        changeFieldValue(
+          textarea,
+          `<svg viewBox="0 0 24 24"><script>alert("blocked")</script></svg>`,
+        );
+      }
       await flush();
     });
 
@@ -345,7 +384,7 @@ describe("hoist stroke width playground", () => {
     });
 
     await act(async () => {
-      pendingRequests.get(initialSvg)?.resolve(createSuccessResult("uniform"));
+      pendingRequests.get(initialSvg)?.resolve(createSuccessResult("single"));
       await flush();
     });
 
@@ -498,7 +537,17 @@ describe("hoist stroke width playground", () => {
     });
 
     expect(writeText).toHaveBeenCalledWith(window.location.href);
-    expect(renderedApp.container.textContent).toContain("Share URL copied");
+    expect(
+      renderedApp.container.querySelector<HTMLElement>(".share-button-text")
+        ?.textContent,
+    ).toBe("Copied");
+    expect(shareButton?.getAttribute("data-share-feedback-state")).toBe(
+      "success",
+    );
+    expect(
+      renderedApp.container.querySelector<HTMLElement>('[aria-live="polite"]')
+        ?.textContent,
+    ).toBe("Share URL copied");
   });
 
   it("shows clipboard unavailable when the browser API is missing", async () => {
@@ -517,9 +566,17 @@ describe("hoist stroke width playground", () => {
       await flush();
     });
 
-    expect(renderedApp.container.textContent).toContain(
-      "Clipboard unavailable",
+    expect(
+      renderedApp.container.querySelector<HTMLElement>(".share-button-text")
+        ?.textContent,
+    ).toBe("Clipboard unavailable");
+    expect(shareButton?.getAttribute("data-share-feedback-state")).toBe(
+      "unavailable",
     );
+    expect(
+      renderedApp.container.querySelector<HTMLElement>('[aria-live="polite"]')
+        ?.textContent,
+    ).toBe("Clipboard unavailable");
   });
 
   it("shows copy failures when the clipboard write rejects", async () => {
@@ -542,7 +599,67 @@ describe("hoist stroke width playground", () => {
       await flush();
     });
 
-    expect(renderedApp.container.textContent).toContain("Copy failed");
+    expect(
+      renderedApp.container.querySelector<HTMLElement>(".share-button-text")
+        ?.textContent,
+    ).toBe("Copy failed");
+    expect(shareButton?.getAttribute("data-share-feedback-state")).toBe(
+      "failed",
+    );
+    expect(
+      renderedApp.container.querySelector<HTMLElement>('[aria-live="polite"]')
+        ?.textContent,
+    ).toBe("Copy failed");
+  });
+
+  it("disables sharing when the current svg is unsafe", async () => {
+    const writeText = vi.fn<(value: string) => Promise<void>>(
+      async () => undefined,
+    );
+
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText,
+      },
+    });
+
+    renderedApp = await renderPlayground(createTransformStub());
+
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
+    const shareButton =
+      renderedApp.container.querySelector<HTMLButtonElement>(".share-button");
+
+    await act(async () => {
+      if (textarea !== null) {
+        changeFieldValue(
+          textarea,
+          `<svg viewBox="0 0 24 24"><script>alert("blocked")</script></svg>`,
+        );
+      }
+      await flush();
+    });
+
+    await act(async () => {
+      shareButton?.click();
+      await flush();
+    });
+
+    expect(shareButton?.disabled).toBe(true);
+    expect(writeText).not.toHaveBeenCalled();
+    expect(
+      renderedApp.container.querySelector<HTMLElement>(".share-button-text")
+        ?.textContent,
+    ).toBe("Sharing unavailable");
+    expect(shareButton?.getAttribute("data-share-feedback-state")).toBe(
+      "unsafe",
+    );
+    expect(
+      renderedApp.container.querySelector<HTMLElement>('[aria-live="polite"]')
+        ?.textContent,
+    ).toBe("Sharing unavailable");
   });
 
   it("updates the live preview when strokeWidth, size, and color change", async () => {
@@ -561,6 +678,7 @@ describe("hoist stroke width playground", () => {
 
     await act(async () => {
       increaseButton?.click();
+      increaseButton?.click();
       if (sizeInput !== null) {
         changeFieldValue(sizeInput, "256");
       }
@@ -571,13 +689,52 @@ describe("hoist stroke width playground", () => {
     });
 
     const previewSvg = renderedApp.container.querySelector<SVGSVGElement>(
-      'svg[data-optimized="uniform"]',
+      'svg[data-optimized="single"]',
     );
 
     expect(previewSvg?.getAttribute("stroke-width")).toBe("2.5");
     expect(previewSvg?.getAttribute("height")).toBe("256");
     expect(previewSvg?.getAttribute("width")).toBe("256");
     expect(previewSvg?.getAttribute("style")).toContain("color: #ff6600");
+  });
+
+  it("formats the strokeWidth label by stripping trailing zeros across .25 steps", async () => {
+    renderedApp = await renderPlayground(createTransformStub());
+
+    const readStrokeWidthLabel = (): string | null | undefined => {
+      return renderedApp?.container
+        .querySelector<HTMLInputElement>("#stroke-width-input")
+        ?.closest(".control-pod")
+        ?.querySelector(".control-value")?.textContent;
+    };
+    const increaseButton =
+      renderedApp.container.querySelector<HTMLButtonElement>(
+        'button[aria-label="Increase strokeWidth"]',
+      );
+
+    expect(readStrokeWidthLabel()).toBe("2");
+
+    await act(async () => {
+      increaseButton?.click();
+      await flush();
+    });
+
+    expect(readStrokeWidthLabel()).toBe("2.25");
+
+    await act(async () => {
+      increaseButton?.click();
+      await flush();
+    });
+
+    expect(readStrokeWidthLabel()).toBe("2.5");
+
+    await act(async () => {
+      increaseButton?.click();
+      increaseButton?.click();
+      await flush();
+    });
+
+    expect(readStrokeWidthLabel()).toBe("3");
   });
 
   it("clamps strokeWidth updates to the configured bounds", async () => {
@@ -602,7 +759,7 @@ describe("hoist stroke width playground", () => {
     expect(strokeWidthInput?.value).toBe("8");
 
     await act(async () => {
-      for (let index = 0; index < 20; index += 1) {
+      for (let index = 0; index < 40; index += 1) {
         decreaseButton?.click();
       }
       await flush();

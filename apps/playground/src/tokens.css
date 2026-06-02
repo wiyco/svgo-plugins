@@ -58,12 +58,12 @@
 
   --space-1: 4px;
   --space-2: 6px;
-  --space-3: 10px;
-  --space-4: 14px;
-  --space-5: 18px;
-  --space-6: 22px;
-  --space-7: 28px;
-  --space-8: 36px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 22px;
+  --space-6: 28px;
+  --space-7: 36px;
+  --space-8: 44px;
 
   --radius-control: 12px;
   --radius-card: 18px;
@@ -82,6 +82,53 @@
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(0.24, 0.86, 0.28, 1);
   --motion-spring-like: cubic-bezier(0.22, 0.9, 0.3, 1);
+
+  --floating-preset-tabbar-height: 64px;
+  --floating-preset-tabbar-edge-gap: 20px;
+  --floating-preset-tabbar-offset-base: 30px;
+  --floating-preset-tabbar-safe-area-extra: 18px;
+  --floating-preset-tabbar-reserved-gap: 8px;
+  --floating-preset-tabbar-padding: 4px;
+  --floating-preset-tabbar-gap: 4px;
+  --floating-preset-tabbar-border-color: rgba(255, 255, 255, 0.42);
+  --floating-preset-tabbar-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 18px 42px rgba(16, 20, 24, 0.1), 0 10px 22px rgba(16, 20, 24, 0.05);
+  --floating-preset-tabbar-surface:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.64),
+      rgba(255, 255, 255, 0.28)
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.28),
+      rgba(255, 255, 255, 0.05)
+    );
+  --floating-preset-tabbar-backdrop-filter: blur(34px) saturate(190%);
+  --floating-preset-tabbar-sheen:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.4), transparent 56%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0));
+  --floating-preset-button-min-width: 68px;
+  --floating-preset-button-min-height: 54px;
+  --floating-preset-button-gap: 2px;
+  --floating-preset-button-padding: 7px 12px 6px;
+  --floating-preset-icon-size: 20px;
+  --floating-preset-glyph-size: 15px;
+  --floating-preset-label-size: 0.6rem;
+  --number-stepper-control-height: 34px;
+  --floating-preset-selection-surface:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.84),
+      rgba(255, 255, 255, 0.46)
+    ),
+    rgba(10, 132, 255, 0.1);
+  --floating-preset-selection-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    inset 0 0 24px rgba(10, 132, 255, 0.14), 0 10px 20px rgba(16, 20, 24, 0.08);
+  --floating-preset-selected-icon-color: var(--color-primary-strong);
 
   font-family: var(--font-sans);
   font-synthesis: none;

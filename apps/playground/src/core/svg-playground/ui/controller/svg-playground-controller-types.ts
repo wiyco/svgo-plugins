@@ -1,4 +1,5 @@
-import type { PlaygroundQueryState } from "../../model";
+import type { PlaygroundQueryState, SvgPreset } from "../../model";
+import type { ShareFeedbackState } from "./use-copy-share-url";
 
 export type TransformState =
   | { kind: "idle" }
@@ -14,16 +15,20 @@ export type ReactSourceState = {
 
 export type SvgPlaygroundViewModel = {
   activePresetId: string | null;
+  canShareUrl: boolean;
   copyShareUrl: () => void;
-  copyStatus: string;
   previewHtml: { __html: string } | null;
   queryState: PlaygroundQueryState;
   reactSourceState: ReactSourceState;
   selectPreset: (presetId: string) => void;
   setColor: (color: string) => void;
   setSize: (size: number) => void;
+  shareAnnouncement: string;
+  shareButtonLabel: string;
+  shareButtonState: ShareFeedbackState;
   setStrokeWidth: (strokeWidth: number) => void;
   setSvg: (svg: string) => void;
   stepStrokeWidth: (delta: number) => void;
   transformState: TransformState;
+  visiblePresets: readonly SvgPreset[];
 };

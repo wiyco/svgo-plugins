@@ -8,28 +8,37 @@ import { createPlaygroundStateCodec } from "../../core/svg-playground/state/play
 
 export const SVG_PRESETS = [
   {
-    id: "uniform-crosshair",
-    label: "Uniform Crosshair",
+    id: "single-weight",
+    label: "Single Weight",
     description:
-      "Uniform descendant stroke widths hoist cleanly to the svg root.",
+      "One inherited stroke-width hoists cleanly from a group to the svg root.",
     svg: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
   <g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="8" />
-    <path d="M12 4V8" />
-    <path d="M12 16V20" />
-    <path d="M4 12H8" />
-    <path d="M16 12H20" />
+    <path d="M12 3.5L18 5.75V11.25C18 14.8 15.6 18.02 12 19.75C8.4 18.02 6 14.8 6 11.25V5.75L12 3.5Z" />
+    <path d="M9.5 11.9L11.25 13.65L14.85 10.05" />
   </g>
+</svg>`,
+  },
+  {
+    id: "multiple-weights",
+    label: "Multiple Weights",
+    description:
+      "Matching descendant stroke-width declarations hoist into one svg root stroke-width.",
+    svg: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5 7.5H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+  <path d="M5 12H19" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" />
+  <path d="M5 16.5H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
 </svg>`,
   },
   {
     id: "mixed-weights",
     label: "Mixed Weights",
     description:
-      "Different descendant stroke widths stay in place after optimization.",
+      "Conflicting descendant stroke widths stay on each element after optimization.",
     svg: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M5 19L12 5L19 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M9 14H15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+  <path d="M5 7.5H19" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" />
+  <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+  <path d="M5 16.5H19" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
 </svg>`,
   },
   {

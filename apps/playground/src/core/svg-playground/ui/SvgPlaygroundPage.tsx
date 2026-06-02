@@ -32,8 +32,8 @@ export const SvgPlaygroundApp = (props: SvgPlaygroundAppProps) => {
 
   if (transform === null) {
     return (
-      <main className="app-shell">
-        <section className="panel">
+      <main className="app-shell playground-shell">
+        <section className="panel panel-boot">
           <div className="preview-placeholder">
             Booting the transform worker…
           </div>

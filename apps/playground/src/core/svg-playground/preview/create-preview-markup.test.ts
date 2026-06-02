@@ -53,4 +53,15 @@ describe("create-preview-markup", () => {
       });
     }).toThrow("Expected optimized SVG to contain a root <svg> element.");
   });
+
+  it("throws when the optimized svg contains unsafe markup", () => {
+    expect(() => {
+      createPreviewMarkup(
+        '<svg><image href="https://example.com/icon.svg" /></svg>',
+        {
+          ariaLabel: "Live preview",
+        },
+      );
+    }).toThrow("Remote URLs are blocked in the playground preview.");
+  });
 });

@@ -51,4 +51,12 @@ describe("create-react-source", () => {
       createReactSource("<g />");
     }).toThrow("Expected optimized SVG to contain a root <svg> element.");
   });
+
+  it("throws when optimized SVG contains unsafe markup", () => {
+    expect(() => {
+      createReactSource(
+        '<svg><style>@import "https://example.com/a.css";</style></svg>',
+      );
+    }).toThrow("Style elements are blocked in the playground preview.");
+  });
 });

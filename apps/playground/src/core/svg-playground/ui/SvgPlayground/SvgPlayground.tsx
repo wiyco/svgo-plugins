@@ -94,7 +94,11 @@ const SvgPlaygroundRoot = (
     strokeWidth,
   ]);
   const optimizedSvg =
-    transformState.kind === "success" ? transformState.optimizedSvg : "";
+    transformState.kind === "success"
+      ? transformState.optimizedSvg
+      : transformState.kind === "unsafe"
+        ? (transformState.optimizedSvg ?? "")
+        : "";
   const status = transformState.kind;
   const statusMessage =
     transformState.kind === "error" || transformState.kind === "unsafe"

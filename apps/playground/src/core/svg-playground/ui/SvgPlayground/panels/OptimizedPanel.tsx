@@ -12,7 +12,8 @@ export const OptimizedPanel = memo(function OptimizedPanel() {
       <div className="panel-header">
         <h2>Optimized SVG</h2>
       </div>
-      {status === "success" && optimizedSvg.length > 0 ? (
+      {(status === "success" || status === "unsafe") &&
+      optimizedSvg.length > 0 ? (
         <pre className="code-panel">{optimizedSvg}</pre>
       ) : status === "loading" ? (
         renderPanelFallback("Rebuilding optimized SVG…")

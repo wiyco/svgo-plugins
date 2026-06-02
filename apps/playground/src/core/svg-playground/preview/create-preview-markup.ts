@@ -1,3 +1,5 @@
+import { getUnsafeSvgReason } from "../transform/unsafe-svg";
+
 type PreviewMarkupOptions = {
   ariaLabel: string;
 };
@@ -18,6 +20,11 @@ export const createPreviewMarkup = (
   options: PreviewMarkupOptions,
 ): string => {
   const { ariaLabel } = options;
+  const unsafeReason = getUnsafeSvgReason(optimizedSvg);
+
+  if (unsafeReason !== null) {
+    throw new Error(unsafeReason);
+  }
 
   const rootElement = getRootSvgElement(optimizedSvg);
 

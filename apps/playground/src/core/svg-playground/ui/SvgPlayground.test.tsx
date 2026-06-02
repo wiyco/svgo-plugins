@@ -337,6 +337,31 @@ describe("SvgPlayground compound components", () => {
     );
   });
 
+  it("keeps optimized svg visible when transform output is downgraded to unsafe", async () => {
+    renderedTree = await renderCompound(
+      createRootProps({
+        previewHtml: null,
+        reactSourceState: {
+          error: "",
+          source: "",
+        },
+        transformState: {
+          kind: "unsafe",
+          message: "Remote URLs are blocked.",
+          optimizedSvg: '<svg data-optimized="unsafe"></svg>',
+        },
+      }),
+      <SvgPlayground.Panels />,
+    );
+
+    expect(renderedTree.container.textContent).toContain(
+      'data-optimized="unsafe"',
+    );
+    expect(renderedTree.container.textContent).toContain(
+      "Remote URLs are blocked.",
+    );
+  });
+
   it("renders error panel fallbacks", async () => {
     renderedTree = await renderCompound(
       createRootProps({

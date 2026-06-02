@@ -5,7 +5,7 @@ export type TransformState =
   | { kind: "idle" }
   | { kind: "loading" }
   | { kind: "success"; optimizedSvg: string }
-  | { kind: "unsafe"; message: string }
+  | { kind: "unsafe"; message: string; optimizedSvg?: string }
   | { kind: "error"; message: string };
 
 export type ReactSourceState = {

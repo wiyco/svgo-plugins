@@ -248,7 +248,24 @@ export const useSvgPlaygroundController = (
       return matchedPresetId;
     },
   );
-  const canShareUrl = getUnsafeSvgReason(renderedQueryState.svg) === null;
+  const inputUnsafeReason = useMemo(() => {
+    return getUnsafeSvgReason(renderedQueryState.svg);
+  }, [renderedQueryState.svg]);
+  const rawTransformState = useSvgTransformState(
+    renderedQueryState.svg,
+    transform,
+  );
+  const optimizedSvg =
+    rawTransformState.kind === "success" ? rawTransformState.optimizedSvg : "";
+  const optimizedSvgUnsafeReason = useMemo(() => {
+    if (optimizedSvg.length === 0) {
+      return null;
+    }
+
+    return getUnsafeSvgReason(optimizedSvg);
+  }, [optimizedSvg]);
+  const canShareUrl =
+    inputUnsafeReason === null && optimizedSvgUnsafeReason === null;
   const {
     copyShareUrl,
     shareAnnouncement,
@@ -257,10 +274,20 @@ export const useSvgPlaygroundController = (
   } = useCopyShareUrl({
     canShare: canShareUrl,
   });
-  const transformState = useSvgTransformState(
-    renderedQueryState.svg,
-    transform,
-  );
+  const transformState = useMemo(() => {
+    if (
+      rawTransformState.kind === "success" &&
+      optimizedSvgUnsafeReason !== null
+    ) {
+      return {
+        kind: "unsafe" as const,
+        message: optimizedSvgUnsafeReason,
+        optimizedSvg,
+      };
+    }
+
+    return rawTransformState;
+  }, [optimizedSvg, optimizedSvgUnsafeReason, rawTransformState]);
   const activePresetId = getActivePresetId({
     definition,
     matchedPresetId,
@@ -270,8 +297,6 @@ export const useSvgPlaygroundController = (
   const visiblePresets = useMemo(() => {
     return getVisiblePresets(definition);
   }, [definition]);
-  const optimizedSvg =
-    transformState.kind === "success" ? transformState.optimizedSvg : "";
 
   useEffect(() => {
     if (!needsInitialNormalization || window.location.search.length === 0) {
@@ -393,12 +418,23 @@ export const useSvgPlaygroundController = (
   );
 
   const previewMarkup = useMemo(() => {
+    if (transformState.kind !== "success") {
+      return null;
+    }
+
     return createPreviewMarkupFromSvg(optimizedSvg);
-  }, [optimizedSvg]);
+  }, [optimizedSvg, transformState.kind]);
 
   const reactSourceState = useMemo(() => {
+    if (transformState.kind !== "success") {
+      return {
+        error: "",
+        source: "",
+      };
+    }
+
     return createReactSourceState(optimizedSvg);
-  }, [optimizedSvg]);
+  }, [optimizedSvg, transformState.kind]);
 
   const previewHtml = useMemo(() => {
     return createPreviewHtml(previewMarkup);

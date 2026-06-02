@@ -1,3 +1,5 @@
+import { getUnsafeSvgReason } from "../transform/unsafe-svg";
+
 const ROOT_ELEMENT_NAME = "svg";
 const INDENT = "  ";
 
@@ -146,6 +148,12 @@ const serializeElement = (
 };
 
 export const createReactSource = (optimizedSvg: string): string => {
+  const unsafeReason = getUnsafeSvgReason(optimizedSvg);
+
+  if (unsafeReason !== null) {
+    throw new Error(unsafeReason);
+  }
+
   const rootElement = getRootSvgElement(optimizedSvg);
   const jsx = serializeElement(rootElement, 1, true);
 

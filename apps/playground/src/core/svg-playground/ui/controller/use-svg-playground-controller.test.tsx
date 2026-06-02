@@ -26,6 +26,13 @@ const successTransform: TransformFn = async ({ svg }) => {
   };
 };
 
+const unsafeOptimizedOutputTransform: TransformFn = async () => {
+  return {
+    kind: "success",
+    optimizedSvg: '<svg><image href="https://example.com/asset.svg" /></svg>',
+  };
+};
+
 const createDefinition = (
   overrides: Partial<
     Pick<SvgPlaygroundDefinition, "defaultState" | "presets">
@@ -59,15 +66,20 @@ let latestActions: ControllerActions | null = null;
 let latestActivePresetId: string | null = null;
 let latestQueryState: SvgPlaygroundViewModel["queryState"] | null = null;
 
+let latestCanShareUrl = false;
+let latestTransformState: SvgPlaygroundViewModel["transformState"] | null =
+  null;
+
 type ControllerHarnessProps = {
   definition: SvgPlaygroundDefinition;
+  transform?: TransformFn;
 };
 
 const ControllerHarness = (props: ControllerHarnessProps) => {
-  const { definition } = props;
+  const { definition, transform = successTransform } = props;
   const controller = useSvgPlaygroundController({
     definition,
-    transform: successTransform,
+    transform,
   });
 
   latestActions = {
@@ -79,7 +91,9 @@ const ControllerHarness = (props: ControllerHarnessProps) => {
     stepStrokeWidth: controller.stepStrokeWidth,
   };
   latestActivePresetId = controller.activePresetId;
+  latestCanShareUrl = controller.canShareUrl;
   latestQueryState = controller.queryState;
+  latestTransformState = controller.transformState;
 
   return (
     <div>
@@ -107,7 +121,9 @@ beforeEach(() => {
   window.history.replaceState({}, "", "/");
   latestActions = null;
   latestActivePresetId = null;
+  latestCanShareUrl = false;
   latestQueryState = null;
+  latestTransformState = null;
   (
     globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
   ).IS_REACT_ACT_ENVIRONMENT = true;
@@ -428,5 +444,32 @@ describe("use-svg-playground-controller", () => {
     expect(latestActions?.stepStrokeWidth).toBe(
       previousActions?.stepStrokeWidth,
     );
+  });
+
+  it("blocks sharing and downgrades the transform state when optimized output is unsafe", async () => {
+    const definition = createDefinition();
+
+    window.history.replaceState(
+      {},
+      "",
+      `/?${definition.serializeState(definition.defaultState)}`,
+    );
+
+    await act(async () => {
+      root.render(
+        <ControllerHarness
+          definition={definition}
+          transform={unsafeOptimizedOutputTransform}
+        />,
+      );
+      await flush();
+    });
+
+    expect(latestCanShareUrl).toBe(false);
+    expect(latestTransformState).toEqual({
+      kind: "unsafe",
+      message: "Remote URLs are blocked in the playground preview.",
+      optimizedSvg: '<svg><image href="https://example.com/asset.svg" /></svg>',
+    });
   });
 });

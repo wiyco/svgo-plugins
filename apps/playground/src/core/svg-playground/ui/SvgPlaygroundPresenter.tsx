@@ -5,7 +5,7 @@ import type { SvgPlaygroundViewModel } from "./controller/svg-playground-control
 
 import { getPlaygroundPackageName } from "../../../playgrounds/registry";
 import { getPlaygroundViewTransitionNames } from "../../../view-transition-names";
-import { SvgPlaygroundView } from "./SvgPlaygroundView";
+import { SvgPlayground } from "./SvgPlayground/SvgPlayground";
 import { usePressRipple } from "./use-press-ripple";
 import { useShareButton } from "./use-share-button";
 
@@ -30,7 +30,7 @@ export const SvgPlaygroundPresenter = (props: SvgPlaygroundPresenterProps) => {
   });
 
   return (
-    <SvgPlaygroundView
+    <SvgPlayground.Root
       activePresetId={viewModel.activePresetId}
       canShareUrl={viewModel.canShareUrl}
       color={viewModel.queryState.color}
@@ -55,6 +55,11 @@ export const SvgPlaygroundPresenter = (props: SvgPlaygroundPresenterProps) => {
       titleTransitionName={transitionNames.title}
       transformState={viewModel.transformState}
       visiblePresets={viewModel.visiblePresets}
-    />
+    >
+      <SvgPlayground.Header />
+      <SvgPlayground.PresetBar />
+      <SvgPlayground.Controls />
+      <SvgPlayground.Panels />
+    </SvgPlayground.Root>
   );
 };

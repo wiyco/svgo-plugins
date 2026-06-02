@@ -222,8 +222,12 @@ describe("hoist stroke width playground", () => {
     expect(optimizedPanel).toContain('data-source="multiple"');
     expect(optimizedPanel).toContain('stroke-width="2"');
     expect(previewSvg).not.toBeNull();
-    expect(previewSvg?.getAttribute("width")).toBe("184");
-    expect(previewSvg?.getAttribute("height")).toBe("184");
+    expect(previewSvg?.getAttribute("width")).toBe(
+      String(hoistStrokeWidthPlayground.defaultState.size),
+    );
+    expect(previewSvg?.getAttribute("height")).toBe(
+      String(hoistStrokeWidthPlayground.defaultState.size),
+    );
     expect(previewSvg?.getAttribute("style")).toContain("color: #155eef");
     expect(slugLink?.getAttribute("href")).toBe("../");
     expect(multiplePresetButton?.className).toContain("ripple-surface");

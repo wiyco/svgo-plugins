@@ -57,7 +57,7 @@ const DEFAULT_SVG_PRESET = SVG_PRESETS[0];
 export const DEFAULT_QUERY_STATE = {
   svg: DEFAULT_SVG_PRESET.svg,
   color: "#155eef",
-  size: 184,
+  size: 120,
   strokeWidth: 2,
 } as const satisfies Readonly<PlaygroundQueryState>;
 

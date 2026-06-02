@@ -153,14 +153,14 @@ textarea {
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  gap: var(--component-chip-gap);
+  padding: var(--component-chip-padding);
   border: 1px solid var(--color-outline);
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.64);
-  color: var(--color-contrast-strong);
+  background: var(--component-chip-interactive-background);
+  color: var(--component-chip-color);
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--component-chip-font-size);
   text-decoration: none;
   transition:
     border-color var(--duration-fast) var(--ease-standard),
@@ -169,9 +169,9 @@ textarea {
 }
 
 .slug-chip:hover {
-  border-color: rgba(10, 132, 255, 0.14);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 10px 24px rgba(16, 20, 24, 0.06);
+  border-color: var(--component-chip-interactive-hover-border-color);
+  background: var(--component-chip-interactive-hover-background);
+  box-shadow: var(--component-chip-interactive-hover-shadow);
 }
 
 .slug-chip:focus-visible {
@@ -233,7 +233,7 @@ textarea {
   width: var(--ripple-size, 120px);
   height: var(--ripple-size, 120px);
   border-radius: 50%;
-  background: rgba(10, 132, 255, 0.16);
+  background: var(--component-ripple-color);
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -50%) scale(0.12);
@@ -264,15 +264,13 @@ textarea {
   position: relative;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: var(--component-share-button-gap);
+  padding: var(--component-share-button-padding);
   border: 1px solid var(--color-outline);
   border-radius: var(--radius-pill);
-  color: var(--color-contrast-strong);
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
-    0 8px 18px rgba(16, 20, 24, 0.05);
+  color: var(--component-share-button-color);
+  background: var(--component-share-button-background);
+  box-shadow: var(--component-share-button-shadow);
   cursor: pointer;
   white-space: nowrap;
   transition:
@@ -285,26 +283,22 @@ textarea {
 }
 
 .share-button:hover {
-  border-color: rgba(10, 132, 255, 0.12);
-  color: var(--color-ink);
-  background-color: rgba(255, 255, 255, 0.96);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    0 12px 22px rgba(16, 20, 24, 0.07);
+  border-color: var(--component-share-button-hover-border-color);
+  color: var(--component-share-button-hover-color);
+  background-color: var(--component-share-button-hover-background);
+  box-shadow: var(--component-share-button-hover-shadow);
 }
 
 .share-button:active {
-  border-color: rgba(10, 132, 255, 0.14);
-  background-color: rgba(250, 251, 253, 0.98);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.76),
-    0 6px 14px rgba(16, 20, 24, 0.05);
+  border-color: var(--component-share-button-pressed-border-color);
+  background-color: var(--component-share-button-pressed-background);
+  box-shadow: var(--component-share-button-pressed-shadow);
 }
 
 .share-button:disabled {
-  border-color: var(--color-outline);
-  color: var(--color-ink-muted);
-  background: rgba(255, 255, 255, 0.72);
+  border-color: var(--component-share-button-disabled-border-color);
+  color: var(--component-share-button-disabled-color);
+  background: var(--component-share-button-disabled-background);
   box-shadow: none;
   cursor: not-allowed;
   transform: none;
@@ -331,15 +325,15 @@ textarea {
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
+  width: var(--component-share-button-icon-size);
+  height: var(--component-share-button-icon-size);
   color: currentColor;
 }
 
 .share-button-icon {
   display: block;
-  width: 14px;
-  height: 14px;
+  width: var(--component-share-button-icon-size);
+  height: var(--component-share-button-icon-size);
 }
 
 .share-button-measure {
@@ -350,26 +344,29 @@ textarea {
 }
 
 .share-button[data-share-feedback-state="success"] {
-  border-color: rgba(0, 136, 255, 0.2);
-  color: rgb(30, 110, 244);
-  background-color: rgba(0, 136, 255, 0.08);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    0 10px 18px rgba(16, 20, 24, 0.05);
+  border-color: var(--component-share-button-success-border-color);
+  color: var(--component-share-button-success-color);
+  background-color: var(--component-share-button-success-background);
+  box-shadow: var(--component-share-button-flash-shadow);
   animation: share-feedback-flash var(--duration-medium) both;
 }
 
-.share-button[data-share-feedback-state="failed"],
 .share-button[data-share-feedback-state="unavailable"] {
-  border-color: rgba(215, 0, 21, 0.14);
-  color: rgba(142, 23, 35, 0.92);
-  background-color: rgba(215, 0, 21, 0.04);
+  border-color: var(--component-share-button-unavailable-border-color);
+  color: var(--component-share-button-unavailable-color);
+  background-color: var(--component-share-button-unavailable-background);
+}
+
+.share-button[data-share-feedback-state="failed"] {
+  border-color: var(--component-share-button-failed-border-color);
+  color: var(--component-share-button-failed-color);
+  background-color: var(--component-share-button-failed-background);
 }
 
 .share-button[data-share-feedback-state="unsafe"] {
-  border-color: rgba(215, 0, 21, 0.12);
-  color: rgba(107, 49, 56, 0.92);
-  background-color: rgba(215, 0, 21, 0.03);
+  border-color: var(--component-share-button-unsafe-border-color);
+  color: var(--component-share-button-unsafe-color);
+  background-color: var(--component-share-button-unsafe-background);
 }
 
 .command-dock {
@@ -504,15 +501,13 @@ textarea {
 }
 
 .floating-preset-button:hover:not([aria-pressed="true"]) {
-  background: rgba(255, 255, 255, 0.26);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.52),
-    0 8px 18px rgba(16, 20, 24, 0.05);
+  background: var(--component-floating-preset-button-hover-background);
+  box-shadow: var(--component-floating-preset-button-hover-shadow);
 }
 
 .floating-preset-button:active:not([aria-pressed="true"]) {
-  background: rgba(255, 255, 255, 0.3);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  background: var(--component-floating-preset-button-active-background);
+  box-shadow: var(--component-floating-preset-button-active-shadow);
 }
 
 .floating-preset-button[aria-pressed="true"] {
@@ -561,14 +556,14 @@ textarea {
   padding: var(--space-4);
   border: 1px solid var(--color-outline);
   border-radius: var(--radius-card);
-  background: var(--color-surface-raised);
+  background: var(--component-control-surface-background);
   box-shadow: var(--shadow-raised);
 }
 
 .control-pod:hover {
-  border-color: rgba(10, 132, 255, 0.1);
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 14px 34px rgba(16, 20, 24, 0.08);
+  border-color: var(--component-control-surface-hover-border-color);
+  background: var(--component-control-surface-hover-background);
+  box-shadow: var(--component-control-surface-hover-shadow);
 }
 
 .control-pod-head,
@@ -581,14 +576,14 @@ textarea {
 
 .control-title {
   color: var(--color-secondary);
-  font-size: 0.75rem;
+  font-size: var(--component-control-title-size);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .control-value {
   color: var(--color-contrast-strong);
-  font-size: 0.8rem;
+  font-size: var(--component-control-value-size);
 }
 
 .number-stepper {
@@ -601,25 +596,25 @@ textarea {
 .number-stepper button {
   display: inline-grid;
   place-items: center;
-  width: 34px;
+  width: var(--number-stepper-control-height);
   height: var(--number-stepper-control-height);
   padding: 0;
   border: 1px solid var(--color-outline);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--component-stepper-button-background);
   cursor: pointer;
   line-height: 0;
 }
 
 .number-stepper button:hover {
-  border-color: rgba(10, 132, 255, 0.14);
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 8px 18px rgba(16, 20, 24, 0.06);
+  border-color: var(--component-stepper-button-hover-border-color);
+  background: var(--component-stepper-button-hover-background);
+  box-shadow: var(--component-stepper-button-hover-shadow);
 }
 
 .number-stepper button:active {
-  background: rgba(10, 132, 255, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+  background: var(--component-stepper-button-active-background);
+  box-shadow: var(--component-stepper-button-active-shadow);
 }
 
 .number-stepper input,
@@ -636,13 +631,13 @@ textarea {
   height: var(--number-stepper-control-height);
   min-width: 0;
   padding: 0 10px;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--component-stepper-input-background);
 }
 
 .size-slider {
-  --size-slider-track-height: 8px;
-  --size-slider-thumb-width: 24px;
-  --size-slider-thumb-height: 20px;
+  --size-slider-track-height: var(--component-slider-track-height);
+  --size-slider-thumb-width: var(--component-slider-thumb-width);
+  --size-slider-thumb-height: var(--component-slider-thumb-height);
   width: 100%;
   height: 30px;
   margin: 0;
@@ -665,7 +660,7 @@ textarea {
   background: linear-gradient(
     90deg,
     var(--color-primary) 0 var(--slider-progress, 50%),
-    rgba(16, 20, 24, 0.1) var(--slider-progress, 50%) 100%
+    var(--component-slider-track-background) var(--slider-progress, 50%) 100%
   );
 }
 
@@ -677,10 +672,8 @@ textarea {
   );
   border: none;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    0 4px 12px rgba(16, 20, 24, 0.16);
+  background: var(--component-slider-thumb-background);
+  box-shadow: var(--component-slider-thumb-shadow);
   transition:
     background-color var(--duration-fast) var(--ease-standard),
     box-shadow var(--duration-medium) var(--motion-spring-like);
@@ -689,30 +682,23 @@ textarea {
 }
 
 .size-slider:hover::-webkit-slider-thumb {
-  background: #fff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 6px 16px rgba(16, 20, 24, 0.2);
+  background: var(--component-slider-thumb-hover-background);
+  box-shadow: var(--component-slider-thumb-hover-shadow);
 }
 
 .size-slider:active::-webkit-slider-thumb {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 3px 10px rgba(16, 20, 24, 0.16);
+  box-shadow: var(--component-slider-thumb-active-shadow);
 }
 
 .size-slider:focus-visible::-webkit-slider-thumb {
-  box-shadow:
-    0 0 0 5px var(--color-focus-ring),
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 6px 16px rgba(16, 20, 24, 0.18);
+  box-shadow: var(--component-slider-thumb-focus-shadow);
 }
 
 .size-slider::-moz-range-track {
   height: var(--size-slider-track-height);
   border: none;
   border-radius: var(--radius-pill);
-  background: rgba(16, 20, 24, 0.1);
+  background: var(--component-slider-track-background);
 }
 
 .size-slider::-moz-range-progress {
@@ -727,33 +713,24 @@ textarea {
   height: var(--size-slider-thumb-height);
   border: none;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    0 4px 12px rgba(16, 20, 24, 0.16);
+  background: var(--component-slider-thumb-background);
+  box-shadow: var(--component-slider-thumb-shadow);
   transition:
     background-color var(--duration-fast) var(--ease-standard),
     box-shadow var(--duration-medium) var(--motion-spring-like);
 }
 
 .size-slider:hover::-moz-range-thumb {
-  background: #fff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 6px 16px rgba(16, 20, 24, 0.2);
+  background: var(--component-slider-thumb-hover-background);
+  box-shadow: var(--component-slider-thumb-hover-shadow);
 }
 
 .size-slider:active::-moz-range-thumb {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 3px 10px rgba(16, 20, 24, 0.16);
+  box-shadow: var(--component-slider-thumb-active-shadow);
 }
 
 .size-slider:focus-visible::-moz-range-thumb {
-  box-shadow:
-    0 0 0 5px var(--color-focus-ring),
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 6px 16px rgba(16, 20, 24, 0.18);
+  box-shadow: var(--component-slider-thumb-focus-shadow);
 }
 
 .color-swatch-row input {
@@ -765,7 +742,7 @@ textarea {
 }
 
 .workbench-grid {
-  --workbench-surface-min-height: 320px;
+  --workbench-surface-min-height: var(--component-workbench-surface-min-height);
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: var(--space-5);
@@ -779,16 +756,16 @@ textarea {
   padding: var(--space-4);
   border: 1px solid var(--color-outline);
   border-radius: var(--radius-panel);
-  background: var(--color-surface-raised);
+  background: var(--component-control-surface-background);
   box-shadow: var(--shadow-raised);
   animation: panel-enter var(--duration-slow) both;
   animation-timing-function: var(--motion-spring-like);
 }
 
 .panel:hover {
-  border-color: rgba(10, 132, 255, 0.08);
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 14px 34px rgba(16, 20, 24, 0.08);
+  border-color: var(--component-card-hover-border-color);
+  background: var(--component-card-hover-background);
+  box-shadow: var(--component-card-hover-shadow);
 }
 
 .panel-preview {
@@ -825,38 +802,32 @@ textarea {
   padding: 6px 10px;
   border: 1px solid var(--color-outline);
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.72);
-  color: var(--color-contrast-strong);
-  font-size: 0.72rem;
+  background: var(--component-status-pill-background);
+  color: var(--component-status-pill-color);
+  font-size: var(--component-status-pill-font-size);
   text-transform: capitalize;
 }
 
 .status-pill.is-success {
-  color: var(--color-secondary);
+  color: var(--component-status-pill-success-color);
 }
 
 .status-pill.is-loading {
-  color: var(--color-primary-strong);
+  color: var(--component-status-pill-loading-color);
 }
 
 .status-pill.is-error,
 .status-pill.is-unsafe {
-  color: var(--color-danger);
-  border-color: rgba(215, 0, 21, 0.16);
-  background: rgba(215, 0, 21, 0.08);
+  color: var(--component-status-pill-danger-color);
+  border-color: var(--component-status-pill-danger-border-color);
+  background: var(--component-status-pill-danger-background);
 }
 
 .preview-stage {
   display: grid;
   padding: var(--space-4);
-  background:
-    radial-gradient(circle at top, rgba(10, 132, 255, 0.06), transparent 46%),
-    linear-gradient(
-      180deg,
-      var(--color-surface-standard),
-      rgba(255, 255, 255, 0.82)
-    );
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.64);
+  background: var(--component-preview-stage-background);
+  box-shadow: var(--component-preview-stage-shadow);
 }
 
 .preview-render,
@@ -890,11 +861,7 @@ textarea {
 .code-panel {
   margin: 0;
   padding: var(--space-4);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.94),
-    rgba(255, 255, 255, 0.84)
-  );
+  background: var(--component-editor-surface-background);
   overflow: auto;
 }
 
@@ -1000,15 +967,11 @@ textarea {
 
 @keyframes share-feedback-flash {
   from {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.78),
-      0 0 0 rgba(16, 20, 24, 0);
+    box-shadow: var(--component-share-button-flash-start-shadow);
   }
 
   to {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.78),
-      0 10px 18px rgba(16, 20, 24, 0.05);
+    box-shadow: var(--component-share-button-flash-shadow);
   }
 }
 

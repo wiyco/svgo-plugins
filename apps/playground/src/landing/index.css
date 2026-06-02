@@ -153,9 +153,9 @@ code {
 }
 
 .landing-item a:hover {
-  border-color: rgba(10, 132, 255, 0.12);
-  background: rgba(255, 255, 255, 0.99);
-  box-shadow: 0 16px 34px rgba(16, 20, 24, 0.08);
+  border-color: var(--component-card-hover-border-color);
+  background: var(--component-card-hover-background);
+  box-shadow: var(--component-card-hover-shadow);
   transform: translateY(-1px);
 }
 
@@ -185,17 +185,17 @@ code {
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  gap: var(--component-chip-gap);
+  padding: var(--component-chip-padding);
   border-radius: var(--radius-pill);
-  font-size: 0.8rem;
+  font-size: var(--component-chip-font-size);
 }
 
 .landing-item-slug,
 .landing-item-package {
   border: 1px solid var(--color-outline);
-  background: rgba(255, 255, 255, 0.66);
-  color: var(--color-contrast-strong);
+  background: var(--component-chip-background);
+  color: var(--component-chip-color);
 }
 
 .landing-item-package-icon {
@@ -223,9 +223,9 @@ code {
 
 .landing-item-count {
   margin-left: auto;
-  border: 1px solid rgba(10, 132, 255, 0.16);
-  background: var(--color-container-emphasis);
-  color: var(--color-primary-strong);
+  border: 1px solid var(--component-chip-accent-border-color);
+  background: var(--component-chip-accent-background);
+  color: var(--component-chip-accent-color);
   white-space: nowrap;
 }
 

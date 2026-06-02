@@ -1,14 +1,29 @@
 ---
-colors:
-  primitives:
-    primary: "#0A84FF"
-    secondary: "#647586"
-    tertiary: "#9CB6CE"
-    neutral-strong: "#101418"
-    neutral-muted: "#566170"
-    danger: "#D70015"
-  semantic:
-    color-canvas: "#F5F5F7"
+primitives:
+  primitive-primary-300: "#78C3FF"
+  primitive-primary-400: "#35A0FF"
+  primitive-primary-500: "#0A84FF"
+  primitive-primary-600: "#1E6EF4"
+  primitive-primary-700: "#005ECB"
+  primitive-secondary-500: "#647586"
+  primitive-tertiary-400: "#9CB6CE"
+  primitive-neutral-0: "#FFFFFF"
+  primitive-neutral-50: "#FBFBFD"
+  primitive-neutral-100: "#F5F5F7"
+  primitive-neutral-150: "#EEF1F5"
+  primitive-neutral-200: "#DFE4EA"
+  primitive-neutral-400: "#8C97A4"
+  primitive-neutral-600: "#566170"
+  primitive-neutral-700: "#3F4954"
+  primitive-neutral-800: "#252B31"
+  primitive-neutral-900: "#101418"
+  primitive-danger-400: "#FF6674"
+  primitive-danger-500: "#D70015"
+  primitive-danger-600: "#8E1723"
+  primitive-danger-700: "#6B3138"
+themes:
+  light:
+    color-canvas: "var(--primitive-neutral-100)"
     color-canvas-tint: "#F4F6F9"
     color-surface-standard: "rgba(255, 255, 255, 0.90)"
     color-surface-raised: "rgba(255, 255, 255, 0.96)"
@@ -16,61 +31,239 @@ colors:
     color-surface-glass-strong: "rgba(255, 255, 255, 0.88)"
     color-surface-scrim: "rgba(247, 248, 250, 0.88)"
     color-container-emphasis: "rgba(10, 132, 255, 0.06)"
-    color-ink: "#101418"
-    color-ink-muted: "#566170"
-    color-primary: "#0A84FF"
-    color-primary-strong: "#005ECB"
-    color-secondary: "#647586"
-    color-tertiary: "#9CB6CE"
+    color-ink: "var(--primitive-neutral-900)"
+    color-ink-muted: "var(--primitive-neutral-600)"
+    color-primary: "var(--primitive-primary-500)"
+    color-primary-strong: "var(--primitive-primary-700)"
+    color-secondary: "var(--primitive-secondary-500)"
+    color-tertiary: "var(--primitive-tertiary-400)"
     color-tertiary-emphasis: "rgba(156, 182, 206, 0.12)"
     color-outline: "rgba(16, 20, 24, 0.08)"
     color-outline-strong: "rgba(16, 20, 24, 0.16)"
     color-contrast-strong: "rgba(16, 20, 24, 0.72)"
-    color-danger: "#D70015"
+    color-danger: "var(--primitive-danger-500)"
     color-focus-ring: "rgba(10, 132, 255, 0.24)"
     color-stage-glow: "rgba(10, 132, 255, 0.08)"
+    shadow-raised: "0 12px 30px rgba(16, 20, 24, 0.08)"
+    shadow-floating: "0 18px 44px rgba(16, 20, 24, 0.10)"
+    component-card-hover-border-color: "rgba(10, 132, 255, 0.10)"
+    component-card-hover-background: "rgba(255, 255, 255, 0.98)"
+    component-card-hover-shadow: "0 14px 34px rgba(16, 20, 24, 0.08)"
+    component-chip-background: "rgba(255, 255, 255, 0.66)"
+    component-chip-color: "var(--color-contrast-strong)"
+    component-chip-accent-border-color: "rgba(10, 132, 255, 0.16)"
+    component-chip-accent-background: "var(--color-container-emphasis)"
+    component-chip-accent-color: "var(--color-primary-strong)"
+    component-chip-interactive-background: "rgba(255, 255, 255, 0.64)"
+    component-chip-interactive-hover-border-color: "rgba(10, 132, 255, 0.14)"
+    component-chip-interactive-hover-background: "rgba(255, 255, 255, 0.90)"
+    component-chip-interactive-hover-shadow: "0 10px 24px rgba(16, 20, 24, 0.06)"
+    component-ripple-color: "rgba(10, 132, 255, 0.16)"
+    component-share-button-background: "rgba(255, 255, 255, 0.84)"
+    component-share-button-color: "var(--color-contrast-strong)"
+    component-share-button-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 18px rgba(16, 20, 24, 0.05)"
+    component-share-button-hover-border-color: "rgba(10, 132, 255, 0.12)"
+    component-share-button-hover-background: "rgba(255, 255, 255, 0.96)"
+    component-share-button-hover-color: "var(--color-ink)"
+    component-share-button-hover-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 12px 22px rgba(16, 20, 24, 0.07)"
+    component-share-button-pressed-border-color: "rgba(10, 132, 255, 0.14)"
+    component-share-button-pressed-background: "rgba(250, 251, 253, 0.98)"
+    component-share-button-pressed-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 6px 14px rgba(16, 20, 24, 0.05)"
+    component-share-button-disabled-background: "rgba(255, 255, 255, 0.72)"
+    component-share-button-disabled-color: "var(--color-ink-muted)"
+    component-share-button-disabled-border-color: "var(--color-outline)"
+    component-share-button-flash-start-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 0 0 rgba(16, 20, 24, 0)"
+    component-share-button-flash-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 10px 18px rgba(16, 20, 24, 0.05)"
+    component-share-button-success-border-color: "rgba(0, 136, 255, 0.20)"
+    component-share-button-success-color: "var(--primitive-primary-600)"
+    component-share-button-success-background: "rgba(0, 136, 255, 0.08)"
+    component-share-button-unavailable-border-color: "rgba(0, 136, 255, 0.20)"
+    component-share-button-unavailable-color: "var(--primitive-primary-600)"
+    component-share-button-unavailable-background: "rgba(0, 136, 255, 0.08)"
+    component-share-button-failed-border-color: "rgba(215, 0, 21, 0.14)"
+    component-share-button-failed-color: "var(--primitive-danger-600)"
+    component-share-button-failed-background: "rgba(215, 0, 21, 0.04)"
+    component-share-button-unsafe-border-color: "rgba(215, 0, 21, 0.12)"
+    component-share-button-unsafe-color: "var(--primitive-danger-700)"
+    component-share-button-unsafe-background: "rgba(215, 0, 21, 0.03)"
+    floating-preset-tabbar-border-color: "rgba(255, 255, 255, 0.42)"
+    floating-preset-tabbar-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.78), inset 0 0 0 1px rgba(255, 255, 255, 0.18), 0 18px 42px rgba(16, 20, 24, 0.10), 0 10px 22px rgba(16, 20, 24, 0.05)"
+    floating-preset-tabbar-surface: "linear-gradient(180deg, rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.28)), linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.05))"
+    floating-preset-tabbar-backdrop-filter: "blur(34px) saturate(190%)"
+    floating-preset-tabbar-sheen: "radial-gradient(circle at top, rgba(255, 255, 255, 0.40), transparent 56%), linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0))"
+    floating-preset-selection-surface: "linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.46)), rgba(10, 132, 255, 0.10)"
+    floating-preset-selection-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.82), inset 0 0 24px rgba(10, 132, 255, 0.14), 0 10px 20px rgba(16, 20, 24, 0.08)"
+    floating-preset-selected-icon-color: "var(--color-primary-strong)"
+    component-floating-preset-button-hover-background: "rgba(255, 255, 255, 0.26)"
+    component-floating-preset-button-hover-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.52), 0 8px 18px rgba(16, 20, 24, 0.05)"
+    component-floating-preset-button-active-background: "rgba(255, 255, 255, 0.30)"
+    component-floating-preset-button-active-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.50)"
+    component-control-surface-background: "var(--color-surface-raised)"
+    component-control-surface-hover-border-color: "rgba(10, 132, 255, 0.10)"
+    component-control-surface-hover-background: "rgba(255, 255, 255, 0.98)"
+    component-control-surface-hover-shadow: "0 14px 34px rgba(16, 20, 24, 0.08)"
+    component-stepper-button-background: "rgba(255, 255, 255, 0.80)"
+    component-stepper-button-hover-border-color: "rgba(10, 132, 255, 0.14)"
+    component-stepper-button-hover-background: "rgba(255, 255, 255, 0.94)"
+    component-stepper-button-hover-shadow: "0 8px 18px rgba(16, 20, 24, 0.06)"
+    component-stepper-button-active-background: "rgba(10, 132, 255, 0.08)"
+    component-stepper-button-active-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.58)"
+    component-stepper-input-background: "rgba(255, 255, 255, 0.88)"
+    component-slider-track-background: "rgba(16, 20, 24, 0.10)"
+    component-slider-thumb-background: "rgba(255, 255, 255, 0.98)"
+    component-slider-thumb-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 4px 12px rgba(16, 20, 24, 0.16)"
+    component-slider-thumb-hover-background: "#FFFFFF"
+    component-slider-thumb-hover-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 6px 16px rgba(16, 20, 24, 0.20)"
+    component-slider-thumb-active-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 3px 10px rgba(16, 20, 24, 0.16)"
+    component-slider-thumb-focus-shadow: "0 0 0 5px var(--color-focus-ring), inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 6px 16px rgba(16, 20, 24, 0.18)"
+    component-status-pill-background: "rgba(255, 255, 255, 0.72)"
+    component-status-pill-color: "var(--color-contrast-strong)"
+    component-status-pill-loading-color: "var(--color-primary-strong)"
+    component-status-pill-success-color: "var(--color-secondary)"
+    component-status-pill-danger-border-color: "rgba(215, 0, 21, 0.16)"
+    component-status-pill-danger-background: "rgba(215, 0, 21, 0.08)"
+    component-status-pill-danger-color: "var(--color-danger)"
+    component-preview-stage-background: "radial-gradient(circle at top, rgba(10, 132, 255, 0.06), transparent 46%), linear-gradient(180deg, var(--color-surface-standard), rgba(255, 255, 255, 0.82))"
+    component-preview-stage-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.64)"
+    component-editor-surface-background: "linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.84))"
+  dark:
+    color-canvas: "var(--primitive-neutral-900)"
+    color-canvas-tint: "#161B22"
+    color-surface-standard: "rgba(24, 28, 35, 0.92)"
+    color-surface-raised: "rgba(24, 28, 35, 0.96)"
+    color-surface-glass: "rgba(29, 35, 44, 0.76)"
+    color-surface-glass-strong: "rgba(29, 35, 44, 0.88)"
+    color-surface-scrim: "rgba(11, 15, 20, 0.88)"
+    color-container-emphasis: "rgba(10, 132, 255, 0.16)"
+    color-ink: "rgba(248, 250, 252, 0.96)"
+    color-ink-muted: "rgba(233, 238, 244, 0.72)"
+    color-primary: "var(--primitive-primary-400)"
+    color-primary-strong: "var(--primitive-primary-300)"
+    color-secondary: "rgba(220, 228, 236, 0.74)"
+    color-tertiary: "#B6C9DC"
+    color-tertiary-emphasis: "rgba(156, 182, 206, 0.18)"
+    color-outline: "rgba(255, 255, 255, 0.12)"
+    color-outline-strong: "rgba(255, 255, 255, 0.24)"
+    color-contrast-strong: "rgba(248, 250, 252, 0.86)"
+    color-danger: "var(--primitive-danger-400)"
+    color-focus-ring: "rgba(10, 132, 255, 0.34)"
+    color-stage-glow: "rgba(10, 132, 255, 0.18)"
+    shadow-raised: "0 16px 36px rgba(0, 0, 0, 0.32)"
+    shadow-floating: "0 24px 54px rgba(0, 0, 0, 0.42)"
+    component-card-hover-border-color: "rgba(53, 160, 255, 0.22)"
+    component-card-hover-background: "rgba(36, 42, 50, 0.98)"
+    component-card-hover-shadow: "0 18px 40px rgba(0, 0, 0, 0.34)"
+    component-chip-background: "rgba(255, 255, 255, 0.08)"
+    component-chip-color: "var(--color-contrast-strong)"
+    component-chip-accent-border-color: "rgba(53, 160, 255, 0.24)"
+    component-chip-accent-background: "rgba(10, 132, 255, 0.16)"
+    component-chip-accent-color: "var(--color-primary-strong)"
+    component-chip-interactive-background: "rgba(255, 255, 255, 0.08)"
+    component-chip-interactive-hover-border-color: "rgba(53, 160, 255, 0.28)"
+    component-chip-interactive-hover-background: "rgba(40, 46, 55, 0.92)"
+    component-chip-interactive-hover-shadow: "0 12px 26px rgba(0, 0, 0, 0.28)"
+    component-ripple-color: "rgba(53, 160, 255, 0.24)"
+    component-share-button-background: "rgba(28, 34, 42, 0.88)"
+    component-share-button-color: "var(--color-contrast-strong)"
+    component-share-button-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 24px rgba(0, 0, 0, 0.32)"
+    component-share-button-hover-border-color: "rgba(53, 160, 255, 0.28)"
+    component-share-button-hover-background: "rgba(36, 42, 50, 0.96)"
+    component-share-button-hover-color: "var(--color-ink)"
+    component-share-button-hover-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 14px 28px rgba(0, 0, 0, 0.34)"
+    component-share-button-pressed-border-color: "rgba(53, 160, 255, 0.30)"
+    component-share-button-pressed-background: "rgba(30, 35, 43, 0.98)"
+    component-share-button-pressed-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 8px 18px rgba(0, 0, 0, 0.28)"
+    component-share-button-disabled-background: "rgba(255, 255, 255, 0.06)"
+    component-share-button-disabled-color: "var(--color-ink-muted)"
+    component-share-button-disabled-border-color: "var(--color-outline)"
+    component-share-button-flash-start-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 0 rgba(0, 0, 0, 0)"
+    component-share-button-flash-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 12px 24px rgba(0, 0, 0, 0.34)"
+    component-share-button-success-border-color: "rgba(83, 164, 255, 0.38)"
+    component-share-button-success-color: "var(--color-primary-strong)"
+    component-share-button-success-background: "rgba(10, 132, 255, 0.18)"
+    component-share-button-unavailable-border-color: "rgba(83, 164, 255, 0.38)"
+    component-share-button-unavailable-color: "var(--color-primary-strong)"
+    component-share-button-unavailable-background: "rgba(10, 132, 255, 0.18)"
+    component-share-button-failed-border-color: "rgba(255, 102, 116, 0.32)"
+    component-share-button-failed-color: "var(--color-danger)"
+    component-share-button-failed-background: "rgba(255, 102, 116, 0.10)"
+    component-share-button-unsafe-border-color: "rgba(255, 102, 116, 0.24)"
+    component-share-button-unsafe-color: "rgba(255, 176, 184, 0.92)"
+    component-share-button-unsafe-background: "rgba(255, 102, 116, 0.07)"
+    floating-preset-tabbar-border-color: "rgba(255, 255, 255, 0.12)"
+    floating-preset-tabbar-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 24px 48px rgba(0, 0, 0, 0.38), 0 10px 24px rgba(0, 0, 0, 0.28)"
+    floating-preset-tabbar-surface: "linear-gradient(180deg, rgba(36, 42, 50, 0.80), rgba(18, 22, 28, 0.68)), linear-gradient(135deg, rgba(53, 160, 255, 0.12), rgba(255, 255, 255, 0.02))"
+    floating-preset-tabbar-backdrop-filter: "blur(34px) saturate(160%)"
+    floating-preset-tabbar-sheen: "radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 56%), linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0))"
+    floating-preset-selection-surface: "linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)), rgba(10, 132, 255, 0.18)"
+    floating-preset-selection-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 0 24px rgba(10, 132, 255, 0.24), 0 12px 24px rgba(0, 0, 0, 0.28)"
+    floating-preset-selected-icon-color: "var(--color-primary-strong)"
+    component-floating-preset-button-hover-background: "rgba(255, 255, 255, 0.08)"
+    component-floating-preset-button-hover-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 22px rgba(0, 0, 0, 0.26)"
+    component-floating-preset-button-active-background: "rgba(255, 255, 255, 0.10)"
+    component-floating-preset-button-active-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.14)"
+    component-control-surface-background: "var(--color-surface-raised)"
+    component-control-surface-hover-border-color: "rgba(53, 160, 255, 0.22)"
+    component-control-surface-hover-background: "rgba(36, 42, 50, 0.98)"
+    component-control-surface-hover-shadow: "0 18px 40px rgba(0, 0, 0, 0.34)"
+    component-stepper-button-background: "rgba(255, 255, 255, 0.10)"
+    component-stepper-button-hover-border-color: "rgba(53, 160, 255, 0.28)"
+    component-stepper-button-hover-background: "rgba(40, 46, 55, 0.94)"
+    component-stepper-button-hover-shadow: "0 10px 22px rgba(0, 0, 0, 0.28)"
+    component-stepper-button-active-background: "rgba(10, 132, 255, 0.16)"
+    component-stepper-button-active-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.16)"
+    component-stepper-input-background: "rgba(255, 255, 255, 0.12)"
+    component-slider-track-background: "rgba(255, 255, 255, 0.16)"
+    component-slider-thumb-background: "rgba(36, 42, 50, 0.98)"
+    component-slider-thumb-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 18px rgba(0, 0, 0, 0.34)"
+    component-slider-thumb-hover-background: "rgba(44, 50, 60, 1)"
+    component-slider-thumb-hover-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 22px rgba(0, 0, 0, 0.36)"
+    component-slider-thumb-active-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 14px rgba(0, 0, 0, 0.32)"
+    component-slider-thumb-focus-shadow: "0 0 0 5px var(--color-focus-ring), inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 22px rgba(0, 0, 0, 0.34)"
+    component-status-pill-background: "rgba(255, 255, 255, 0.08)"
+    component-status-pill-color: "var(--color-contrast-strong)"
+    component-status-pill-loading-color: "var(--color-primary-strong)"
+    component-status-pill-success-color: "var(--color-secondary)"
+    component-status-pill-danger-border-color: "rgba(255, 102, 116, 0.28)"
+    component-status-pill-danger-background: "rgba(255, 102, 116, 0.10)"
+    component-status-pill-danger-color: "var(--color-danger)"
+    component-preview-stage-background: "radial-gradient(circle at top, rgba(10, 132, 255, 0.14), transparent 46%), linear-gradient(180deg, var(--color-surface-standard), rgba(24, 28, 35, 0.92))"
+    component-preview-stage-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08)"
+    component-editor-surface-background: "linear-gradient(180deg, rgba(36, 42, 50, 0.96), rgba(28, 34, 42, 0.90))"
 typography:
   font-sans: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", "Roboto Flex", "Noto Sans", sans-serif'
   font-mono: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace'
-  roles:
-    display:
-      size: "clamp(1.45rem, 2.35vw, 1.95rem)"
-      line-height: "1.02"
-      weight: 610
-    headline:
-      size: "clamp(1.25rem, 2vw, 1.6rem)"
-      line-height: "1.05"
-      weight: 600
-    title:
-      size: "1rem"
-      line-height: "1.25"
-      weight: 590
-    body:
-      size: "0.9375rem"
-      line-height: "1.5"
-      weight: 400
-    label:
-      size: "0.6875rem"
-      line-height: "1.2"
-      weight: 600
+  type-display-size: "clamp(1.45rem, 2.35vw, 1.95rem)"
+  type-display-line-height: "1.02"
+  type-display-weight: "610"
+  type-headline-size: "clamp(1.25rem, 2vw, 1.6rem)"
+  type-headline-line-height: "1.05"
+  type-headline-weight: "600"
+  type-title-size: "1rem"
+  type-title-line-height: "1.25"
+  type-title-weight: "590"
+  type-body-size: "0.9375rem"
+  type-body-line-height: "1.5"
+  type-body-weight: "400"
+  type-label-size: "0.6875rem"
+  type-label-line-height: "1.2"
+  type-label-weight: "600"
 spacing:
-  space-1: 4
-  space-2: 6
-  space-3: 10
-  space-4: 14
-  space-5: 18
-  space-6: 22
-  space-7: 28
-  space-8: 36
+  space-1: "4px"
+  space-2: "6px"
+  space-3: "14px"
+  space-4: "18px"
+  space-5: "22px"
+  space-6: "28px"
+  space-7: "36px"
+  space-8: "44px"
 radii:
   radius-control: "12px"
   radius-card: "18px"
   radius-panel: "22px"
   radius-hero: "24px"
   radius-pill: "999px"
-elevation:
-  shadow-raised: "0 12px 30px rgba(16, 20, 24, 0.08)"
-  shadow-floating: "0 18px 44px rgba(16, 20, 24, 0.10)"
+effects:
   blur-glass: "18px"
   blur-soft: "10px"
 motion:
@@ -80,29 +273,59 @@ motion:
   ease-standard: "cubic-bezier(0.2, 0, 0, 1)"
   ease-emphasized: "cubic-bezier(0.24, 0.86, 0.28, 1)"
   motion-spring-like: "cubic-bezier(0.22, 0.9, 0.3, 1)"
+components:
+  component-chip-gap: "6px"
+  component-chip-padding: "6px 10px"
+  component-chip-font-size: "0.8rem"
+  component-share-button-gap: "8px"
+  component-share-button-padding: "10px 14px"
+  component-share-button-icon-size: "14px"
+  component-control-title-size: "0.75rem"
+  component-control-value-size: "0.8rem"
+  component-status-pill-font-size: "0.72rem"
+  component-slider-track-height: "8px"
+  component-slider-thumb-width: "24px"
+  component-slider-thumb-height: "20px"
+  component-workbench-surface-min-height: "320px"
+  floating-preset-tabbar-height: "64px"
+  floating-preset-tabbar-edge-gap: "20px"
+  floating-preset-tabbar-offset-base: "30px"
+  floating-preset-tabbar-safe-area-extra: "18px"
+  floating-preset-tabbar-reserved-gap: "8px"
+  floating-preset-tabbar-padding: "4px"
+  floating-preset-tabbar-gap: "4px"
+  floating-preset-button-min-width: "68px"
+  floating-preset-button-min-height: "54px"
+  floating-preset-button-gap: "2px"
+  floating-preset-button-padding: "7px 12px 6px"
+  floating-preset-icon-size: "20px"
+  floating-preset-glyph-size: "15px"
+  floating-preset-label-size: "0.6rem"
+  number-stepper-control-height: "34px"
 ---
 
 # Playground Design Tokens
 
-`apps/playground` stays light-only. This pass keeps the denser utility layout, scales back oversized display type, and softens emphasis surfaces toward Apple's latest light chrome guidance.
+`apps/playground` now treats this file as the human-readable source of truth for visual tokens, while `src/tokens.css` stays the runtime mirror.
 
 ## Principles
 
-- Liquid Glass stays on chrome only: landing header, playground intro, and command dock.
-- Editors, code panels, preview stages, warnings, and loading surfaces stay raised and readable.
-- `primary` is reserved for focus, hover, and ripple feedback. The share button stays neutral in its resting state, then picks up state color only when feedback matters. `secondary` is quiet metadata. `tertiary` is limited to selected preset emphasis. `danger` is only for failure and unsafe states.
-- `DESIGN.md` and `src/tokens.css` stay in manual 1:1 sync.
+- Structure tokens in three layers: primitives, theme semantics, then shared component chrome.
+- Keep light as the live default. Dark tokens exist for future activation, but no runtime theme switching is introduced in this pass.
+- Promote only values that shape shared UI language: state colors, glass/card surfaces, chips, buttons, controls, slider chrome, and floating preset chrome. One-off page sizing stays in CSS.
 
-## Semantic Tokens
+## Color System
 
-- `color-tertiary-emphasis` is the selected preset fill.
-- `color-container-emphasis` is the subtle blue wash used for restrained highlight surfaces.
-- `color-surface-scrim` is the page-level light field behind chrome.
-- `color-stage-glow` is reserved for the preview halo.
-- `color-contrast-strong` strengthens text and outlines under higher-contrast conditions.
-- `motion-spring-like` is the standard entry/state easing for this app.
+- `success` and `unavailable` share the same blue informational family on the share button.
+- `failed` stays high-emphasis danger, while `unsafe` stays muted danger to signal blocked sharing without competing with hard failures.
+- Theme semantic tokens own app-wide meaning such as canvas, raised surface, emphasis wash, outline strength, focus ring, and stage glow. Component tokens consume those semantics rather than repeating raw values in view CSS.
+
+## Token Sync
+
+- `DESIGN.md` and `src/tokens.css` are intended to stay in 1:1 sync.
+- A playground test should fail when token names or values drift between the two files.
 
 ## Accessibility
 
-- Interactive surfaces always animate. Hover stays color-first, press feedback uses ripple on buttons, and cross-document navigation uses View Transitions when supported. Under `prefers-reduced-motion: reduce`, durations collapse and travel is removed.
-- Under `prefers-contrast: more`, glass shifts toward raised surfaces and outlines become stronger.
+- The app still defaults to light chrome and keeps the current reduced-motion and higher-contrast behavior.
+- Focus indicators remain semantic and stateful, so future theme activation can switch contrast without touching component CSS.

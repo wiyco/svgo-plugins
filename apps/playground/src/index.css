@@ -102,8 +102,7 @@ textarea {
   padding-bottom: calc(56px + var(--floating-preset-tabbar-reserved-space));
 }
 
-.intro-band,
-.command-dock {
+.intro-band {
   border: 1px solid var(--color-outline);
   background: linear-gradient(
     180deg,
@@ -115,6 +114,27 @@ textarea {
   -webkit-backdrop-filter: blur(var(--blur-glass));
   animation: chrome-enter var(--duration-slow) both;
   animation-timing-function: var(--motion-spring-like);
+}
+
+.command-dock,
+.floating-preset-tabbar {
+  border: 1px solid var(--component-liquid-glass-border-color);
+  background: var(--component-liquid-glass-surface);
+  box-shadow: var(--component-liquid-glass-shadow);
+  overflow: hidden;
+  isolation: isolate;
+  backdrop-filter: var(--component-liquid-glass-backdrop-filter);
+  -webkit-backdrop-filter: var(--component-liquid-glass-backdrop-filter);
+}
+
+.command-dock::before,
+.floating-preset-tabbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--component-liquid-glass-sheen);
+  pointer-events: none;
 }
 
 .intro-band {
@@ -417,26 +437,11 @@ textarea {
   display: block;
   inline-size: fit-content;
   max-inline-size: calc(100vw - var(--floating-preset-tabbar-edge-gap));
-  border: 1px solid var(--floating-preset-tabbar-border-color);
   border-radius: var(--radius-pill);
-  background: var(--floating-preset-tabbar-surface);
-  box-shadow: var(--floating-preset-tabbar-shadow);
   transform: translateX(-50%);
-  overflow: hidden;
-  backdrop-filter: var(--floating-preset-tabbar-backdrop-filter);
-  -webkit-backdrop-filter: var(--floating-preset-tabbar-backdrop-filter);
   animation: floating-tabbar-enter var(--duration-slow) both;
   animation-delay: 80ms;
   animation-timing-function: var(--motion-spring-like);
-}
-
-.floating-preset-tabbar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--floating-preset-tabbar-sheen);
-  pointer-events: none;
 }
 
 .floating-preset-tabbar-scroll {

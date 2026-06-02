@@ -180,26 +180,46 @@
   --component-share-button-unsafe-color: var(--primitive-danger-700);
   --component-share-button-unsafe-background: rgba(215, 0, 21, 0.03);
 
-  --floating-preset-tabbar-border-color: rgba(255, 255, 255, 0.42);
-  --floating-preset-tabbar-shadow:
+  --component-liquid-glass-border-color: rgba(255, 255, 255, 0.48);
+  --component-liquid-glass-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
-    0 18px 42px rgba(16, 20, 24, 0.1), 0 10px 22px rgba(16, 20, 24, 0.05);
-  --floating-preset-tabbar-surface:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 20px 44px rgba(16, 20, 24, 0.08), 0 8px 22px rgba(16, 20, 24, 0.04);
+  --component-liquid-glass-surface:
+    radial-gradient(
+      circle at top left,
+      rgba(255, 255, 255, 0.28),
+      transparent 56%
+    ),
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.64),
-      rgba(255, 255, 255, 0.28)
+      rgba(255, 255, 255, 0.48),
+      rgba(255, 255, 255, 0.16)
     ),
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.28),
+      rgba(255, 255, 255, 0.22),
       rgba(255, 255, 255, 0.05)
     );
-  --floating-preset-tabbar-backdrop-filter: blur(34px) saturate(190%);
-  --floating-preset-tabbar-sheen:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.4), transparent 56%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0));
+  --component-liquid-glass-backdrop-filter: blur(36px) saturate(185%);
+  --component-liquid-glass-sheen:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.44), transparent 54%),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0.02) 38%,
+      rgba(255, 255, 255, 0)
+    );
+
+  --floating-preset-tabbar-border-color: var(
+    --component-liquid-glass-border-color
+  );
+  --floating-preset-tabbar-shadow: var(--component-liquid-glass-shadow);
+  --floating-preset-tabbar-surface: var(--component-liquid-glass-surface);
+  --floating-preset-tabbar-backdrop-filter: var(
+    --component-liquid-glass-backdrop-filter
+  );
+  --floating-preset-tabbar-sheen: var(--component-liquid-glass-sheen);
   --floating-preset-selection-surface:
     linear-gradient(
       180deg,
@@ -362,18 +382,38 @@
   --component-share-button-unsafe-color: rgba(255, 176, 184, 0.92);
   --component-share-button-unsafe-background: rgba(255, 102, 116, 0.07);
 
-  --floating-preset-tabbar-border-color: rgba(255, 255, 255, 0.12);
-  --floating-preset-tabbar-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 24px 48px rgba(0, 0, 0, 0.38),
-    0 10px 24px rgba(0, 0, 0, 0.28);
-  --floating-preset-tabbar-surface:
-    linear-gradient(180deg, rgba(36, 42, 50, 0.8), rgba(18, 22, 28, 0.68)),
-    linear-gradient(135deg, rgba(53, 160, 255, 0.12), rgba(255, 255, 255, 0.02));
-  --floating-preset-tabbar-backdrop-filter: blur(34px) saturate(160%);
-  --floating-preset-tabbar-sheen:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 56%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+  --component-liquid-glass-border-color: rgba(255, 255, 255, 0.14);
+  --component-liquid-glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 28px 56px rgba(0, 0, 0, 0.34),
+    0 10px 24px rgba(0, 0, 0, 0.2);
+  --component-liquid-glass-surface:
+    radial-gradient(
+      circle at top left,
+      rgba(255, 255, 255, 0.08),
+      transparent 58%
+    ),
+    linear-gradient(180deg, rgba(39, 45, 55, 0.58), rgba(18, 22, 29, 0.24)),
+    linear-gradient(135deg, rgba(83, 164, 255, 0.08), rgba(255, 255, 255, 0.02));
+  --component-liquid-glass-backdrop-filter: blur(38px) saturate(155%);
+  --component-liquid-glass-sheen:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 54%),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.01) 38%,
+      rgba(255, 255, 255, 0)
+    );
+
+  --floating-preset-tabbar-border-color: var(
+    --component-liquid-glass-border-color
+  );
+  --floating-preset-tabbar-shadow: var(--component-liquid-glass-shadow);
+  --floating-preset-tabbar-surface: var(--component-liquid-glass-surface);
+  --floating-preset-tabbar-backdrop-filter: var(
+    --component-liquid-glass-backdrop-filter
+  );
+  --floating-preset-tabbar-sheen: var(--component-liquid-glass-sheen);
   --floating-preset-selection-surface:
     linear-gradient(
       180deg,

@@ -188,6 +188,10 @@ textarea {
     box-shadow var(--duration-medium) var(--motion-spring-like);
 }
 
+.slug-chip {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .slug-chip:hover {
   border-color: var(--component-chip-interactive-hover-border-color);
   background: var(--component-chip-interactive-hover-background);

@@ -138,6 +138,7 @@ code {
     box-shadow var(--duration-medium) var(--motion-spring-like),
     transform var(--duration-medium) var(--motion-spring-like),
     opacity var(--duration-fast) var(--ease-standard);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .landing-item:nth-child(1) {

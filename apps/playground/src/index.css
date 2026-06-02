@@ -551,6 +551,9 @@ textarea {
 
 .control-pod {
   display: grid;
+  grid-template-rows:
+    minmax(var(--component-control-row-height), auto)
+    minmax(var(--component-control-row-height), auto);
   gap: var(--space-4);
   min-width: 0;
   padding: var(--space-4);
@@ -574,6 +577,10 @@ textarea {
   justify-content: space-between;
 }
 
+.control-pod-head {
+  min-block-size: var(--component-control-row-height);
+}
+
 .control-title {
   color: var(--color-secondary);
   font-size: var(--component-control-title-size);
@@ -591,6 +598,7 @@ textarea {
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-2);
   align-items: center;
+  min-block-size: var(--component-control-row-height);
 }
 
 .number-stepper button {
@@ -639,7 +647,7 @@ textarea {
   --size-slider-thumb-width: var(--component-slider-thumb-width);
   --size-slider-thumb-height: var(--component-slider-thumb-height);
   width: 100%;
-  height: 30px;
+  height: var(--component-control-row-height);
   margin: 0;
   padding: 0;
   border: none;
@@ -733,9 +741,16 @@ textarea {
   box-shadow: var(--component-slider-thumb-focus-shadow);
 }
 
+.color-swatch-row {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--component-control-row-height);
+}
+
 .color-swatch-row input {
   width: 100%;
-  min-height: 40px;
+  height: 100%;
+  min-height: 0;
   padding: 2px;
   background: transparent;
   cursor: pointer;

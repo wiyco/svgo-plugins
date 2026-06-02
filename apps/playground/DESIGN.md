@@ -280,6 +280,7 @@ components:
   component-share-button-gap: "8px"
   component-share-button-padding: "10px 14px"
   component-share-button-icon-size: "14px"
+  component-control-row-height: "34px"
   component-control-title-size: "0.75rem"
   component-control-value-size: "0.8rem"
   component-status-pill-font-size: "0.72rem"
@@ -301,7 +302,7 @@ components:
   floating-preset-icon-size: "20px"
   floating-preset-glyph-size: "15px"
   floating-preset-label-size: "0.6rem"
-  number-stepper-control-height: "34px"
+  number-stepper-control-height: "var(--component-control-row-height)"
 ---
 
 # Playground Design Tokens

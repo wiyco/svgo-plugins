@@ -24,6 +24,18 @@ const parseSvg = (svg: string): Element => {
 };
 
 describe("svg-controls", () => {
+  it("drops malformed style declarations when it rewrites the root color", () => {
+    const nextSvg = applyControlsToSvg(
+      '<svg style="fill none; : 1; opacity: ; fill: none" viewBox="0 0 24 24"><path d="M0 0L24 24" /></svg>',
+      FALLBACK_CONTROLS,
+    );
+    const rootElement = parseSvg(nextSvg);
+
+    expect(rootElement.getAttribute("style")).toBe(
+      "fill: none; color: #155eef",
+    );
+  });
+
   it("applies size, color, and stroke width while preserving other root styles", () => {
     const nextSvg = applyControlsToSvg(
       '<svg color="#0f766e" style="fill: none; opacity: 0.8" viewBox="0 0 24 24"><g stroke-width="1.25"><path d="M0 0L24 24" stroke-width="3" /></g></svg>',
@@ -84,6 +96,51 @@ describe("svg-controls", () => {
     expect(paths[1]?.getAttribute("stroke-width")).toBe("2.5");
   });
 
+  it("treats unparseable leading stroke-width values as mixed when preservation is enabled", () => {
+    const nextSvg = applyControlsToSvg(
+      '<svg stroke-width="inherit" viewBox="0 0 24 24"><path d="M0 0L24 24" stroke-width="2" /></svg>',
+      {
+        color: "#ff6600",
+        size: 256,
+        strokeWidth: 4,
+      },
+      {
+        preserveStrokeWidthVariations: true,
+      },
+    );
+    const rootElement = parseSvg(nextSvg);
+
+    expect(rootElement.getAttribute("width")).toBe("256");
+    expect(rootElement.getAttribute("height")).toBe("256");
+    expect(rootElement.getAttribute("style")).toContain("color: #ff6600");
+    expect(rootElement.getAttribute("stroke-width")).toBe("inherit");
+    expect(
+      rootElement.querySelector("path")?.getAttribute("stroke-width"),
+    ).toBe("2");
+  });
+
+  it("does not preserve stroke widths when there is only one stroke-width target", () => {
+    const nextSvg = applyControlsToSvg(
+      '<svg viewBox="0 0 24 24"><path d="M0 0L24 24" stroke-width="1.25" /></svg>',
+      {
+        color: "#ff6600",
+        size: 256,
+        strokeWidth: 4,
+      },
+      {
+        preserveStrokeWidthVariations: true,
+      },
+    );
+    const rootElement = parseSvg(nextSvg);
+
+    expect(rootElement.getAttribute("width")).toBe("256");
+    expect(rootElement.getAttribute("height")).toBe("256");
+    expect(rootElement.getAttribute("style")).toContain("color: #ff6600");
+    expect(
+      rootElement.querySelector("path")?.getAttribute("stroke-width"),
+    ).toBe("4");
+  });
+
   it("extracts root width, style color, and uniform stroke width", () => {
     expect(
       extractControlsFromSvg(
@@ -107,6 +164,30 @@ describe("svg-controls", () => {
       color: "#aabbcc",
       size: 96,
       strokeWidth: 2,
+    });
+  });
+
+  it("falls back for invalid color and unsupported numeric units", () => {
+    expect(
+      extractControlsFromSvg(
+        '<svg width="12em" color="red" viewBox="0 0 24 24"><path d="M0 0L24 24" stroke-width="2px" /></svg>',
+        FALLBACK_CONTROLS,
+      ),
+    ).toEqual(FALLBACK_CONTROLS);
+  });
+
+  it("falls back when oversized numeric literals overflow parseFloat", () => {
+    const oversizedNumber = "9".repeat(400);
+
+    expect(
+      extractControlsFromSvg(
+        `<svg width="${oversizedNumber}" color="#abc" viewBox="0 0 24 24"><path d="M0 0L24 24" stroke-width="${oversizedNumber}" /></svg>`,
+        FALLBACK_CONTROLS,
+      ),
+    ).toEqual({
+      color: "#aabbcc",
+      size: FALLBACK_CONTROLS.size,
+      strokeWidth: FALLBACK_CONTROLS.strokeWidth,
     });
   });
 

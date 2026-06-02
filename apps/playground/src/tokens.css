@@ -1,0 +1,90 @@
+:root {
+  color-scheme: light;
+  --primitive-primary-500: #0a84ff;
+  --primitive-primary-700: #005ecb;
+  --primitive-secondary-500: #647586;
+  --primitive-tertiary-400: #9cb6ce;
+  --primitive-neutral-0: #ffffff;
+  --primitive-neutral-50: #fbfbfd;
+  --primitive-neutral-100: #f5f5f7;
+  --primitive-neutral-150: #eef1f5;
+  --primitive-neutral-200: #dfe4ea;
+  --primitive-neutral-400: #8c97a4;
+  --primitive-neutral-600: #566170;
+  --primitive-neutral-900: #101418;
+  --primitive-danger-500: #d70015;
+
+  --color-canvas: var(--primitive-neutral-100);
+  --color-canvas-tint: #f4f6f9;
+  --color-surface-standard: rgba(255, 255, 255, 0.9);
+  --color-surface-raised: rgba(255, 255, 255, 0.96);
+  --color-surface-glass: rgba(255, 255, 255, 0.76);
+  --color-surface-glass-strong: rgba(255, 255, 255, 0.88);
+  --color-surface-scrim: rgba(247, 248, 250, 0.88);
+  --color-container-emphasis: rgba(10, 132, 255, 0.06);
+  --color-ink: var(--primitive-neutral-900);
+  --color-ink-muted: var(--primitive-neutral-600);
+  --color-primary: var(--primitive-primary-500);
+  --color-primary-strong: var(--primitive-primary-700);
+  --color-secondary: var(--primitive-secondary-500);
+  --color-tertiary: var(--primitive-tertiary-400);
+  --color-tertiary-emphasis: rgba(156, 182, 206, 0.12);
+  --color-outline: rgba(16, 20, 24, 0.08);
+  --color-outline-strong: rgba(16, 20, 24, 0.16);
+  --color-contrast-strong: rgba(16, 20, 24, 0.72);
+  --color-danger: var(--primitive-danger-500);
+  --color-focus-ring: rgba(10, 132, 255, 0.24);
+  --color-stage-glow: rgba(10, 132, 255, 0.08);
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Segoe UI", "Roboto Flex", "Noto Sans", sans-serif;
+  --font-mono: "SF Mono", "IBM Plex Mono", "Roboto Mono", monospace;
+  --type-display-size: clamp(1.45rem, 2.35vw, 1.95rem);
+  --type-display-line-height: 1.02;
+  --type-display-weight: 610;
+  --type-headline-size: clamp(1.25rem, 2vw, 1.6rem);
+  --type-headline-line-height: 1.05;
+  --type-headline-weight: 600;
+  --type-title-size: 1rem;
+  --type-title-line-height: 1.25;
+  --type-title-weight: 590;
+  --type-body-size: 0.9375rem;
+  --type-body-line-height: 1.5;
+  --type-body-weight: 400;
+  --type-label-size: 0.6875rem;
+  --type-label-line-height: 1.2;
+  --type-label-weight: 600;
+
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 10px;
+  --space-4: 14px;
+  --space-5: 18px;
+  --space-6: 22px;
+  --space-7: 28px;
+  --space-8: 36px;
+
+  --radius-control: 12px;
+  --radius-card: 18px;
+  --radius-panel: 22px;
+  --radius-hero: 24px;
+  --radius-pill: 999px;
+
+  --shadow-raised: 0 12px 30px rgba(16, 20, 24, 0.08);
+  --shadow-floating: 0 18px 44px rgba(16, 20, 24, 0.1);
+  --blur-glass: 18px;
+  --blur-soft: 10px;
+
+  --duration-fast: 140ms;
+  --duration-medium: 220ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.24, 0.86, 0.28, 1);
+  --motion-spring-like: cubic-bezier(0.22, 0.9, 0.3, 1);
+
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  line-height: var(--type-body-line-height);
+  font-weight: var(--type-body-weight);
+}

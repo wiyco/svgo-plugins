@@ -4,7 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SvgPreset } from "../model";
 
-import { FloatingPresetTabBar } from "./FloatingPresetTabBar";
+import {
+  FloatingPresetTabBar,
+  getNextPresetButton,
+} from "./FloatingPresetTabBar";
 
 type RenderedTabBar = {
   container: HTMLDivElement;
@@ -90,6 +93,7 @@ const getPresetButton = (
 
 let renderedTabBar: RenderedTabBar | null = null;
 const originalResizeObserver = globalThis.ResizeObserver;
+const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
 
 const setResizeObserver = (
   value: typeof globalThis.ResizeObserver | undefined,
@@ -104,6 +108,7 @@ const setResizeObserver = (
 beforeEach(() => {
   document.body.innerHTML = "";
   setResizeObserver(originalResizeObserver);
+  HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
   (
     globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
   ).IS_REACT_ACT_ENVIRONMENT = true;
@@ -111,6 +116,7 @@ beforeEach(() => {
 
 afterEach(async () => {
   setResizeObserver(originalResizeObserver);
+  HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
 
   if (renderedTabBar !== null) {
     await act(async () => {
@@ -186,6 +192,149 @@ describe("FloatingPresetTabBar", () => {
 
     expect(selectPreset).toHaveBeenCalledTimes(1);
     expect(selectPreset).toHaveBeenCalledWith("multiple-weights");
+  });
+
+  it("treats the preset bar as a horizontal toolbar and keeps focused presets scrolled into view", async () => {
+    const scrollIntoView = vi.fn<HTMLElement["scrollIntoView"]>();
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    renderedTabBar = await renderTabBar({
+      presets: TEST_PRESETS,
+    });
+
+    const presetBar = renderedTabBar.container.querySelector<HTMLElement>(
+      ".floating-preset-tabbar",
+    );
+    const mixedButton = getPresetButton(
+      renderedTabBar.container,
+      "Mixed Weights",
+    );
+
+    mixedButton?.focus();
+
+    expect(presetBar?.getAttribute("role")).toBe("toolbar");
+    expect(presetBar?.getAttribute("aria-orientation")).toBe("horizontal");
+    expect(document.activeElement).toBe(mixedButton);
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      block: "nearest",
+      inline: "nearest",
+    });
+  });
+
+  it("moves keyboard focus across presets with arrow keys and home/end without selecting", async () => {
+    const selectPreset = vi.fn<(presetId: string) => void>();
+
+    renderedTabBar = await renderTabBar({
+      presets: TEST_PRESETS,
+      selectPreset,
+    });
+
+    const singleButton = getPresetButton(
+      renderedTabBar.container,
+      "Single Weight",
+    );
+    const multipleButton = getPresetButton(
+      renderedTabBar.container,
+      "Multiple Weights",
+    );
+    const mixedButton = getPresetButton(
+      renderedTabBar.container,
+      "Mixed Weights",
+    );
+    const customButton = getPresetButton(
+      renderedTabBar.container,
+      "Custom Safe Preset",
+    );
+
+    singleButton?.focus();
+    singleButton?.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        key: "ArrowRight",
+      }),
+    );
+    expect(document.activeElement).toBe(multipleButton);
+
+    multipleButton?.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        key: "End",
+      }),
+    );
+    expect(document.activeElement).toBe(customButton);
+
+    customButton?.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        key: "ArrowLeft",
+      }),
+    );
+    expect(document.activeElement).toBe(mixedButton);
+
+    mixedButton?.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        key: "Home",
+      }),
+    );
+    expect(document.activeElement).toBe(singleButton);
+    expect(selectPreset).not.toHaveBeenCalled();
+  });
+
+  it("ignores unsupported keys without moving focus or selecting", async () => {
+    const selectPreset = vi.fn<(presetId: string) => void>();
+
+    renderedTabBar = await renderTabBar({
+      presets: TEST_PRESETS,
+      selectPreset,
+    });
+
+    const multipleButton = getPresetButton(
+      renderedTabBar.container,
+      "Multiple Weights",
+    );
+
+    multipleButton?.focus();
+    multipleButton?.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        key: "Tab",
+      }),
+    );
+
+    expect(document.activeElement).toBe(multipleButton);
+    expect(selectPreset).not.toHaveBeenCalled();
+  });
+
+  it("returns undefined when keyboard navigation has no preset track", () => {
+    const detachedButton = document.createElement("button");
+
+    expect(
+      getNextPresetButton({
+        currentTarget: detachedButton,
+        key: "ArrowRight",
+        presetTrack: null,
+      }),
+    ).toBeUndefined();
+  });
+
+  it("returns undefined when the current button is not in the preset track", async () => {
+    renderedTabBar = await renderTabBar({
+      presets: TEST_PRESETS,
+    });
+
+    const detachedButton = document.createElement("button");
+    const presetTrack = renderedTabBar.container.querySelector(
+      ".floating-preset-tabbar-track",
+    );
+
+    expect(
+      getNextPresetButton({
+        currentTarget: detachedButton,
+        key: "ArrowRight",
+        presetTrack,
+      }),
+    ).toBeUndefined();
   });
 
   it("omits the selection indicator when no preset is active", async () => {

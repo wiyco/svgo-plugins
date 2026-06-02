@@ -19,6 +19,7 @@ type ShareButtonHarnessProps = {
 
 const ShareButtonHarness = (props: ShareButtonHarnessProps) => {
   const shareButton = useShareButton(props);
+  latestShareButton = shareButton;
 
   return (
     <div>
@@ -58,6 +59,7 @@ const UnwiredShareButtonHarness = (props: ShareButtonHarnessProps) => {
 
 let container: HTMLDivElement;
 let root: Root;
+let latestShareButton: ReturnType<typeof useShareButton> | null = null;
 
 beforeEach(() => {
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
@@ -91,6 +93,7 @@ beforeEach(() => {
   root = createRoot(container);
   document.body.innerHTML = "";
   document.body.append(container);
+  latestShareButton = null;
   (
     globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
   ).IS_REACT_ACT_ENVIRONMENT = true;
@@ -161,5 +164,34 @@ describe("use-share-button", () => {
     });
 
     expect(container.querySelector("output")?.textContent).toBe("{}");
+  });
+
+  it("keeps the returned share button view model stable across rerenders when props are unchanged", async () => {
+    await act(async () => {
+      root.render(
+        <ShareButtonHarness
+          shareAnnouncement=""
+          shareButtonLabel="Copy share URL"
+          shareButtonState="idle"
+        />,
+      );
+      await flush();
+    });
+
+    const previousShareButton = latestShareButton;
+
+    await act(async () => {
+      root.render(
+        <ShareButtonHarness
+          shareAnnouncement=""
+          shareButtonLabel="Copy share URL"
+          shareButtonState="idle"
+        />,
+      );
+      await flush();
+    });
+
+    expect(latestShareButton).not.toBeNull();
+    expect(latestShareButton).toBe(previousShareButton);
   });
 });

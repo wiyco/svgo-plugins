@@ -15,6 +15,7 @@ type RippleHarnessProps = {
 
 const RippleHarness = ({ disabled = false }: RippleHarnessProps) => {
   const rippleHandlers = usePressRipple();
+  latestRippleHandlers = rippleHandlers;
 
   return (
     <button disabled={disabled} type="button" {...rippleHandlers}>
@@ -64,6 +65,7 @@ const dispatchPointerDown = (
 
 let container: HTMLDivElement;
 let root: Root;
+let latestRippleHandlers: ReturnType<typeof usePressRipple> | null = null;
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -89,6 +91,7 @@ beforeEach(() => {
   root = createRoot(container);
   document.body.innerHTML = "";
   document.body.append(container);
+  latestRippleHandlers = null;
   (
     globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
   ).IS_REACT_ACT_ENVIRONMENT = true;
@@ -267,5 +270,29 @@ describe("use-press-ripple", () => {
 
     expect(button.dataset.rippleState).toBeUndefined();
     expect(button.style.getPropertyValue("--ripple-size")).toBe("");
+  });
+
+  it("keeps the ripple handlers stable across rerenders", async () => {
+    await act(async () => {
+      root.render(<RippleHarness />);
+      await flush();
+    });
+
+    const previousRippleHandlers = latestRippleHandlers;
+
+    await act(async () => {
+      root.render(<RippleHarness />);
+      await flush();
+    });
+
+    expect(latestRippleHandlers).not.toBeNull();
+    expect(latestRippleHandlers).toBe(previousRippleHandlers);
+    expect(latestRippleHandlers?.onBlur).toBe(previousRippleHandlers?.onBlur);
+    expect(latestRippleHandlers?.onKeyDown).toBe(
+      previousRippleHandlers?.onKeyDown,
+    );
+    expect(latestRippleHandlers?.onPointerDown).toBe(
+      previousRippleHandlers?.onPointerDown,
+    );
   });
 });

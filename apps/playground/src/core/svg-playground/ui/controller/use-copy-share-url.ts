@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const DEFAULT_SHARE_BUTTON_LABEL = "Copy share URL";
 export const COPIED_SHARE_BUTTON_LABEL = "Copied";
@@ -42,36 +42,37 @@ export const useCopyShareUrl = (options: UseCopyShareUrlOptions = {}) => {
     useState<ShareFeedbackState>(canShare ? "idle" : "unsafe");
   const resetTimerIdRef = useRef<number | null>(null);
 
-  const clearResetTimer = (): void => {
+  const clearResetTimer = useCallback((): void => {
     if (resetTimerIdRef.current !== null) {
       window.clearTimeout(resetTimerIdRef.current);
       resetTimerIdRef.current = null;
     }
-  };
+  }, []);
 
-  const setTransientShareFeedbackState = (
-    nextState: Exclude<ShareFeedbackState, "idle" | "unsafe">,
-  ): void => {
-    clearResetTimer();
-    setShareFeedbackState(nextState);
-    resetTimerIdRef.current = window.setTimeout(() => {
-      resetTimerIdRef.current = null;
-      setShareFeedbackState("idle");
-    }, SHARE_FEEDBACK_RESET_DELAY_MS);
-  };
+  const setTransientShareFeedbackState = useCallback(
+    (nextState: Exclude<ShareFeedbackState, "idle" | "unsafe">): void => {
+      clearResetTimer();
+      setShareFeedbackState(nextState);
+      resetTimerIdRef.current = window.setTimeout(() => {
+        resetTimerIdRef.current = null;
+        setShareFeedbackState("idle");
+      }, SHARE_FEEDBACK_RESET_DELAY_MS);
+    },
+    [clearResetTimer],
+  );
 
   useEffect(() => {
     clearResetTimer();
     setShareFeedbackState(canShare ? "idle" : "unsafe");
-  }, [canShare]);
+  }, [canShare, clearResetTimer]);
 
   useEffect(() => {
     return () => {
       clearResetTimer();
     };
-  }, []);
+  }, [clearResetTimer]);
 
-  const copyShareUrl = (): void => {
+  const copyShareUrl = useCallback((): void => {
     if (!canShare) {
       clearResetTimer();
       setShareFeedbackState("unsafe");
@@ -91,7 +92,7 @@ export const useCopyShareUrl = (options: UseCopyShareUrlOptions = {}) => {
         setTransientShareFeedbackState("failed");
       },
     );
-  };
+  }, [canShare, clearResetTimer, setTransientShareFeedbackState]);
 
   return {
     copyShareUrl,

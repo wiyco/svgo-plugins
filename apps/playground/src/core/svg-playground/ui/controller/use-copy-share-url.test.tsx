@@ -32,6 +32,7 @@ const CopyShareUrlHarness = (props: CopyShareUrlHarnessProps) => {
   } = useCopyShareUrl({
     canShare,
   });
+  latestCopyShareUrl = copyShareUrl;
 
   return (
     <div>
@@ -50,6 +51,7 @@ const CopyShareUrlHarness = (props: CopyShareUrlHarnessProps) => {
 let container: HTMLDivElement;
 let root: Root;
 let originalClipboard: Clipboard | undefined;
+let latestCopyShareUrl: (() => void) | null = null;
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -58,6 +60,7 @@ beforeEach(() => {
   document.body.innerHTML = "";
   document.body.append(container);
   originalClipboard = navigator.clipboard;
+  latestCopyShareUrl = null;
   (
     globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
   ).IS_REACT_ACT_ENVIRONMENT = true;
@@ -219,5 +222,22 @@ describe("use-copy-share-url", () => {
     expect(container.querySelector("output")?.textContent).toBe(
       COPY_FAILED_LABEL,
     );
+  });
+
+  it("keeps copyShareUrl stable across rerenders when canShare is unchanged", async () => {
+    await act(async () => {
+      root.render(<CopyShareUrlHarness canShare />);
+      await flush();
+    });
+
+    const previousCopyShareUrl = latestCopyShareUrl;
+
+    await act(async () => {
+      root.render(<CopyShareUrlHarness canShare />);
+      await flush();
+    });
+
+    expect(latestCopyShareUrl).not.toBeNull();
+    expect(latestCopyShareUrl).toBe(previousCopyShareUrl);
   });
 });

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type {
   PlaygroundQueryState,
@@ -38,24 +38,161 @@ const applyRenderableControlsToSvg = (
   });
 };
 
+const doesPresetMatchSvg = (
+  presetSvg: string,
+  svg: string,
+  queryState: PlaygroundQueryState,
+): boolean => {
+  return (
+    presetSvg === svg ||
+    applyRenderableControlsToSvg(presetSvg, queryState) === svg
+  );
+};
+
 const getPresetIdForSvg = (
   definition: SvgPlaygroundDefinition,
   svg: string,
   queryState: PlaygroundQueryState,
 ): string | null => {
   const exactMatch = definition.presets.find((preset) => {
-    return preset.svg === svg;
+    return doesPresetMatchSvg(preset.svg, svg, queryState);
   });
 
-  if (exactMatch !== undefined) {
-    return exactMatch.id;
+  return exactMatch?.id ?? null;
+};
+
+const getActivePresetId = ({
+  matchedPresetId,
+  renderedQueryState,
+  selectedPresetId,
+  definition,
+}: {
+  matchedPresetId: string | null;
+  renderedQueryState: PlaygroundQueryState;
+  selectedPresetId: string | null;
+  definition: SvgPlaygroundDefinition;
+}): string | null => {
+  if (selectedPresetId === null) {
+    return matchedPresetId;
   }
 
-  return (
-    definition.presets.find((preset) => {
-      return applyRenderableControlsToSvg(preset.svg, queryState) === svg;
-    })?.id ?? null
+  const selectedPreset = definition.presets.find((preset) => {
+    return preset.id === selectedPresetId;
+  });
+
+  if (selectedPreset === undefined) {
+    return matchedPresetId;
+  }
+
+  return doesPresetMatchSvg(
+    selectedPreset.svg,
+    renderedQueryState.svg,
+    renderedQueryState,
+  )
+    ? selectedPreset.id
+    : matchedPresetId;
+};
+
+const createRenderableSvgWithStrokeWidth = (
+  normalizedState: PlaygroundQueryState,
+  strokeWidth: number,
+): string => {
+  return applyControlsToSvg(normalizedState.svg, {
+    ...normalizedState,
+    strokeWidth,
+  });
+};
+
+const createRenderableSvgWithSize = (
+  normalizedState: PlaygroundQueryState,
+  size: number,
+): string => {
+  return applyControlsToSvg(
+    normalizedState.svg,
+    {
+      ...normalizedState,
+      size,
+    },
+    {
+      preserveStrokeWidthVariations: true,
+    },
   );
+};
+
+const createRenderableSvgWithColor = (
+  normalizedState: PlaygroundQueryState,
+  color: string,
+): string => {
+  return applyControlsToSvg(
+    normalizedState.svg,
+    {
+      ...normalizedState,
+      color,
+    },
+    {
+      preserveStrokeWidthVariations: true,
+    },
+  );
+};
+
+const selectPresetById = (
+  definition: SvgPlaygroundDefinition,
+  presetId: string,
+) => {
+  return definition.presets.find((candidate) => {
+    return candidate.id === presetId;
+  });
+};
+
+const getVisiblePresets = (definition: SvgPlaygroundDefinition) => {
+  return definition.presets.filter((preset) => {
+    return getUnsafeSvgReason(preset.svg) === null;
+  });
+};
+
+const createPreviewHtml = (previewMarkup: string | null) => {
+  if (previewMarkup === null) {
+    return null;
+  }
+
+  return {
+    __html: previewMarkup,
+  };
+};
+
+const createPreviewMarkupFromSvg = (optimizedSvg: string) => {
+  if (optimizedSvg.length === 0) {
+    return null;
+  }
+
+  try {
+    return createPreviewMarkup(optimizedSvg, {
+      ariaLabel: "Live preview",
+    });
+  } catch {
+    return null;
+  }
+};
+
+const createReactSourceState = (optimizedSvg: string) => {
+  if (optimizedSvg.length === 0) {
+    return {
+      error: "",
+      source: "",
+    };
+  }
+
+  try {
+    return {
+      error: "",
+      source: createReactSource(optimizedSvg),
+    };
+  } catch (error) {
+    return {
+      error: getErrorMessage(error, "Unable to generate React source."),
+      source: "",
+    };
+  }
 };
 
 const clamp = (value: number, min: number, max: number): number => {
@@ -124,12 +261,15 @@ export const useSvgPlaygroundController = (
     renderedQueryState.svg,
     transform,
   );
-  const activePresetId = selectedPresetId ?? matchedPresetId;
+  const activePresetId = getActivePresetId({
+    definition,
+    matchedPresetId,
+    renderedQueryState,
+    selectedPresetId,
+  });
   const visiblePresets = useMemo(() => {
-    return definition.presets.filter((preset) => {
-      return getUnsafeSvgReason(preset.svg) === null;
-    });
-  }, [definition.presets]);
+    return getVisiblePresets(definition);
+  }, [definition]);
   const optimizedSvg =
     transformState.kind === "success" ? transformState.optimizedSvg : "";
 
@@ -141,193 +281,127 @@ export const useSvgPlaygroundController = (
     setQueryState(initialNormalizedQueryState);
   }, [initialNormalizedQueryState, needsInitialNormalization, setQueryState]);
 
-  useEffect(() => {
-    if (selectedPresetId === null) {
-      if (matchedPresetId !== null) {
-        setSelectedPresetId(matchedPresetId);
+  const selectPreset = useCallback(
+    (presetId: string): void => {
+      const preset = selectPresetById(definition, presetId);
+
+      if (preset === undefined) {
+        return;
       }
 
-      return;
-    }
+      setSelectedPresetId(preset.id);
+      setQueryState((currentState) => {
+        const normalizedState = normalizeSvgQueryState(currentState);
 
-    const selectedPreset = definition.presets.find((preset) => {
-      return preset.id === selectedPresetId;
-    });
+        return {
+          ...normalizedState,
+          svg: applyRenderableControlsToSvg(preset.svg, normalizedState),
+        };
+      });
+    },
+    [definition, setQueryState],
+  );
 
-    if (selectedPreset === undefined) {
-      setSelectedPresetId(matchedPresetId);
-      return;
-    }
+  const setStrokeWidth = useCallback(
+    (strokeWidth: number): void => {
+      setQueryState((currentState) => {
+        const normalizedState = normalizeSvgQueryState(currentState);
+        const nextStrokeWidth = clamp(
+          strokeWidth,
+          MIN_STROKE_WIDTH,
+          MAX_STROKE_WIDTH,
+        );
 
-    if (
-      applyRenderableControlsToSvg(selectedPreset.svg, renderedQueryState) !==
-      renderedQueryState.svg
-    ) {
-      setSelectedPresetId(matchedPresetId);
-    }
-  }, [
-    definition.presets,
-    matchedPresetId,
-    renderedQueryState,
-    selectedPresetId,
-  ]);
-
-  const selectPreset = (presetId: string): void => {
-    const preset = definition.presets.find((candidate) => {
-      return candidate.id === presetId;
-    });
-
-    if (preset === undefined) {
-      return;
-    }
-
-    setSelectedPresetId(preset.id);
-    setQueryState((currentState) => {
-      const normalizedState = normalizeSvgQueryState(currentState);
-
-      return {
-        ...normalizedState,
-        svg: applyRenderableControlsToSvg(preset.svg, normalizedState),
-      };
-    });
-  };
-
-  const setStrokeWidth = (strokeWidth: number): void => {
-    setQueryState((currentState) => {
-      const normalizedState = normalizeSvgQueryState(currentState);
-      const nextStrokeWidth = clamp(
-        strokeWidth,
-        MIN_STROKE_WIDTH,
-        MAX_STROKE_WIDTH,
-      );
-
-      return {
-        ...normalizedState,
-        strokeWidth: nextStrokeWidth,
-        svg: applyControlsToSvg(normalizedState.svg, {
+        return {
           ...normalizedState,
           strokeWidth: nextStrokeWidth,
-        }),
-      };
-    });
-  };
+          svg: createRenderableSvgWithStrokeWidth(
+            normalizedState,
+            nextStrokeWidth,
+          ),
+        };
+      });
+    },
+    [setQueryState],
+  );
 
-  const stepStrokeWidth = (delta: number): void => {
-    setQueryState((currentState) => {
-      const normalizedState = normalizeSvgQueryState(currentState);
-      const nextStrokeWidth = clamp(
-        normalizedState.strokeWidth + delta,
-        MIN_STROKE_WIDTH,
-        MAX_STROKE_WIDTH,
-      );
+  const stepStrokeWidth = useCallback(
+    (delta: number): void => {
+      setQueryState((currentState) => {
+        const normalizedState = normalizeSvgQueryState(currentState);
+        const nextStrokeWidth = clamp(
+          normalizedState.strokeWidth + delta,
+          MIN_STROKE_WIDTH,
+          MAX_STROKE_WIDTH,
+        );
 
-      return {
-        ...normalizedState,
-        strokeWidth: nextStrokeWidth,
-        svg: applyControlsToSvg(normalizedState.svg, {
+        return {
           ...normalizedState,
           strokeWidth: nextStrokeWidth,
-        }),
-      };
-    });
-  };
+          svg: createRenderableSvgWithStrokeWidth(
+            normalizedState,
+            nextStrokeWidth,
+          ),
+        };
+      });
+    },
+    [setQueryState],
+  );
 
-  const setSize = (size: number): void => {
-    setQueryState((currentState) => {
-      const normalizedState = normalizeSvgQueryState(currentState);
-      const nextSize = clamp(size, MIN_SIZE, MAX_SIZE);
+  const setSize = useCallback(
+    (size: number): void => {
+      setQueryState((currentState) => {
+        const normalizedState = normalizeSvgQueryState(currentState);
+        const nextSize = clamp(size, MIN_SIZE, MAX_SIZE);
 
-      return {
-        ...normalizedState,
-        size: nextSize,
-        svg: applyControlsToSvg(
-          normalizedState.svg,
-          {
-            ...normalizedState,
-            size: nextSize,
-          },
-          {
-            preserveStrokeWidthVariations: true,
-          },
-        ),
-      };
-    });
-  };
+        return {
+          ...normalizedState,
+          size: nextSize,
+          svg: createRenderableSvgWithSize(normalizedState, nextSize),
+        };
+      });
+    },
+    [setQueryState],
+  );
 
-  const setColor = (color: string): void => {
-    setQueryState((currentState) => {
-      const normalizedState = normalizeSvgQueryState(currentState);
+  const setColor = useCallback(
+    (color: string): void => {
+      setQueryState((currentState) => {
+        const normalizedState = normalizeSvgQueryState(currentState);
 
-      return {
-        ...normalizedState,
-        color,
-        svg: applyControlsToSvg(
-          normalizedState.svg,
-          {
-            ...normalizedState,
-            color,
-          },
-          {
-            preserveStrokeWidthVariations: true,
-          },
-        ),
-      };
-    });
-  };
+        return {
+          ...normalizedState,
+          color,
+          svg: createRenderableSvgWithColor(normalizedState, color),
+        };
+      });
+    },
+    [setQueryState],
+  );
 
-  const setSvg = (svg: string): void => {
-    setQueryState((currentState) => {
-      return {
-        ...currentState,
-        ...extractControlsFromSvg(svg, currentState),
-        svg,
-      };
-    });
-  };
+  const setSvg = useCallback(
+    (svg: string): void => {
+      setQueryState((currentState) => {
+        return {
+          ...currentState,
+          ...extractControlsFromSvg(svg, currentState),
+          svg,
+        };
+      });
+    },
+    [setQueryState],
+  );
 
   const previewMarkup = useMemo(() => {
-    if (optimizedSvg.length === 0) {
-      return null;
-    }
-
-    try {
-      return createPreviewMarkup(optimizedSvg, {
-        ariaLabel: "Live preview",
-      });
-    } catch {
-      return null;
-    }
+    return createPreviewMarkupFromSvg(optimizedSvg);
   }, [optimizedSvg]);
 
   const reactSourceState = useMemo(() => {
-    if (optimizedSvg.length === 0) {
-      return {
-        error: "",
-        source: "",
-      };
-    }
-
-    try {
-      return {
-        error: "",
-        source: createReactSource(optimizedSvg),
-      };
-    } catch (error) {
-      return {
-        error: getErrorMessage(error, "Unable to generate React source."),
-        source: "",
-      };
-    }
+    return createReactSourceState(optimizedSvg);
   }, [optimizedSvg]);
 
   const previewHtml = useMemo(() => {
-    if (previewMarkup === null) {
-      return null;
-    }
-
-    return {
-      __html: previewMarkup,
-    };
+    return createPreviewHtml(previewMarkup);
   }, [previewMarkup]);
 
   return {

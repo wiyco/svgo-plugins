@@ -47,7 +47,12 @@ const createDefinition = (
 
 type ControllerActions = Pick<
   SvgPlaygroundViewModel,
-  "selectPreset" | "setColor" | "setSize" | "setSvg" | "stepStrokeWidth"
+  | "selectPreset"
+  | "setColor"
+  | "setSize"
+  | "setStrokeWidth"
+  | "setSvg"
+  | "stepStrokeWidth"
 >;
 
 let latestActions: ControllerActions | null = null;
@@ -69,6 +74,7 @@ const ControllerHarness = (props: ControllerHarnessProps) => {
     selectPreset: controller.selectPreset,
     setColor: controller.setColor,
     setSize: controller.setSize,
+    setStrokeWidth: controller.setStrokeWidth,
     setSvg: controller.setSvg,
     stepStrokeWidth: controller.stepStrokeWidth,
   };
@@ -202,6 +208,39 @@ describe("use-svg-playground-controller", () => {
     });
 
     expect(latestActivePresetId).toBeNull();
+
+    await act(async () => {
+      latestActions?.setSvg(normalizedSingleSvg);
+      await flush();
+    });
+
+    expect(latestActivePresetId).toBe("single-weight");
+  });
+
+  it("derives the current matched preset even when the last selected preset no longer matches", async () => {
+    const definition = createDefinition();
+    const normalizedSingleSvg = applyControlsToSvg(
+      definition.presets[0]?.svg ?? "",
+      definition.defaultState,
+    );
+
+    window.history.replaceState(
+      {},
+      "",
+      `/?${definition.serializeState(definition.defaultState)}`,
+    );
+
+    await act(async () => {
+      root.render(<ControllerHarness definition={definition} />);
+      await flush();
+    });
+
+    await act(async () => {
+      latestActions?.selectPreset("multiple-weights");
+      await flush();
+    });
+
+    expect(latestActivePresetId).toBe("multiple-weights");
 
     await act(async () => {
       latestActions?.setSvg(normalizedSingleSvg);
@@ -356,5 +395,38 @@ describe("use-svg-playground-controller", () => {
     });
 
     expect(latestActivePresetId).toBeNull();
+  });
+
+  it("keeps controller action callbacks stable across rerenders when dependencies do not change", async () => {
+    const definition = createDefinition();
+
+    window.history.replaceState(
+      {},
+      "",
+      `/?${definition.serializeState(definition.defaultState)}`,
+    );
+
+    await act(async () => {
+      root.render(<ControllerHarness definition={definition} />);
+      await flush();
+    });
+
+    const previousActions = latestActions;
+
+    await act(async () => {
+      root.render(<ControllerHarness definition={definition} />);
+      await flush();
+    });
+
+    expect(latestActions).not.toBeNull();
+    expect(previousActions).not.toBeNull();
+    expect(latestActions?.selectPreset).toBe(previousActions?.selectPreset);
+    expect(latestActions?.setColor).toBe(previousActions?.setColor);
+    expect(latestActions?.setSize).toBe(previousActions?.setSize);
+    expect(latestActions?.setStrokeWidth).toBe(previousActions?.setStrokeWidth);
+    expect(latestActions?.setSvg).toBe(previousActions?.setSvg);
+    expect(latestActions?.stepStrokeWidth).toBe(
+      previousActions?.stepStrokeWidth,
+    );
   });
 });

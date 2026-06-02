@@ -104,14 +104,22 @@ export const useShareButton = (
     return renderShareButtonIcon(shareButtonState);
   }, [shareButtonState]);
 
-  return {
+  return useMemo(() => {
+    return {
+      shareAnnouncement,
+      shareButtonIcon,
+      shareButtonLabel,
+      shareButtonLabelRef,
+      shareButtonMeasureRef,
+      shareButtonRef,
+      shareButtonState,
+      shareButtonStyle,
+    };
+  }, [
     shareAnnouncement,
     shareButtonIcon,
     shareButtonLabel,
-    shareButtonLabelRef,
-    shareButtonMeasureRef,
-    shareButtonRef,
     shareButtonState,
     shareButtonStyle,
-  };
+  ]);
 };

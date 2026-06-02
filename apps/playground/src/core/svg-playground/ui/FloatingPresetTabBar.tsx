@@ -2,6 +2,7 @@ import {
   type FocusEvent,
   type KeyboardEvent,
   type MouseEvent,
+  memo,
   useCallback,
   useRef,
 } from "react";
@@ -117,7 +118,7 @@ const renderFloatingPresetGlyph = (
   }
 };
 
-export const FloatingPresetTabBar = (props: FloatingPresetTabBarProps) => {
+const FloatingPresetTabBarImpl = (props: FloatingPresetTabBarProps) => {
   const { activePresetId, presets, selectPreset } = props;
 
   const rippleHandlers = usePressRipple();
@@ -214,3 +215,5 @@ export const FloatingPresetTabBar = (props: FloatingPresetTabBarProps) => {
     </div>
   );
 };
+
+export const FloatingPresetTabBar = memo(FloatingPresetTabBarImpl);

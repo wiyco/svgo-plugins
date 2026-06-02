@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import type { SvgPlaygroundDefinition } from "../model";
 import type { SvgPlaygroundViewModel } from "./controller/svg-playground-controller-types";
 
@@ -15,6 +17,12 @@ type SvgPlaygroundPresenterProps = {
 export const SvgPlaygroundPresenter = (props: SvgPlaygroundPresenterProps) => {
   const { definition, viewModel } = props;
   const rippleHandlers = usePressRipple();
+  const packageName = useMemo(() => {
+    return getPlaygroundPackageName(definition.slug);
+  }, [definition.slug]);
+  const transitionNames = useMemo(() => {
+    return getPlaygroundViewTransitionNames(definition.slug);
+  }, [definition.slug]);
   const shareButton = useShareButton({
     shareAnnouncement: viewModel.shareAnnouncement,
     shareButtonLabel: viewModel.shareButtonLabel,
@@ -25,10 +33,11 @@ export const SvgPlaygroundPresenter = (props: SvgPlaygroundPresenterProps) => {
     <SvgPlaygroundView
       activePresetId={viewModel.activePresetId}
       canShareUrl={viewModel.canShareUrl}
+      color={viewModel.queryState.color}
       copyShareUrl={viewModel.copyShareUrl}
-      packageName={getPlaygroundPackageName(definition.slug)}
+      inputSvg={viewModel.queryState.svg}
+      packageName={packageName}
       previewHtml={viewModel.previewHtml}
-      queryState={viewModel.queryState}
       reactSourceState={viewModel.reactSourceState}
       rippleHandlers={rippleHandlers}
       selectPreset={viewModel.selectPreset}
@@ -37,11 +46,14 @@ export const SvgPlaygroundPresenter = (props: SvgPlaygroundPresenterProps) => {
       setStrokeWidth={viewModel.setStrokeWidth}
       setSvg={viewModel.setSvg}
       shareButton={shareButton}
+      size={viewModel.queryState.size}
       slug={definition.slug}
+      slugTransitionName={transitionNames.slug}
       stepStrokeWidth={viewModel.stepStrokeWidth}
+      strokeWidth={viewModel.queryState.strokeWidth}
       title={definition.title}
+      titleTransitionName={transitionNames.title}
       transformState={viewModel.transformState}
-      transitionNames={getPlaygroundViewTransitionNames(definition.slug)}
       visiblePresets={viewModel.visiblePresets}
     />
   );

@@ -5,7 +5,7 @@ import type {
   PointerEventHandler,
 } from "react";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 const RIPPLE_DURATION_MS = 420;
 const TOUCH_RIPPLE_DIAMETER_MIN_PX = 64;
@@ -54,7 +54,7 @@ export const usePressRipple = (): RippleHandlers => {
     };
   }, []);
 
-  const resetRipple = (element: HTMLButtonElement) => {
+  const resetRipple = useCallback((element: HTMLButtonElement) => {
     const timeoutId = timersRef.current.get(element);
 
     if (timeoutId !== undefined) {
@@ -68,64 +68,75 @@ export const usePressRipple = (): RippleHandlers => {
         timersRef.current.delete(element);
       }, RIPPLE_DURATION_MS),
     );
-  };
+  }, []);
 
-  const triggerRipple = (
-    element: HTMLButtonElement,
-    origin: { x: number; y: number },
-    pointerType?: string,
-  ) => {
-    if (element.disabled) {
-      return;
-    }
+  const triggerRipple = useCallback(
+    (
+      element: HTMLButtonElement,
+      origin: { x: number; y: number },
+      pointerType?: string,
+    ) => {
+      if (element.disabled) {
+        return;
+      }
 
-    const rippleSize =
-      pointerType === "touch"
-        ? getTouchRippleDiameter(element)
-        : Math.ceil(
-            Math.hypot(
-              Math.max(origin.x, element.clientWidth - origin.x),
-              Math.max(origin.y, element.clientHeight - origin.y),
-            ) * 2,
-          );
+      const rippleSize =
+        pointerType === "touch"
+          ? getTouchRippleDiameter(element)
+          : Math.ceil(
+              Math.hypot(
+                Math.max(origin.x, element.clientWidth - origin.x),
+                Math.max(origin.y, element.clientHeight - origin.y),
+              ) * 2,
+            );
 
-    element.style.setProperty("--ripple-origin-x", `${origin.x}px`);
-    element.style.setProperty("--ripple-origin-y", `${origin.y}px`);
-    element.style.setProperty("--ripple-size", `${rippleSize}px`);
-    element.dataset.rippleState = "idle";
-    void element.offsetWidth;
-    element.dataset.rippleState = "active";
-    resetRipple(element);
-  };
+      element.style.setProperty("--ripple-origin-x", `${origin.x}px`);
+      element.style.setProperty("--ripple-origin-y", `${origin.y}px`);
+      element.style.setProperty("--ripple-size", `${rippleSize}px`);
+      element.dataset.rippleState = "idle";
+      void element.offsetWidth;
+      element.dataset.rippleState = "active";
+      resetRipple(element);
+    },
+    [resetRipple],
+  );
 
-  const onPointerDown: PointerEventHandler<HTMLButtonElement> = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
+  const onPointerDown = useCallback<PointerEventHandler<HTMLButtonElement>>(
+    (event) => {
+      const rect = event.currentTarget.getBoundingClientRect();
 
-    triggerRipple(
-      event.currentTarget,
-      {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      },
-      event.pointerType,
-    );
-  };
+      triggerRipple(
+        event.currentTarget,
+        {
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
+        },
+        event.pointerType,
+      );
+    },
+    [triggerRipple],
+  );
 
-  const onKeyDown: KeyboardEventHandler<HTMLButtonElement> = (event) => {
-    if (event.repeat || (event.key !== " " && event.key !== "Enter")) {
-      return;
-    }
+  const onKeyDown = useCallback<KeyboardEventHandler<HTMLButtonElement>>(
+    (event) => {
+      if (event.repeat || (event.key !== " " && event.key !== "Enter")) {
+        return;
+      }
 
-    triggerRipple(event.currentTarget, centerRipple(event.currentTarget));
-  };
+      triggerRipple(event.currentTarget, centerRipple(event.currentTarget));
+    },
+    [triggerRipple],
+  );
 
-  const onBlur: FocusEventHandler<HTMLButtonElement> = (event) => {
+  const onBlur = useCallback<FocusEventHandler<HTMLButtonElement>>((event) => {
     event.currentTarget.dataset.rippleState = "idle";
-  };
+  }, []);
 
-  return {
-    onBlur,
-    onKeyDown,
-    onPointerDown,
-  };
+  return useMemo(() => {
+    return {
+      onBlur,
+      onKeyDown,
+      onPointerDown,
+    };
+  }, [onBlur, onKeyDown, onPointerDown]);
 };

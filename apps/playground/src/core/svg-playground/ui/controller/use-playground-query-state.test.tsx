@@ -1,11 +1,15 @@
 import { act, useCallback } from "react";
 import { type Root, createRoot } from "react-dom/client";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { PlaygroundQueryState } from "../../model";
 
 import { hoistStrokeWidthPlayground } from "../../../../playgrounds/svgo-plugin-hoist-stroke-width/definition";
-import { usePlaygroundQueryState } from "./use-playground-query-state";
+import {
+  PLAYGROUND_URL_SYNC_DELAY_MS,
+  usePlaygroundQueryState,
+  usePlaygroundQueryStateUrlSync,
+} from "./use-playground-query-state";
 
 const flush = async (): Promise<void> => {
   await Promise.resolve();
@@ -16,6 +20,10 @@ const QueryStateHarness = () => {
   const [queryState, setQueryState] = usePlaygroundQueryState(
     hoistStrokeWidthPlayground,
   );
+  usePlaygroundQueryStateUrlSync({
+    definition: hoistStrokeWidthPlayground,
+    queryState,
+  });
   const handleSetColorClick = useCallback(() => {
     setQueryState({
       ...queryState,
@@ -50,6 +58,7 @@ let container: HTMLDivElement;
 let root: Root;
 
 beforeEach(() => {
+  vi.useFakeTimers();
   container = document.createElement("div");
   root = createRoot(container);
   document.body.innerHTML = "";
@@ -71,6 +80,7 @@ afterEach(async () => {
     root.unmount();
     await flush();
   });
+  vi.useRealTimers();
 });
 
 describe("use-playground-query-state", () => {
@@ -88,7 +98,7 @@ describe("use-playground-query-state", () => {
     );
   });
 
-  it("supports direct object updates and syncs them back to the URL", async () => {
+  it("supports direct object updates and syncs them back to the URL after the debounce", async () => {
     await act(async () => {
       root.render(<QueryStateHarness />);
       await flush();
@@ -102,6 +112,15 @@ describe("use-playground-query-state", () => {
     expect(container.querySelector('[data-testid="color"]')?.textContent).toBe(
       "#0f766e",
     );
+    expect(
+      hoistStrokeWidthPlayground.parseState(window.location.search).color,
+    ).toBe(hoistStrokeWidthPlayground.defaultState.color);
+
+    await act(async () => {
+      vi.advanceTimersByTime(PLAYGROUND_URL_SYNC_DELAY_MS);
+      await flush();
+    });
+
     expect(
       hoistStrokeWidthPlayground.parseState(window.location.search).color,
     ).toBe("#0f766e");
@@ -121,6 +140,15 @@ describe("use-playground-query-state", () => {
     expect(container.querySelector('[data-testid="size"]')?.textContent).toBe(
       String(hoistStrokeWidthPlayground.defaultState.size + 4),
     );
+    expect(
+      hoistStrokeWidthPlayground.parseState(window.location.search).size,
+    ).toBe(hoistStrokeWidthPlayground.defaultState.size);
+
+    await act(async () => {
+      vi.advanceTimersByTime(PLAYGROUND_URL_SYNC_DELAY_MS);
+      await flush();
+    });
+
     expect(
       hoistStrokeWidthPlayground.parseState(window.location.search).size,
     ).toBe(hoistStrokeWidthPlayground.defaultState.size + 4);

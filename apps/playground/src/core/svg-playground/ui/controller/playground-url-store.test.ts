@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  createLocationHref,
   getLocationSearchSnapshot,
   replaceLocationSearch,
   subscribeToLocationSearch,
@@ -11,6 +12,13 @@ beforeEach(() => {
 });
 
 describe("playground-url-store", () => {
+  it("builds absolute hrefs with and without query strings", () => {
+    expect(createLocationHref("color=%23155eef")).toBe(
+      "http://localhost:3000/playground?color=%23155eef",
+    );
+    expect(createLocationHref("")).toBe("http://localhost:3000/playground");
+  });
+
   it("returns the current location search snapshot", () => {
     window.history.replaceState(null, "", "/playground?color=%23155eef");
 

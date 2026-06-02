@@ -20,18 +20,21 @@ const flush = async (): Promise<void> => {
 
 type CopyShareUrlHarnessProps = {
   canShare?: boolean;
+  resolveShareUrl?: () => string;
 };
 
 const CopyShareUrlHarness = (props: CopyShareUrlHarnessProps) => {
-  const { canShare = true } = props;
+  const { canShare = true, resolveShareUrl } = props;
+  const options =
+    resolveShareUrl === undefined
+      ? { canShare }
+      : { canShare, resolveShareUrl };
   const {
     copyShareUrl,
     shareAnnouncement,
     shareButtonLabel,
     shareButtonState,
-  } = useCopyShareUrl({
-    canShare,
-  });
+  } = useCopyShareUrl(options);
   latestCopyShareUrl = copyShareUrl;
 
   return (
@@ -160,7 +163,38 @@ describe("use-copy-share-url", () => {
     expect(container.querySelector("output")?.textContent).toBe("");
   });
 
+  it("uses the current window location when no share URL resolver is provided", async () => {
+    const writeText = vi.fn<(text: string) => Promise<void>>(
+      async () => undefined,
+    );
+
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText,
+      } as unknown as Clipboard,
+    });
+    window.history.replaceState(null, "", "/playground?size=120");
+
+    await act(async () => {
+      root.render(<CopyShareUrlHarness />);
+      await flush();
+    });
+
+    await act(async () => {
+      container.querySelector("button")?.click();
+      await flush();
+    });
+
+    expect(writeText).toHaveBeenCalledWith(
+      "http://localhost:3000/playground?size=120",
+    );
+  });
+
   it("reports success and failure from clipboard writes", async () => {
+    const resolveShareUrl = vi.fn<() => string>().mockImplementation(() => {
+      return "https://example.com/playground?shared=true";
+    });
     const writeText = vi
       .fn<(text: string) => Promise<void>>()
       .mockResolvedValueOnce(undefined)
@@ -174,7 +208,7 @@ describe("use-copy-share-url", () => {
     });
 
     await act(async () => {
-      root.render(<CopyShareUrlHarness />);
+      root.render(<CopyShareUrlHarness resolveShareUrl={resolveShareUrl} />);
       await flush();
     });
 
@@ -183,7 +217,10 @@ describe("use-copy-share-url", () => {
       await flush();
     });
 
-    expect(writeText).toHaveBeenCalledWith(window.location.href);
+    expect(resolveShareUrl).toHaveBeenCalledTimes(1);
+    expect(writeText).toHaveBeenCalledWith(
+      "https://example.com/playground?shared=true",
+    );
     expect(container.querySelector("button")?.textContent).toBe(
       COPIED_SHARE_BUTTON_LABEL,
     );

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type {
   PlaygroundQueryState,
@@ -16,7 +16,11 @@ import {
   extractControlsFromSvg,
 } from "../../utils/svg-controls";
 import { useCopyShareUrl } from "./use-copy-share-url";
-import { usePlaygroundQueryState } from "./use-playground-query-state";
+import {
+  syncPlaygroundQueryStateToUrl,
+  usePlaygroundQueryState,
+  usePlaygroundQueryStateUrlSync,
+} from "./use-playground-query-state";
 import { useSvgTransformState } from "./use-svg-transform-state";
 
 type UseSvgPlaygroundControllerOptions = {
@@ -236,6 +240,8 @@ export const useSvgPlaygroundController = (
   const renderedQueryState = needsInitialNormalization
     ? initialNormalizedQueryState
     : queryState;
+  const renderedQueryStateRef = useRef(renderedQueryState);
+  renderedQueryStateRef.current = renderedQueryState;
   const matchedPresetId = useMemo(() => {
     return getPresetIdForSvg(
       definition,
@@ -266,6 +272,17 @@ export const useSvgPlaygroundController = (
   }, [optimizedSvg]);
   const canShareUrl =
     inputUnsafeReason === null && optimizedSvgUnsafeReason === null;
+  usePlaygroundQueryStateUrlSync({
+    definition,
+    enabled: canShareUrl,
+    queryState: renderedQueryState,
+  });
+  const resolveShareUrl = useCallback(() => {
+    return syncPlaygroundQueryStateToUrl(
+      definition,
+      renderedQueryStateRef.current,
+    );
+  }, [definition]);
   const {
     copyShareUrl,
     shareAnnouncement,
@@ -273,6 +290,7 @@ export const useSvgPlaygroundController = (
     shareButtonState,
   } = useCopyShareUrl({
     canShare: canShareUrl,
+    resolveShareUrl,
   });
   const transformState = useMemo(() => {
     if (

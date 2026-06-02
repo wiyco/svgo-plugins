@@ -4,6 +4,14 @@ const createNextUrl = (search: string): string => {
   return search.length > 0 ? `?${search}` : window.location.pathname;
 };
 
+export const createLocationHref = (search: string): string => {
+  const nextUrl = new URL(window.location.href);
+
+  nextUrl.search = search.length > 0 ? `?${search}` : "";
+
+  return nextUrl.toString();
+};
+
 export const getLocationSearchSnapshot = (): string => {
   return window.location.search;
 };

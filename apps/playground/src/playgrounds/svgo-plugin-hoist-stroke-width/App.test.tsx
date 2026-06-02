@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TransformFn } from "../../core/svg-playground/model";
 
+import { PLAYGROUND_URL_SYNC_DELAY_MS } from "../../core/svg-playground/ui/controller/use-playground-query-state";
 import { SvgPlaygroundPage } from "../../core/svg-playground/ui/SvgPlaygroundPage";
 import { applyControlsToSvg } from "../../core/svg-playground/utils/svg-controls";
 import { hoistStrokeWidthPlayground } from "./definition";
@@ -153,6 +154,7 @@ beforeEach(() => {
 });
 
 afterEach(async () => {
+  vi.useRealTimers();
   Object.defineProperty(navigator, "clipboard", {
     configurable: true,
     value: originalClipboard,
@@ -236,6 +238,7 @@ describe("hoist stroke width playground", () => {
   });
 
   it("loads legacy query state, normalizes it, and keeps the URL in sync", async () => {
+    vi.useFakeTimers();
     const legacyState = {
       color: "#0f766e",
       size: 240,
@@ -262,6 +265,13 @@ describe("hoist stroke width playground", () => {
     expect(renderedApp.container.textContent).toContain("240px");
     expect(renderedApp.container.textContent).toContain("3.5");
     expect(textarea?.value).toBe(normalizedState.svg);
+    expect(window.location.search).toBe(`?${serialized}`);
+
+    await act(async () => {
+      vi.advanceTimersByTime(PLAYGROUND_URL_SYNC_DELAY_MS);
+      await flush();
+    });
+
     expect(window.location.search).toBe(
       `?${hoistStrokeWidthPlayground.serializeState(normalizedState)}`,
     );
@@ -270,6 +280,13 @@ describe("hoist stroke width playground", () => {
       if (colorInput !== null) {
         changeFieldValue(colorInput, "#ff6600");
       }
+      await flush();
+    });
+
+    expect(window.location.search).not.toContain("color=%23ff6600");
+
+    await act(async () => {
+      vi.advanceTimersByTime(PLAYGROUND_URL_SYNC_DELAY_MS);
       await flush();
     });
 
@@ -551,6 +568,24 @@ describe("hoist stroke width playground", () => {
     ).toContain("Preview render failed.");
   });
 
+  it("shows empty-state source and preview fallbacks when the optimized svg is empty", async () => {
+    const transform: TransformFn = async () => {
+      return {
+        kind: "success",
+        optimizedSvg: "",
+      };
+    };
+
+    renderedApp = await renderPlayground(transform);
+
+    expect(renderedApp.container.textContent).toContain(
+      "React source appears here after a successful transform.",
+    );
+    expect(
+      renderedApp.container.querySelector('[role="alert"]')?.textContent,
+    ).toContain("Preview render failed.");
+  });
+
   it("shows thrown Error messages from transform failures", async () => {
     const transform: TransformFn = async () => {
       throw new Error("Broken preview runtime");
@@ -579,6 +614,7 @@ describe("hoist stroke width playground", () => {
   });
 
   it("copies the current share URL when the clipboard is available", async () => {
+    vi.useFakeTimers();
     const writeText = vi.fn<(value: string) => Promise<void>>(
       async () => undefined,
     );
@@ -592,14 +628,27 @@ describe("hoist stroke width playground", () => {
 
     renderedApp = await renderPlayground(createTransformStub());
 
+    const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
+      'input[aria-label="color"]',
+    );
     const shareButton =
       renderedApp.container.querySelector<HTMLButtonElement>(".share-button");
+
+    await act(async () => {
+      if (colorInput !== null) {
+        changeFieldValue(colorInput, "#0f766e");
+      }
+      await flush();
+    });
+
+    expect(window.location.search).toBe("");
 
     await act(async () => {
       shareButton?.click();
       await flush();
     });
 
+    expect(window.location.search).toContain("color=%230f766e");
     expect(writeText).toHaveBeenCalledWith(window.location.href);
     expect(
       renderedApp.container.querySelector<HTMLElement>(".share-button-text")
@@ -677,6 +726,7 @@ describe("hoist stroke width playground", () => {
   });
 
   it("disables sharing when the current svg is unsafe", async () => {
+    vi.useFakeTimers();
     const writeText = vi.fn<(value: string) => Promise<void>>(
       async () => undefined,
     );
@@ -707,10 +757,16 @@ describe("hoist stroke width playground", () => {
     });
 
     await act(async () => {
+      vi.advanceTimersByTime(PLAYGROUND_URL_SYNC_DELAY_MS);
+      await flush();
+    });
+
+    await act(async () => {
       shareButton?.click();
       await flush();
     });
 
+    expect(window.location.search).toBe("");
     expect(shareButton?.disabled).toBe(true);
     expect(writeText).not.toHaveBeenCalled();
     expect(

@@ -7,6 +7,9 @@ export const CLIPBOARD_UNAVAILABLE_LABEL = "Clipboard unavailable";
 export const COPY_FAILED_LABEL = "Copy failed";
 export const UNSAFE_SHARE_MESSAGE = "Sharing unavailable";
 export const SHARE_FEEDBACK_RESET_DELAY_MS = 2000;
+const getWindowLocationHref = (): string => {
+  return window.location.href;
+};
 
 export type ShareFeedbackState =
   | "idle"
@@ -33,10 +36,11 @@ const SHARE_ANNOUNCEMENTS: Record<ShareFeedbackState, string> = {
 
 type UseCopyShareUrlOptions = {
   canShare?: boolean;
+  resolveShareUrl?: () => string;
 };
 
 export const useCopyShareUrl = (options: UseCopyShareUrlOptions = {}) => {
-  const { canShare = true } = options;
+  const { canShare = true, resolveShareUrl = getWindowLocationHref } = options;
 
   const [shareFeedbackState, setShareFeedbackState] =
     useState<ShareFeedbackState>(canShare ? "idle" : "unsafe");
@@ -84,7 +88,7 @@ export const useCopyShareUrl = (options: UseCopyShareUrlOptions = {}) => {
       return;
     }
 
-    void navigator.clipboard.writeText(window.location.href).then(
+    void navigator.clipboard.writeText(resolveShareUrl()).then(
       () => {
         setTransientShareFeedbackState("success");
       },
@@ -92,7 +96,12 @@ export const useCopyShareUrl = (options: UseCopyShareUrlOptions = {}) => {
         setTransientShareFeedbackState("failed");
       },
     );
-  }, [canShare, clearResetTimer, setTransientShareFeedbackState]);
+  }, [
+    canShare,
+    clearResetTimer,
+    resolveShareUrl,
+    setTransientShareFeedbackState,
+  ]);
 
   return {
     copyShareUrl,

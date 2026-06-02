@@ -66,3 +66,5 @@ export type WorkerTransformClient = {
   dispose: () => void;
   transform: TransformFn;
 };
+
+export type TransformWorkerFactory = () => Worker;

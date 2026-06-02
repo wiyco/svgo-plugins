@@ -44,12 +44,12 @@ describe("preload-registry", () => {
       document.head.querySelector(
         'link[data-playground-warmup="svgo-plugin-hoist-stroke-width"][data-warmup-kind="module-0"]',
       ),
-    ).not.toBeNull();
+    ).toBeNull();
     expect(
       document.head.querySelectorAll(
         'link[data-playground-warmup="svgo-plugin-hoist-stroke-width"]',
       ),
-    ).toHaveLength(3);
+    ).toHaveLength(2);
 
     await warmPlaygroundRoutes(["svgo-plugin-hoist-stroke-width"]);
 
@@ -57,7 +57,7 @@ describe("preload-registry", () => {
       document.head.querySelectorAll(
         'link[data-playground-warmup="svgo-plugin-hoist-stroke-width"]',
       ),
-    ).toHaveLength(3);
+    ).toHaveLength(2);
   });
 
   it("falls back to a document prefetch when no warmup definition exists", async () => {

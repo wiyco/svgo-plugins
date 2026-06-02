@@ -20,28 +20,31 @@ const flush = async (): Promise<void> => {
 };
 
 const waitForPanelsToSettle = async (): Promise<void> => {
-  await expect.poll(() => {
-    const previewLabel = document
-      .querySelector(".preview-render svg")
-      ?.getAttribute("aria-label");
-    const reactSource = document.querySelector(".panel-react .code-panel")
-      ?.textContent;
-    const textContent = document.body.textContent ?? "";
+  await expect
+    .poll(() => {
+      const previewLabel = document
+        .querySelector(".preview-render svg")
+        ?.getAttribute("aria-label");
+      const reactSource = document.querySelector(
+        ".panel-react .code-panel",
+      )?.textContent;
+      const textContent = document.body.textContent ?? "";
 
-    return {
-      hasLoadingMessage: LOADING_MESSAGES.some((message) => {
-        return textContent.includes(message);
-      }),
-      previewLabel,
-      reactSourceReady: reactSource?.startsWith(
-        "const SvgComponent = (props) => (",
-      ),
-    };
-  }).toEqual({
-    hasLoadingMessage: false,
-    previewLabel: "Live preview",
-    reactSourceReady: true,
-  });
+      return {
+        hasLoadingMessage: LOADING_MESSAGES.some((message) => {
+          return textContent.includes(message);
+        }),
+        previewLabel,
+        reactSourceReady: reactSource?.startsWith(
+          "const SvgComponent = (props) => (",
+        ),
+      };
+    })
+    .toEqual({
+      hasLoadingMessage: false,
+      previewLabel: "Live preview",
+      reactSourceReady: true,
+    });
 };
 
 let root: Root | null = null;
@@ -102,15 +105,19 @@ describe("playground browser worker regression", () => {
     await expect
       .element(page.getByText("Preview disabled for unsafe SVG input."))
       .toBeInTheDocument();
-    await expect.poll(() => {
-      return document.querySelector(".share-button-text")?.textContent;
-    }).toBe("Sharing unavailable");
-    await expect.poll(() => {
-      const textContent = document.body.textContent ?? "";
+    await expect
+      .poll(() => {
+        return document.querySelector(".share-button-text")?.textContent;
+      })
+      .toBe("Sharing unavailable");
+    await expect
+      .poll(() => {
+        const textContent = document.body.textContent ?? "";
 
-      return LOADING_MESSAGES.some((message) => {
-        return textContent.includes(message);
-      });
-    }).toBe(false);
+        return LOADING_MESSAGES.some((message) => {
+          return textContent.includes(message);
+        });
+      })
+      .toBe(false);
   });
 });

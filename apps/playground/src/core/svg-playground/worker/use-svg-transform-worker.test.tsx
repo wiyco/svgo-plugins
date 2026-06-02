@@ -2,14 +2,18 @@ import { act } from "react";
 import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { TransformFn, WorkerTransformClient } from "../model";
+import type {
+  TransformFn,
+  TransformWorkerFactory,
+  WorkerTransformClient,
+} from "../model";
 
 import { useWorkerTransform } from "./use-svg-transform-worker";
 
 const { createTransformWorkerClient } = vi.hoisted(() => {
   return {
     createTransformWorkerClient:
-      vi.fn<(workerUrl: URL) => WorkerTransformClient>(),
+      vi.fn<(createWorker: TransformWorkerFactory) => WorkerTransformClient>(),
   };
 });
 
@@ -20,7 +24,7 @@ vi.mock("./svg-transform-worker-client", () => {
 });
 
 type HarnessProps = {
-  workerUrl: URL;
+  createWorker: TransformWorkerFactory;
 };
 
 const flush = async (): Promise<void> => {
@@ -37,8 +41,16 @@ const createTransformStub = (): TransformFn => {
   };
 };
 
-const HookHarness = ({ workerUrl }: HarnessProps) => {
-  const transform = useWorkerTransform(workerUrl);
+const firstCreateWorker: TransformWorkerFactory = () => {
+  throw new Error("should not execute in hook test");
+};
+
+const secondCreateWorker: TransformWorkerFactory = () => {
+  throw new Error("should not execute in hook test");
+};
+
+const HookHarness = ({ createWorker }: HarnessProps) => {
+  const transform = useWorkerTransform(createWorker);
 
   return (
     <output data-transform-ready={transform === null ? "no" : "yes"}>
@@ -84,32 +96,24 @@ describe("use-svg-transform-worker", () => {
       });
 
     await act(async () => {
-      root.render(
-        <HookHarness
-          workerUrl={new URL("https://example.com/one.worker.js")}
-        />,
-      );
+      root.render(<HookHarness createWorker={firstCreateWorker} />);
       await flush();
     });
 
     expect(container.textContent).toBe("ready");
 
     await act(async () => {
-      root.render(
-        <HookHarness
-          workerUrl={new URL("https://example.com/two.worker.js")}
-        />,
-      );
+      root.render(<HookHarness createWorker={secondCreateWorker} />);
       await flush();
     });
 
     expect(createTransformWorkerClient).toHaveBeenNthCalledWith(
       1,
-      new URL("https://example.com/one.worker.js"),
+      firstCreateWorker,
     );
     expect(createTransformWorkerClient).toHaveBeenNthCalledWith(
       2,
-      new URL("https://example.com/two.worker.js"),
+      secondCreateWorker,
     );
     expect(firstDispose).toHaveBeenCalledTimes(1);
 

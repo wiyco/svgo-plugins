@@ -1,4 +1,8 @@
-import type { SvgPlaygroundDefinition, TransformFn } from "../model";
+import type {
+  SvgPlaygroundDefinition,
+  TransformFn,
+  TransformWorkerFactory,
+} from "../model";
 
 import { useWorkerTransform } from "../worker/use-svg-transform-worker";
 import { SvgPlaygroundPresenter } from "./SvgPlaygroundPresenter";
@@ -23,14 +27,14 @@ export const SvgPlaygroundPage = (props: SvgPlaygroundPageProps) => {
 };
 
 type SvgPlaygroundAppProps = {
+  createWorker: TransformWorkerFactory;
   definition: SvgPlaygroundDefinition;
-  workerUrl: URL;
 };
 
 export const SvgPlaygroundApp = (props: SvgPlaygroundAppProps) => {
-  const { definition, workerUrl } = props;
+  const { createWorker, definition } = props;
 
-  const transform = useWorkerTransform(workerUrl);
+  const transform = useWorkerTransform(createWorker);
 
   if (transform === null) {
     return (

@@ -70,9 +70,10 @@ afterEach(() => {
 
 describe("svg-transform-worker-client", () => {
   it("posts requests and resolves matching worker responses", async () => {
-    const client = createTransformWorkerClient(
-      new URL("https://example.com/transform.worker.js"),
-    );
+    const workerUrl = new URL("https://example.com/transform.worker.js");
+    const client = createTransformWorkerClient(() => {
+      return new Worker(workerUrl, { type: "module" });
+    });
     const worker = MockWorker.instances[0];
     const payload = {
       kind: "success",
@@ -110,9 +111,11 @@ describe("svg-transform-worker-client", () => {
   });
 
   it("rejects pending requests when the worker crashes", async () => {
-    const client = createTransformWorkerClient(
-      new URL("https://example.com/transform.worker.js"),
-    );
+    const client = createTransformWorkerClient(() => {
+      return new Worker(new URL("https://example.com/transform.worker.js"), {
+        type: "module",
+      });
+    });
     const worker = MockWorker.instances[0];
     const resultPromise = client.transform({
       svg: "<svg />",
@@ -124,9 +127,11 @@ describe("svg-transform-worker-client", () => {
   });
 
   it("rejects pending requests and terminates the worker on dispose", async () => {
-    const client = createTransformWorkerClient(
-      new URL("https://example.com/transform.worker.js"),
-    );
+    const client = createTransformWorkerClient(() => {
+      return new Worker(new URL("https://example.com/transform.worker.js"), {
+        type: "module",
+      });
+    });
     const worker = MockWorker.instances[0];
     const resultPromise = client.transform({
       svg: "<svg />",
@@ -139,9 +144,11 @@ describe("svg-transform-worker-client", () => {
   });
 
   it("keeps only the latest queued request while a transform is already in flight", async () => {
-    const client = createTransformWorkerClient(
-      new URL("https://example.com/transform.worker.js"),
-    );
+    const client = createTransformWorkerClient(() => {
+      return new Worker(new URL("https://example.com/transform.worker.js"), {
+        type: "module",
+      });
+    });
     const worker = MockWorker.instances[0];
     const firstResultPromise = client.transform({
       svg: "<svg data-id='first' />",
@@ -208,9 +215,11 @@ describe("svg-transform-worker-client", () => {
   });
 
   it("ignores premature queued responses and supersedes stale queued work safely", async () => {
-    const client = createTransformWorkerClient(
-      new URL("https://example.com/transform.worker.js"),
-    );
+    const client = createTransformWorkerClient(() => {
+      return new Worker(new URL("https://example.com/transform.worker.js"), {
+        type: "module",
+      });
+    });
     const worker = MockWorker.instances[0];
     const firstResultPromise = client.transform({
       svg: "<svg data-id='first' />",

@@ -2,14 +2,15 @@ import { act } from "react";
 import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { TransformFn } from "../model";
+import type { TransformFn, TransformWorkerFactory } from "../model";
 
 import { hoistStrokeWidthPlayground } from "../../../playgrounds/svgo-plugin-hoist-stroke-width/definition";
 import { SvgPlaygroundApp } from "./SvgPlaygroundPage";
 
 const { useWorkerTransform } = vi.hoisted(() => {
   return {
-    useWorkerTransform: vi.fn<(workerUrl: URL) => TransformFn | null>(),
+    useWorkerTransform:
+      vi.fn<(createWorker: TransformWorkerFactory) => TransformFn | null>(),
   };
 });
 
@@ -31,6 +32,10 @@ const createTransformStub = (): TransformFn => {
       optimizedSvg: "<svg data-optimized />",
     };
   };
+};
+
+const createWorkerStub: TransformWorkerFactory = () => {
+  throw new Error("should not create worker during app shell test");
 };
 
 let container: HTMLDivElement;
@@ -61,8 +66,8 @@ describe("SvgPlaygroundApp", () => {
     await act(async () => {
       root.render(
         <SvgPlaygroundApp
+          createWorker={createWorkerStub}
           definition={hoistStrokeWidthPlayground}
-          workerUrl={new URL("https://example.com/transform.worker.js")}
         />,
       );
       await flush();
@@ -77,8 +82,8 @@ describe("SvgPlaygroundApp", () => {
     await act(async () => {
       root.render(
         <SvgPlaygroundApp
+          createWorker={createWorkerStub}
           definition={hoistStrokeWidthPlayground}
-          workerUrl={new URL("https://example.com/transform.worker.js")}
         />,
       );
       await flush();

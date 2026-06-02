@@ -2,7 +2,10 @@ import { act } from "react";
 import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { SvgPlaygroundDefinition } from "../../core/svg-playground/model";
+import type {
+  SvgPlaygroundDefinition,
+  TransformWorkerFactory,
+} from "../../core/svg-playground/model";
 
 import App from "./App";
 import { hoistStrokeWidthPlayground } from "./definition";
@@ -11,8 +14,8 @@ const { SvgPlaygroundApp } = vi.hoisted(() => {
   return {
     SvgPlaygroundApp: vi.fn<
       (props: {
+        createWorker: TransformWorkerFactory;
         definition: SvgPlaygroundDefinition;
-        workerUrl: URL;
       }) => unknown
     >(() => {
       return <div data-app="playground" />;
@@ -32,6 +35,9 @@ const flush = async (): Promise<void> => {
 
 let container: HTMLDivElement;
 let root: Root;
+let originalWorker: typeof Worker;
+const workerConstructor =
+  vi.fn<(url: URL, options?: WorkerOptions) => Worker>();
 
 beforeEach(() => {
   container = document.createElement("div");
@@ -39,6 +45,9 @@ beforeEach(() => {
   document.body.innerHTML = "";
   document.body.append(container);
   SvgPlaygroundApp.mockClear();
+  originalWorker = globalThis.Worker;
+  globalThis.Worker = workerConstructor as unknown as typeof Worker;
+  workerConstructor.mockReset();
   (
     globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
   ).IS_REACT_ACT_ENVIRONMENT = true;
@@ -49,6 +58,8 @@ afterEach(async () => {
     root.unmount();
     await flush();
   });
+
+  globalThis.Worker = originalWorker;
 });
 
 describe("playground App", () => {
@@ -59,12 +70,26 @@ describe("playground App", () => {
     });
 
     const props = SvgPlaygroundApp.mock.lastCall?.[0] as
-      | { definition: SvgPlaygroundDefinition; workerUrl: URL }
+      | {
+          createWorker: TransformWorkerFactory;
+          definition: SvgPlaygroundDefinition;
+        }
       | undefined;
 
     expect(container.querySelector('[data-app="playground"]')).not.toBeNull();
     expect(props?.definition).toBe(hoistStrokeWidthPlayground);
-    expect(props?.workerUrl).toBeInstanceOf(URL);
-    expect(String(props?.workerUrl)).toContain("svg-transform.worker.ts");
+    expect(typeof props?.createWorker).toBe("function");
+
+    props?.createWorker();
+
+    expect(workerConstructor).toHaveBeenCalledWith(
+      expect.any(URL),
+      expect.objectContaining({
+        type: "module",
+      }),
+    );
+    expect(String(workerConstructor.mock.calls[0]?.[0])).toContain(
+      "svg-transform.worker.ts",
+    );
   });
 });

@@ -1,4 +1,5 @@
 import type {
+  TransformWorkerFactory,
   WorkerRequestMessage,
   WorkerResponseMessage,
   WorkerTransformClient,
@@ -18,9 +19,9 @@ const SUPERSEDED_REQUEST_REASON =
   "Transform request superseded by newer input.";
 
 export const createTransformWorkerClient = (
-  workerUrl: URL,
+  createWorker: TransformWorkerFactory,
 ): WorkerTransformClient => {
-  const worker = new Worker(workerUrl, { type: "module" });
+  const worker = createWorker();
   let nextRequestId = 0;
   let activeRequestId: number | null = null;
   let queuedRequest: QueuedRequest | null = null;

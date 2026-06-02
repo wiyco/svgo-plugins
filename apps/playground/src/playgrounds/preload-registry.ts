@@ -2,7 +2,6 @@ import playgroundStylesheetHref from "../index.css?url";
 import { PLAYGROUND_CATALOG } from "./catalog";
 
 type PlaygroundWarmupDefinition = {
-  modulePreloadHrefs?: readonly string[];
   stylesheetHref?: string;
 };
 
@@ -16,12 +15,6 @@ type WarmupLinkOptions = {
 const playgroundWarmupDefinitions: Record<string, PlaygroundWarmupDefinition> =
   {
     "svgo-plugin-hoist-stroke-width": {
-      modulePreloadHrefs: [
-        new URL(
-          "./svgo-plugin-hoist-stroke-width/svg-transform.worker.ts",
-          import.meta.url,
-        ).href,
-      ],
       stylesheetHref: playgroundStylesheetHref,
     },
   };
@@ -44,10 +37,6 @@ const ensureWarmupLink = (options: WarmupLinkOptions): HTMLLinkElement => {
   link.href = href;
   link.dataset.playgroundWarmup = slug;
   link.dataset.warmupKind = kind;
-
-  if (rel === "modulepreload") {
-    link.crossOrigin = "";
-  }
 
   document.head.append(link);
 
@@ -74,15 +63,6 @@ const ensurePlaygroundAssetWarmupLinks = (slug: string): void => {
       slug,
     });
   }
-
-  definition?.modulePreloadHrefs?.forEach((href, index) => {
-    ensureWarmupLink({
-      href,
-      kind: `module-${index}`,
-      rel: "modulepreload",
-      slug,
-    });
-  });
 };
 
 export const warmPlaygroundRoute = async (slug: string): Promise<void> => {

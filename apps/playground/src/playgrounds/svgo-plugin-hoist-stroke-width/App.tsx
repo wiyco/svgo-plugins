@@ -1,13 +1,17 @@
 import { SvgPlaygroundApp } from "../../core/svg-playground/ui/SvgPlaygroundPage";
 import { hoistStrokeWidthPlayground } from "./definition";
 
-const workerUrl = new URL("./svg-transform.worker.ts", import.meta.url);
+const createWorker = () => {
+  return new Worker(new URL("./svg-transform.worker.ts", import.meta.url), {
+    type: "module",
+  });
+};
 
 const App = () => {
   return (
     <SvgPlaygroundApp
+      createWorker={createWorker}
       definition={hoistStrokeWidthPlayground}
-      workerUrl={workerUrl}
     />
   );
 };

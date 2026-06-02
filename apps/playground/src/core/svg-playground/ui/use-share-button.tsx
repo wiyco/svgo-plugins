@@ -17,7 +17,7 @@ type UseShareButtonOptions = {
   shareButtonState: ShareFeedbackState;
 };
 
-type UseShareButtonResult = {
+export type UseShareButtonResult = {
   shareAnnouncement: string;
   shareButtonIcon: ReactNode;
   shareButtonLabel: string;
@@ -54,6 +54,7 @@ export const useShareButton = (
   options: UseShareButtonOptions,
 ): UseShareButtonResult => {
   const { shareAnnouncement, shareButtonLabel, shareButtonState } = options;
+
   const shareButtonRef = useRef<HTMLButtonElement | null>(null);
   const shareButtonLabelRef = useRef<HTMLSpanElement | null>(null);
   const shareButtonMeasureRef = useRef<HTMLSpanElement | null>(null);

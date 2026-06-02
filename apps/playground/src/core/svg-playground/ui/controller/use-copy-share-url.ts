@@ -37,6 +37,7 @@ type UseCopyShareUrlOptions = {
 
 export const useCopyShareUrl = (options: UseCopyShareUrlOptions = {}) => {
   const { canShare = true } = options;
+
   const [shareFeedbackState, setShareFeedbackState] =
     useState<ShareFeedbackState>(canShare ? "idle" : "unsafe");
   const resetTimerIdRef = useRef<number | null>(null);

@@ -6,48 +6,85 @@ import {
   useMemo,
 } from "react";
 
-import type { SvgPlaygroundDefinition } from "../model";
-import type { SvgPlaygroundViewModel } from "./use-svg-playground-controller";
+import type { PlaygroundQueryState, SvgPreset } from "../model";
+import type {
+  ReactSourceState,
+  TransformState,
+} from "./controller/svg-playground-controller-types";
+import type { RippleHandlers } from "./use-press-ripple";
+import type { UseShareButtonResult } from "./use-share-button";
 
-import { getPlaygroundPackageName } from "../../../playgrounds/registry";
-import { getPlaygroundViewTransitionNames } from "../../../view-transition-names";
 import { FloatingPresetTabBar } from "./FloatingPresetTabBar";
-import { usePressRipple } from "./use-press-ripple";
-import { useShareButton } from "./use-share-button";
 
 const PREVIEW_BLOCKED_MESSAGE = "Preview disabled for unsafe SVG input.";
+const MIN_SIZE = 64;
+const MAX_SIZE = 320;
 
 const formatNumberLabel = (value: number): string => {
   return value.toFixed(2).replace(/\.?0+$/, "");
+};
+
+const getSizeSliderStyle = (size: number): CSSProperties => {
+  const progress = ((size - MIN_SIZE) / (MAX_SIZE - MIN_SIZE)) * 100;
+
+  return {
+    ["--slider-progress" as const]: `${progress}%`,
+  } as CSSProperties;
 };
 
 const renderPanelFallback = (message: string) => {
   return <p className="panel-empty">{message}</p>;
 };
 
-export interface SvgPlaygroundViewProps extends SvgPlaygroundViewModel {
-  definition: SvgPlaygroundDefinition;
-}
+type SvgPlaygroundTransitionNames = {
+  slug: string;
+  title: string;
+};
+
+export type SvgPlaygroundViewProps = {
+  activePresetId: string | null;
+  canShareUrl: boolean;
+  copyShareUrl: () => void;
+  packageName: string | null;
+  previewHtml: { __html: string } | null;
+  queryState: PlaygroundQueryState;
+  reactSourceState: ReactSourceState;
+  rippleHandlers: RippleHandlers;
+  selectPreset: (presetId: string) => void;
+  setColor: (color: string) => void;
+  setSize: (size: number) => void;
+  setStrokeWidth: (strokeWidth: number) => void;
+  setSvg: (svg: string) => void;
+  shareButton: UseShareButtonResult;
+  slug: string;
+  stepStrokeWidth: (delta: number) => void;
+  title: string;
+  transformState: TransformState;
+  transitionNames: SvgPlaygroundTransitionNames;
+  visiblePresets: readonly SvgPreset[];
+};
 
 export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
   const {
-    definition,
     activePresetId,
     canShareUrl,
     copyShareUrl,
+    packageName,
     previewHtml,
     queryState,
     reactSourceState,
+    rippleHandlers,
     selectPreset,
     setColor,
     setSize,
-    shareAnnouncement,
-    shareButtonLabel,
-    shareButtonState,
     setStrokeWidth,
     setSvg,
+    shareButton,
+    slug,
     stepStrokeWidth,
+    title,
     transformState,
+    transitionNames,
     visiblePresets,
   } = props;
 
@@ -58,14 +95,6 @@ export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
     transformState.kind === "error" || transformState.kind === "unsafe"
       ? transformState.message
       : "";
-  const rippleHandlers = usePressRipple();
-  const shareButton = useShareButton({
-    shareAnnouncement,
-    shareButtonLabel,
-    shareButtonState,
-  });
-  const packageName = getPlaygroundPackageName(definition.slug);
-  const transitionNames = getPlaygroundViewTransitionNames(definition.slug);
   const titleTransitionStyle = useMemo<CSSProperties>(() => {
     return {
       viewTransitionName: transitionNames.title,
@@ -77,44 +106,32 @@ export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
     };
   }, [transitionNames.slug]);
   const sizeSliderStyle = useMemo<CSSProperties>(() => {
-    const minSize = 64;
-    const maxSize = 320;
-    const progress = ((queryState.size - minSize) / (maxSize - minSize)) * 100;
-
-    return {
-      ["--slider-progress" as const]: `${progress}%`,
-    } as CSSProperties;
+    return getSizeSliderStyle(queryState.size);
   }, [queryState.size]);
-
   const handleDecreaseStrokeWidthClick = useCallback((): void => {
     stepStrokeWidth(-0.25);
   }, [stepStrokeWidth]);
-
   const handleIncreaseStrokeWidthClick = useCallback((): void => {
     stepStrokeWidth(0.25);
   }, [stepStrokeWidth]);
-
   const handleStrokeWidthChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
       setStrokeWidth(Number(event.currentTarget.value));
     },
     [setStrokeWidth],
   );
-
   const handleSizeChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
       setSize(Number(event.currentTarget.value));
     },
     [setSize],
   );
-
   const handleColorChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
       setColor(event.currentTarget.value);
     },
     [setColor],
   );
-
   const handleSvgChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>): void => {
       setSvg(event.currentTarget.value);
@@ -131,7 +148,7 @@ export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
             data-view-transition-name={transitionNames.title}
             style={titleTransitionStyle}
           >
-            {definition.title}
+            {title}
           </h1>
           <div className="intro-meta">
             <a
@@ -140,7 +157,7 @@ export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
               href="../"
               style={slugTransitionStyle}
             >
-              /{definition.slug}
+              /{slug}
             </a>
             {packageName !== null ? (
               <code className="package-chip">
@@ -253,8 +270,8 @@ export const SvgPlaygroundView = (props: SvgPlaygroundViewProps) => {
               aria-label="size"
               className="size-slider"
               id="size-input"
-              max="320"
-              min="64"
+              max={MAX_SIZE}
+              min={MIN_SIZE}
               style={sizeSliderStyle}
               step="4"
               type="range"

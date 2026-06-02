@@ -1,7 +1,7 @@
 import type { SvgPlaygroundDefinition, TransformFn } from "../model";
 
 import { useWorkerTransform } from "../worker/use-svg-transform-worker";
-import { SvgPlaygroundView } from "./SvgPlaygroundView";
+import { SvgPlaygroundPresenter } from "./SvgPlaygroundPresenter";
 import { useSvgPlaygroundController } from "./use-svg-playground-controller";
 
 type SvgPlaygroundPageProps = {
@@ -17,7 +17,9 @@ export const SvgPlaygroundPage = (props: SvgPlaygroundPageProps) => {
     transform,
   });
 
-  return <SvgPlaygroundView definition={definition} {...viewModel} />;
+  return (
+    <SvgPlaygroundPresenter definition={definition} viewModel={viewModel} />
+  );
 };
 
 type SvgPlaygroundAppProps = {

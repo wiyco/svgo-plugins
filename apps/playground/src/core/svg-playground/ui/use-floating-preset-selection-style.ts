@@ -70,6 +70,7 @@ export const useFloatingPresetSelectionStyle = (
   options: UseFloatingPresetSelectionStyleOptions,
 ): FloatingPresetSelectionStyle | null => {
   const { activePresetId, presets, presetTrackRef } = options;
+
   const [presetSelectionStyle, setPresetSelectionStyle] =
     useState<FloatingPresetSelectionStyle | null>(null);
 

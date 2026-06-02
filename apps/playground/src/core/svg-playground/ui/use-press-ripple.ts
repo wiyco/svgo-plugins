@@ -12,7 +12,7 @@ const TOUCH_RIPPLE_DIAMETER_MIN_PX = 64;
 const TOUCH_RIPPLE_DIAMETER_MAX_PX = 112;
 const TOUCH_RIPPLE_SIZE_MULTIPLIER = 1.8;
 
-type RippleHandlers = Pick<
+export type RippleHandlers = Pick<
   ButtonHTMLAttributes<HTMLButtonElement>,
   "onBlur" | "onKeyDown" | "onPointerDown"
 >;

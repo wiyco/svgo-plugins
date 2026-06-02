@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type {
   PlaygroundQueryState,
@@ -11,6 +11,10 @@ import { createPreviewMarkup } from "../../preview/create-preview-markup";
 import { createReactSource } from "../../source/create-react-source";
 import { getUnsafeSvgReason } from "../../transform/unsafe-svg";
 import { getErrorMessage } from "../../utils/get-error-message";
+import {
+  applyControlsToSvg,
+  extractControlsFromSvg,
+} from "../../utils/svg-controls";
 import { useCopyShareUrl } from "./use-copy-share-url";
 import { usePlaygroundQueryState } from "./use-playground-query-state";
 import { useSvgTransformState } from "./use-svg-transform-state";
@@ -20,13 +24,27 @@ type UseSvgPlaygroundControllerOptions = {
   transform: TransformFn;
 };
 
+const MIN_SIZE = 64;
+const MAX_SIZE = 320;
+const MIN_STROKE_WIDTH = 0.5;
+const MAX_STROKE_WIDTH = 8;
+
 const getPresetIdForSvg = (
   definition: SvgPlaygroundDefinition,
   svg: string,
+  queryState: PlaygroundQueryState,
 ): string | null => {
+  const exactMatch = definition.presets.find((preset) => {
+    return preset.svg === svg;
+  });
+
+  if (exactMatch !== undefined) {
+    return exactMatch.id;
+  }
+
   return (
     definition.presets.find((preset) => {
-      return preset.svg === svg;
+      return applyControlsToSvg(preset.svg, queryState) === svg;
     })?.id ?? null
   );
 };
@@ -35,20 +53,25 @@ const clamp = (value: number, min: number, max: number): number => {
   return Math.min(max, Math.max(min, value));
 };
 
-const updatePlaygroundQueryState = (
-  setQueryState: (
-    value:
-      | PlaygroundQueryState
-      | ((currentState: PlaygroundQueryState) => PlaygroundQueryState),
-  ) => void,
-  nextState: Partial<PlaygroundQueryState>,
-): void => {
-  setQueryState((currentState) => {
-    return {
-      ...currentState,
-      ...nextState,
-    };
-  });
+const areQueryStatesEqual = (
+  left: PlaygroundQueryState,
+  right: PlaygroundQueryState,
+): boolean => {
+  return (
+    left.color === right.color &&
+    left.size === right.size &&
+    left.strokeWidth === right.strokeWidth &&
+    left.svg === right.svg
+  );
+};
+
+const normalizeSvgQueryState = (
+  queryState: PlaygroundQueryState,
+): PlaygroundQueryState => {
+  return {
+    ...queryState,
+    svg: applyControlsToSvg(queryState.svg, queryState),
+  };
 };
 
 export const useSvgPlaygroundController = (
@@ -57,7 +80,29 @@ export const useSvgPlaygroundController = (
   const { definition, transform } = options;
 
   const [queryState, setQueryState] = usePlaygroundQueryState(definition);
-  const canShareUrl = getUnsafeSvgReason(queryState.svg) === null;
+  const [initialQueryState] = useState(queryState);
+  const [initialNormalizedQueryState] = useState(() => {
+    return normalizeSvgQueryState(queryState);
+  });
+  const needsInitialNormalization =
+    areQueryStatesEqual(queryState, initialQueryState) &&
+    !areQueryStatesEqual(initialNormalizedQueryState, initialQueryState);
+  const renderedQueryState = needsInitialNormalization
+    ? initialNormalizedQueryState
+    : queryState;
+  const matchedPresetId = useMemo(() => {
+    return getPresetIdForSvg(
+      definition,
+      renderedQueryState.svg,
+      renderedQueryState,
+    );
+  }, [definition, renderedQueryState]);
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(
+    () => {
+      return matchedPresetId;
+    },
+  );
+  const canShareUrl = getUnsafeSvgReason(renderedQueryState.svg) === null;
   const {
     copyShareUrl,
     shareAnnouncement,
@@ -66,8 +111,11 @@ export const useSvgPlaygroundController = (
   } = useCopyShareUrl({
     canShare: canShareUrl,
   });
-  const transformState = useSvgTransformState(queryState.svg, transform);
-  const activePresetId = getPresetIdForSvg(definition, queryState.svg);
+  const transformState = useSvgTransformState(
+    renderedQueryState.svg,
+    transform,
+  );
+  const activePresetId = selectedPresetId ?? matchedPresetId;
   const visiblePresets = useMemo(() => {
     return definition.presets.filter((preset) => {
       return getUnsafeSvgReason(preset.svg) === null;
@@ -75,6 +123,45 @@ export const useSvgPlaygroundController = (
   }, [definition.presets]);
   const optimizedSvg =
     transformState.kind === "success" ? transformState.optimizedSvg : "";
+
+  useEffect(() => {
+    if (!needsInitialNormalization || window.location.search.length === 0) {
+      return;
+    }
+
+    setQueryState(initialNormalizedQueryState);
+  }, [initialNormalizedQueryState, needsInitialNormalization, setQueryState]);
+
+  useEffect(() => {
+    if (selectedPresetId === null) {
+      if (matchedPresetId !== null) {
+        setSelectedPresetId(matchedPresetId);
+      }
+
+      return;
+    }
+
+    const selectedPreset = definition.presets.find((preset) => {
+      return preset.id === selectedPresetId;
+    });
+
+    if (selectedPreset === undefined) {
+      setSelectedPresetId(matchedPresetId);
+      return;
+    }
+
+    if (
+      applyControlsToSvg(selectedPreset.svg, renderedQueryState) !==
+      renderedQueryState.svg
+    ) {
+      setSelectedPresetId(matchedPresetId);
+    }
+  }, [
+    definition.presets,
+    matchedPresetId,
+    renderedQueryState,
+    selectedPresetId,
+  ]);
 
   const selectPreset = (presetId: string): void => {
     const preset = definition.presets.find((candidate) => {
@@ -85,41 +172,95 @@ export const useSvgPlaygroundController = (
       return;
     }
 
-    updatePlaygroundQueryState(setQueryState, {
-      svg: preset.svg,
+    setSelectedPresetId(preset.id);
+    setQueryState((currentState) => {
+      const normalizedState = normalizeSvgQueryState(currentState);
+
+      return {
+        ...normalizedState,
+        svg: applyControlsToSvg(preset.svg, normalizedState),
+      };
     });
   };
 
   const setStrokeWidth = (strokeWidth: number): void => {
-    updatePlaygroundQueryState(setQueryState, {
-      strokeWidth: clamp(strokeWidth, 0.5, 8),
+    setQueryState((currentState) => {
+      const normalizedState = normalizeSvgQueryState(currentState);
+      const nextStrokeWidth = clamp(
+        strokeWidth,
+        MIN_STROKE_WIDTH,
+        MAX_STROKE_WIDTH,
+      );
+
+      return {
+        ...normalizedState,
+        strokeWidth: nextStrokeWidth,
+        svg: applyControlsToSvg(normalizedState.svg, {
+          ...normalizedState,
+          strokeWidth: nextStrokeWidth,
+        }),
+      };
     });
   };
 
   const stepStrokeWidth = (delta: number): void => {
     setQueryState((currentState) => {
+      const normalizedState = normalizeSvgQueryState(currentState);
+      const nextStrokeWidth = clamp(
+        normalizedState.strokeWidth + delta,
+        MIN_STROKE_WIDTH,
+        MAX_STROKE_WIDTH,
+      );
+
       return {
-        ...currentState,
-        strokeWidth: clamp(currentState.strokeWidth + delta, 0.5, 8),
+        ...normalizedState,
+        strokeWidth: nextStrokeWidth,
+        svg: applyControlsToSvg(normalizedState.svg, {
+          ...normalizedState,
+          strokeWidth: nextStrokeWidth,
+        }),
       };
     });
   };
 
   const setSize = (size: number): void => {
-    updatePlaygroundQueryState(setQueryState, {
-      size,
+    setQueryState((currentState) => {
+      const normalizedState = normalizeSvgQueryState(currentState);
+      const nextSize = clamp(size, MIN_SIZE, MAX_SIZE);
+
+      return {
+        ...normalizedState,
+        size: nextSize,
+        svg: applyControlsToSvg(normalizedState.svg, {
+          ...normalizedState,
+          size: nextSize,
+        }),
+      };
     });
   };
 
   const setColor = (color: string): void => {
-    updatePlaygroundQueryState(setQueryState, {
-      color,
+    setQueryState((currentState) => {
+      const normalizedState = normalizeSvgQueryState(currentState);
+
+      return {
+        ...normalizedState,
+        color,
+        svg: applyControlsToSvg(normalizedState.svg, {
+          ...normalizedState,
+          color,
+        }),
+      };
     });
   };
 
   const setSvg = (svg: string): void => {
-    updatePlaygroundQueryState(setQueryState, {
-      svg,
+    setQueryState((currentState) => {
+      return {
+        ...currentState,
+        ...extractControlsFromSvg(svg, currentState),
+        svg,
+      };
     });
   };
 
@@ -131,14 +272,11 @@ export const useSvgPlaygroundController = (
     try {
       return createPreviewMarkup(optimizedSvg, {
         ariaLabel: "Live preview",
-        color: queryState.color,
-        size: queryState.size,
-        strokeWidth: queryState.strokeWidth,
       });
     } catch {
       return null;
     }
-  }, [optimizedSvg, queryState.color, queryState.size, queryState.strokeWidth]);
+  }, [optimizedSvg]);
 
   const reactSourceState = useMemo(() => {
     if (optimizedSvg.length === 0) {
@@ -176,7 +314,7 @@ export const useSvgPlaygroundController = (
     canShareUrl,
     copyShareUrl,
     previewHtml,
-    queryState,
+    queryState: renderedQueryState,
     reactSourceState,
     selectPreset,
     setColor,

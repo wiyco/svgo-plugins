@@ -54,16 +54,16 @@ export const SVG_PRESETS = [
 
 const DEFAULT_SVG_PRESET = SVG_PRESETS[0];
 
-export const DEFAULT_QUERY_STATE: PlaygroundQueryState = {
+export const DEFAULT_QUERY_STATE = {
   svg: DEFAULT_SVG_PRESET.svg,
   color: "#155eef",
   size: 184,
   strokeWidth: 2,
-};
+} as const satisfies Readonly<PlaygroundQueryState>;
 
 const playgroundStateCodec = createPlaygroundStateCodec(DEFAULT_QUERY_STATE);
 
-export const hoistStrokeWidthPlayground: SvgPlaygroundDefinition = {
+export const hoistStrokeWidthPlayground = {
   defaultState: DEFAULT_QUERY_STATE,
   description:
     "Built from the shared apps/playground app and published at a slug-based URL. Paste SVG, swap presets, and inspect the full runtime pipeline from SVGO through live React preview.",
@@ -75,4 +75,4 @@ export const hoistStrokeWidthPlayground: SvgPlaygroundDefinition = {
   summary:
     "Try the hoist-stroke-width plugin against raw SVG input and inspect the optimized output, generated React source, and live preview.",
   title: "SVGO plugin playground for hoisting stroke width",
-};
+} as const satisfies Readonly<SvgPlaygroundDefinition>;

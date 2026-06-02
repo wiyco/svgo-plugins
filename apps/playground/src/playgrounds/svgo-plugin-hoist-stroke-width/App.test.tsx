@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { TransformFn } from "../../core/svg-playground/model";
 
 import { SvgPlaygroundPage } from "../../core/svg-playground/ui/SvgPlaygroundPage";
+import { applyControlsToSvg } from "../../core/svg-playground/utils/svg-controls";
 import { hoistStrokeWidthPlayground } from "./definition";
 
 type RenderedApp = {
@@ -17,11 +18,43 @@ const flush = async (): Promise<void> => {
   await Promise.resolve();
 };
 
-const createSuccessResult = (presetName: "single" | "multiple" | "mixed") => {
+const stampOptimizedSvg = (
+  svg: string,
+  presetName: "single" | "multiple" | "mixed",
+) => {
+  const document = new DOMParser().parseFromString(svg, "image/svg+xml");
+  const rootElement = document.documentElement;
+
+  if (rootElement.tagName.toLowerCase() !== "svg") {
+    return svg;
+  }
+
+  rootElement.setAttribute("data-optimized", presetName);
+  rootElement.setAttribute("data-source", presetName);
+
+  return new XMLSerializer().serializeToString(rootElement);
+};
+
+const createSuccessResult = (
+  presetName: "single" | "multiple" | "mixed",
+  svg = "<svg />",
+) => {
   return {
     kind: "success" as const,
-    optimizedSvg: `<svg data-optimized="${presetName}" data-source="${presetName}" />`,
+    optimizedSvg: stampOptimizedSvg(svg, presetName),
   };
+};
+
+const getPresetName = (svg: string): "single" | "multiple" | "mixed" => {
+  if (svg.includes("M12 3.5L18 5.75V11.25")) {
+    return "single";
+  }
+
+  if (svg.includes('stroke-width="1.25"')) {
+    return "mixed";
+  }
+
+  return "multiple";
 };
 
 const createTransformStub = (): TransformFn => {
@@ -40,13 +73,7 @@ const createTransformStub = (): TransformFn => {
       };
     }
 
-    const presetName = svg.includes('stroke-width="1.25"')
-      ? "mixed"
-      : svg.includes('stroke-width="2.0"')
-        ? "multiple"
-        : "single";
-
-    return createSuccessResult(presetName);
+    return createSuccessResult(getPresetName(svg), svg);
   };
 };
 
@@ -185,11 +212,19 @@ describe("hoist stroke width playground", () => {
     );
     const slugLink =
       renderedApp.container.querySelector<HTMLAnchorElement>(".slug-chip");
+    const expectedSvg = applyControlsToSvg(
+      hoistStrokeWidthPlayground.presets[1]?.svg ?? "",
+      hoistStrokeWidthPlayground.defaultState,
+    );
 
-    expect(textarea?.value).toContain('stroke-width="2.0"');
+    expect(textarea?.value).toBe(expectedSvg);
     expect(optimizedPanel).toContain('data-optimized="multiple"');
     expect(optimizedPanel).toContain('data-source="multiple"');
+    expect(optimizedPanel).toContain('stroke-width="2"');
     expect(previewSvg).not.toBeNull();
+    expect(previewSvg?.getAttribute("width")).toBe("184");
+    expect(previewSvg?.getAttribute("height")).toBe("184");
+    expect(previewSvg?.getAttribute("style")).toContain("color: #155eef");
     expect(slugLink?.getAttribute("href")).toBe("../");
     expect(multiplePresetButton?.className).toContain("ripple-surface");
     expect(singlePresetButton?.getAttribute("aria-pressed")).toBe("false");
@@ -216,13 +251,18 @@ describe("hoist stroke width playground", () => {
     expect(textarea?.value).not.toContain('stroke-width="1.25"');
   });
 
-  it("loads its initial state from the query string and keeps the URL in sync", async () => {
-    const serialized = hoistStrokeWidthPlayground.serializeState({
+  it("loads legacy query state, normalizes it, and keeps the URL in sync", async () => {
+    const legacyState = {
       color: "#0f766e",
       size: 240,
       strokeWidth: 3.5,
       svg: `<svg viewBox="0 0 24 24"><path d="M0 0L24 24" stroke="currentColor" /></svg>`,
-    });
+    };
+    const serialized = hoistStrokeWidthPlayground.serializeState(legacyState);
+    const normalizedState = {
+      ...legacyState,
+      svg: applyControlsToSvg(legacyState.svg, legacyState),
+    };
 
     window.history.replaceState({}, "", `/?${serialized}`);
     renderedApp = await renderPlayground(createTransformStub());
@@ -230,11 +270,17 @@ describe("hoist stroke width playground", () => {
     const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
       'input[aria-label="color"]',
     );
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
 
     expect(colorInput?.value).toBe("#0f766e");
     expect(renderedApp.container.textContent).toContain("240px");
     expect(renderedApp.container.textContent).toContain("3.5");
-    expect(window.location.search).toBe(`?${serialized}`);
+    expect(textarea?.value).toBe(normalizedState.svg);
+    expect(window.location.search).toBe(
+      `?${hoistStrokeWidthPlayground.serializeState(normalizedState)}`,
+    );
 
     await act(async () => {
       if (colorInput !== null) {
@@ -254,6 +300,131 @@ describe("hoist stroke width playground", () => {
 
     expect(window.location.pathname).toBe("/");
     expect(window.location.search).toBe("");
+  });
+
+  it("syncs command-dock controls back from direct svg edits", async () => {
+    renderedApp = await renderPlayground(createTransformStub());
+
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
+    const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
+      'input[aria-label="color"]',
+    );
+    const sizeInput = renderedApp.container.querySelector<HTMLInputElement>(
+      'input[aria-label="size"]',
+    );
+    const strokeWidthInput =
+      renderedApp.container.querySelector<HTMLInputElement>(
+        'input[aria-label="strokeWidth"]',
+      );
+
+    await act(async () => {
+      if (textarea !== null) {
+        changeFieldValue(
+          textarea,
+          `<svg width="128" height="144" style="fill: none; color: #0f766e" viewBox="0 0 24 24"><path d="M0 0L24 24" stroke="currentColor" stroke-width="3.5" /><path d="M24 0L0 24" stroke="currentColor" stroke-width="3.5" /></svg>`,
+        );
+      }
+      await flush();
+    });
+
+    expect(colorInput?.value).toBe("#0f766e");
+    expect(sizeInput?.value).toBe("128");
+    expect(strokeWidthInput?.value).toBe("3.5");
+    expect(renderedApp.container.textContent).toContain("128px");
+    expect(renderedApp.container.textContent).toContain("3.5");
+  });
+
+  it("keeps the dock stroke width when textarea edits contain mixed stroke widths", async () => {
+    renderedApp = await renderPlayground(createTransformStub());
+
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
+    const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
+      'input[aria-label="color"]',
+    );
+    const sizeInput = renderedApp.container.querySelector<HTMLInputElement>(
+      'input[aria-label="size"]',
+    );
+    const strokeWidthInput =
+      renderedApp.container.querySelector<HTMLInputElement>(
+        'input[aria-label="strokeWidth"]',
+      );
+    const increaseButton =
+      renderedApp.container.querySelector<HTMLButtonElement>(
+        'button[aria-label="Increase strokeWidth"]',
+      );
+
+    await act(async () => {
+      if (textarea !== null) {
+        changeFieldValue(
+          textarea,
+          `<svg width="96" style="color: #0f766e" viewBox="0 0 24 24"><path d="M0 0L24 24" stroke="currentColor" stroke-width="1.25" /><path d="M24 0L0 24" stroke="currentColor" stroke-width="2.5" /></svg>`,
+        );
+      }
+      await flush();
+    });
+
+    expect(colorInput?.value).toBe("#0f766e");
+    expect(sizeInput?.value).toBe("96");
+    expect(strokeWidthInput?.value).toBe("2");
+    expect(textarea?.value).toContain('stroke-width="1.25"');
+    expect(textarea?.value).toContain('stroke-width="2.5"');
+
+    await act(async () => {
+      increaseButton?.click();
+      await flush();
+    });
+
+    expect(textarea?.value).not.toContain('stroke-width="1.25"');
+    expect(textarea?.value).not.toContain('stroke-width="2.5"');
+    expect(textarea?.value).toContain('stroke-width="2.25"');
+  });
+
+  it("applies the current dock controls when switching presets", async () => {
+    renderedApp = await renderPlayground(createTransformStub());
+
+    const increaseButton =
+      renderedApp.container.querySelector<HTMLButtonElement>(
+        'button[aria-label="Increase strokeWidth"]',
+      );
+    const sizeInput = renderedApp.container.querySelector<HTMLInputElement>(
+      'input[aria-label="size"]',
+    );
+    const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
+      'input[aria-label="color"]',
+    );
+    const multiplePresetButton = findPresetButton(
+      renderedApp.container,
+      "Multiple",
+    );
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
+
+    await act(async () => {
+      increaseButton?.click();
+      increaseButton?.click();
+      if (sizeInput !== null) {
+        changeFieldValue(sizeInput, "256");
+      }
+      if (colorInput !== null) {
+        changeFieldValue(colorInput, "#ff6600");
+      }
+      multiplePresetButton?.click();
+      await flush();
+    });
+
+    expect(textarea?.value).toBe(
+      applyControlsToSvg(hoistStrokeWidthPlayground.presets[1]?.svg ?? "", {
+        ...hoistStrokeWidthPlayground.defaultState,
+        color: "#ff6600",
+        size: 256,
+        strokeWidth: 2.5,
+      }),
+    );
   });
 
   it("shows loading placeholders first and falls back to idle placeholders for empty input", async () => {
@@ -662,7 +833,7 @@ describe("hoist stroke width playground", () => {
     ).toBe("Sharing unavailable");
   });
 
-  it("updates the live preview when strokeWidth, size, and color change", async () => {
+  it("updates the input, optimized, react, and preview panels when dock controls change", async () => {
     renderedApp = await renderPlayground(createTransformStub());
 
     const increaseButton =
@@ -688,11 +859,33 @@ describe("hoist stroke width playground", () => {
       await flush();
     });
 
+    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Input SVG"]',
+    );
+    const optimizedPanel = renderedApp.container.querySelector<HTMLElement>(
+      ".panel-optimized pre",
+    );
+    const reactPanel =
+      renderedApp.container.querySelector<HTMLElement>(".panel-react pre");
     const previewSvg = renderedApp.container.querySelector<SVGSVGElement>(
       'svg[data-optimized="single"]',
     );
 
-    expect(previewSvg?.getAttribute("stroke-width")).toBe("2.5");
+    expect(textarea?.value).toContain('stroke-width="2.5"');
+    expect(textarea?.value).toContain('height="256"');
+    expect(textarea?.value).toContain('width="256"');
+    expect(textarea?.value).toContain("color: #ff6600");
+    expect(optimizedPanel?.textContent).toContain('stroke-width="2.5"');
+    expect(optimizedPanel?.textContent).toContain('height="256"');
+    expect(optimizedPanel?.textContent).toContain('width="256"');
+    expect(optimizedPanel?.textContent).toContain("color: #ff6600");
+    expect(reactPanel?.textContent).toContain('strokeWidth="2.5"');
+    expect(reactPanel?.textContent).toContain('height="256"');
+    expect(reactPanel?.textContent).toContain('width="256"');
+    expect(reactPanel?.textContent).toContain('color: "#ff6600"');
+    expect(
+      previewSvg?.querySelector("[stroke-width]")?.getAttribute("stroke-width"),
+    ).toBe("2.5");
     expect(previewSvg?.getAttribute("height")).toBe("256");
     expect(previewSvg?.getAttribute("width")).toBe("256");
     expect(previewSvg?.getAttribute("style")).toContain("color: #ff6600");

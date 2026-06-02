@@ -14,14 +14,11 @@ const parseSvg = (svg: string): Element => {
 };
 
 describe("create-preview-markup", () => {
-  it("applies runtime preview overrides on the root svg element", () => {
+  it("adds only the preview aria label while preserving svg attributes", () => {
     const markup = createPreviewMarkup(
-      '<svg data-preview="icon" style="fill: none" viewBox="0 0 24 24"><path d="M0 0L24 24" /></svg>',
+      '<svg data-preview="icon" height="128" stroke-width="2.5" style="fill: none; color: #ff6600" viewBox="0 0 24 24" width="128"><path d="M0 0L24 24" /></svg>',
       {
         ariaLabel: "Live preview",
-        color: "#ff6600",
-        size: 128,
-        strokeWidth: 2.5,
       },
     );
     const rootElement = parseSvg(markup);
@@ -37,29 +34,22 @@ describe("create-preview-markup", () => {
     expect(rootElement.querySelector("path")).not.toBeNull();
   });
 
-  it("appends preview color when the source style already ends with a semicolon", () => {
+  it("preserves existing style declarations without appending overrides", () => {
     const markup = createPreviewMarkup(
       '<svg style="fill: none;" viewBox="0 0 24 24" />',
       {
         ariaLabel: "Live preview",
-        color: "#0f766e",
-        size: 96,
-        strokeWidth: 1.5,
       },
     );
     const rootElement = parseSvg(markup);
 
-    expect(rootElement.getAttribute("style")).toContain("fill: none;");
-    expect(rootElement.getAttribute("style")).toContain("color: #0f766e");
+    expect(rootElement.getAttribute("style")).toBe("fill: none;");
   });
 
   it("throws when the optimized svg does not have a root svg element", () => {
     expect(() => {
       createPreviewMarkup("<g />", {
         ariaLabel: "Live preview",
-        color: "#ff6600",
-        size: 128,
-        strokeWidth: 2.5,
       });
     }).toThrow("Expected optimized SVG to contain a root <svg> element.");
   });

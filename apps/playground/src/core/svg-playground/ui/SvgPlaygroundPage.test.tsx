@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { TransformFn } from "../model";
 
 import { hoistStrokeWidthPlayground } from "../../../playgrounds/svgo-plugin-hoist-stroke-width/definition";
+import { applyControlsToSvg } from "../utils/svg-controls";
 import { SvgPlaygroundPage } from "./SvgPlaygroundPage";
 
 const playgroundDefinitionWithoutPackage = {
@@ -60,7 +61,10 @@ describe("SvgPlaygroundPage", () => {
     });
 
     expect(transform).toHaveBeenCalledWith({
-      svg: hoistStrokeWidthPlayground.defaultState.svg,
+      svg: applyControlsToSvg(
+        hoistStrokeWidthPlayground.defaultState.svg,
+        hoistStrokeWidthPlayground.defaultState,
+      ),
     });
     expect(
       container.querySelector<HTMLButtonElement>(".share-button"),

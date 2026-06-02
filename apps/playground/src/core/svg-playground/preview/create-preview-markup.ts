@@ -1,8 +1,5 @@
 type PreviewMarkupOptions = {
   ariaLabel: string;
-  color: string;
-  size: number;
-  strokeWidth: number;
 };
 
 const getRootSvgElement = (svg: string): Element => {
@@ -16,40 +13,15 @@ const getRootSvgElement = (svg: string): Element => {
   return rootElement;
 };
 
-const appendStyleDeclaration = (
-  styleText: string | null,
-  declaration: string,
-): string => {
-  const normalizedStyleText = styleText?.trim() ?? "";
-
-  if (normalizedStyleText.length === 0) {
-    return declaration;
-  }
-
-  return normalizedStyleText.endsWith(";")
-    ? `${normalizedStyleText} ${declaration}`
-    : `${normalizedStyleText}; ${declaration}`;
-};
-
 export const createPreviewMarkup = (
   optimizedSvg: string,
   options: PreviewMarkupOptions,
 ): string => {
-  const { ariaLabel, color, size, strokeWidth } = options;
+  const { ariaLabel } = options;
 
   const rootElement = getRootSvgElement(optimizedSvg);
 
   rootElement.setAttribute("aria-label", ariaLabel);
-  rootElement.setAttribute("height", `${size}`);
-  rootElement.setAttribute("stroke-width", `${strokeWidth}`);
-  rootElement.setAttribute(
-    "style",
-    appendStyleDeclaration(
-      rootElement.getAttribute("style"),
-      `color: ${color};`,
-    ),
-  );
-  rootElement.setAttribute("width", `${size}`);
 
   return new XMLSerializer().serializeToString(rootElement);
 };

@@ -10,6 +10,7 @@ export type TransformState =
 
 export type ReactSourceState = {
   error: string;
+  isPending?: boolean;
   source: string;
 };
 

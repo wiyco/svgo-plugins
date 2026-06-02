@@ -313,6 +313,26 @@ describe("SvgPlayground compound components", () => {
     );
   });
 
+  it("renders a React source fallback while deferred source generation is still pending", async () => {
+    renderedTree = await renderCompound(
+      createRootProps({
+        reactSourceState: {
+          error: "",
+          isPending: true,
+          source: "",
+        },
+      }),
+      <SvgPlayground.Panels />,
+    );
+
+    expect(renderedTree.container.textContent).toContain(
+      "Rebuilding React component source…",
+    );
+    expect(renderedTree.container.textContent).not.toContain(
+      "export const Icon = () => <svg />;",
+    );
+  });
+
   it("renders unsafe panel fallbacks", async () => {
     renderedTree = await renderCompound(
       createRootProps({

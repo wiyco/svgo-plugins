@@ -8,9 +8,7 @@ import type {
 import type { SvgPlaygroundViewModel } from "./svg-playground-controller-types";
 
 import { createPreviewMarkup } from "../../preview/create-preview-markup";
-import { createReactSource } from "../../source/create-react-source";
 import { getUnsafeSvgReason } from "../../transform/unsafe-svg";
-import { getErrorMessage } from "../../utils/get-error-message";
 import {
   applyControlsToSvg,
   extractControlsFromSvg,
@@ -21,6 +19,7 @@ import {
   usePlaygroundQueryState,
   usePlaygroundQueryStateUrlSync,
 } from "./use-playground-query-state";
+import { useReactSourceState } from "./use-react-source-state";
 import { useSvgTransformState } from "./use-svg-transform-state";
 
 type UseSvgPlaygroundControllerOptions = {
@@ -175,27 +174,6 @@ const createPreviewMarkupFromSvg = (optimizedSvg: string) => {
     });
   } catch {
     return null;
-  }
-};
-
-const createReactSourceState = (optimizedSvg: string) => {
-  if (optimizedSvg.length === 0) {
-    return {
-      error: "",
-      source: "",
-    };
-  }
-
-  try {
-    return {
-      error: "",
-      source: createReactSource(optimizedSvg),
-    };
-  } catch (error) {
-    return {
-      error: getErrorMessage(error, "Unable to generate React source."),
-      source: "",
-    };
   }
 };
 
@@ -442,17 +420,7 @@ export const useSvgPlaygroundController = (
 
     return createPreviewMarkupFromSvg(optimizedSvg);
   }, [optimizedSvg, transformState.kind]);
-
-  const reactSourceState = useMemo(() => {
-    if (transformState.kind !== "success") {
-      return {
-        error: "",
-        source: "",
-      };
-    }
-
-    return createReactSourceState(optimizedSvg);
-  }, [optimizedSvg, transformState.kind]);
+  const reactSourceState = useReactSourceState(transformState);
 
   const previewHtml = useMemo(() => {
     return createPreviewHtml(previewMarkup);

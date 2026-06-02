@@ -12,7 +12,9 @@ export const ReactSourcePanel = memo(function ReactSourcePanel() {
       <div className="panel-header">
         <h2>React source</h2>
       </div>
-      {status === "success" && reactSourceState.source.length > 0 ? (
+      {status === "success" && reactSourceState.isPending === true ? (
+        renderPanelFallback("Rebuilding React component source…")
+      ) : status === "success" && reactSourceState.source.length > 0 ? (
         <pre className="code-panel">{reactSourceState.source}</pre>
       ) : status === "success" && reactSourceState.error.length > 0 ? (
         renderPanelFallback(reactSourceState.error)

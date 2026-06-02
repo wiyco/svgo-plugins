@@ -19,6 +19,13 @@ const flush = async (): Promise<void> => {
   await Promise.resolve();
 };
 
+const flushDeferredReactSourceBuild = async (): Promise<void> => {
+  await act(async () => {
+    vi.runAllTimers();
+    await flush();
+  });
+};
+
 const stampOptimizedSvg = (
   svg: string,
   presetName: "single" | "multiple" | "mixed",
@@ -551,6 +558,7 @@ describe("hoist stroke width playground", () => {
   });
 
   it("shows source and preview fallbacks when optimized svg has no root svg element", async () => {
+    vi.useFakeTimers();
     const transform: TransformFn = async () => {
       return {
         kind: "success",
@@ -559,6 +567,7 @@ describe("hoist stroke width playground", () => {
     };
 
     renderedApp = await renderPlayground(transform);
+    await flushDeferredReactSourceBuild();
 
     expect(renderedApp.container.textContent).toContain(
       "Expected optimized SVG to contain a root <svg> element.",
@@ -783,6 +792,7 @@ describe("hoist stroke width playground", () => {
   });
 
   it("updates the input, optimized, react, and preview panels when dock controls change", async () => {
+    vi.useFakeTimers();
     renderedApp = await renderPlayground(createTransformStub());
 
     const increaseButton =
@@ -807,6 +817,7 @@ describe("hoist stroke width playground", () => {
       }
       await flush();
     });
+    await flushDeferredReactSourceBuild();
 
     const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
       'textarea[aria-label="Input SVG"]',

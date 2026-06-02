@@ -10,6 +10,9 @@ coverage/
 .env*
 !.env.example
 
+.vitest-attachments/
+__screenshots__/
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json

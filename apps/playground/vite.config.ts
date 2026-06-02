@@ -17,6 +17,9 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: ["svgo/browser"],
+  },
   plugins: [react()],
   resolve: {
     alias: createPlaygroundPackageSourceAliases(import.meta.url, [

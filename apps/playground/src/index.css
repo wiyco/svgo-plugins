@@ -1,9 +1,5 @@
 @import "./tokens.css";
 
-@view-transition {
-  navigation: auto;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -62,20 +58,6 @@ textarea {
 
 #root {
   min-height: 100vh;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: var(--duration-medium);
-  animation-timing-function: var(--ease-standard);
-}
-
-::view-transition-old(root) {
-  animation-name: root-fade-out;
-}
-
-::view-transition-new(root) {
-  animation-name: root-fade-in;
 }
 
 .app-shell {
@@ -991,30 +973,6 @@ textarea {
   }
 }
 
-@keyframes root-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.995);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes root-fade-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: scale(1.005);
-  }
-}
-
 @keyframes button-ripple {
   from {
     opacity: 1;
@@ -1145,8 +1103,6 @@ textarea {
     transition-duration: 1ms;
   }
 
-  ::view-transition-old(root),
-  ::view-transition-new(root),
   .ripple-surface[data-ripple-state="active"]::after,
   .share-button[data-share-feedback-state="success"] {
     animation-duration: 1ms;

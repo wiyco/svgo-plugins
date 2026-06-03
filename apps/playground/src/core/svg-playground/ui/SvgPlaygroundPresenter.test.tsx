@@ -190,9 +190,7 @@ describe("SvgPlaygroundPresenter", () => {
       rippleHandlers: mocks.rippleHandlers,
       shareButton: mocks.shareButton,
       slug: hoistStrokeWidthPlayground.slug,
-      slugTransitionName: "playground-slug-svgo-plugin-hoist-stroke-width",
       title: hoistStrokeWidthPlayground.title,
-      titleTransitionName: "playground-title-svgo-plugin-hoist-stroke-width",
       visiblePresets: hoistStrokeWidthPlayground.presets,
     });
     expect(container.querySelector('[data-slot="header"]')).not.toBeNull();

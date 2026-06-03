@@ -34,11 +34,9 @@ const SvgPlaygroundRoot = (
     shareButton,
     size,
     slug,
-    slugTransitionName,
     stepStrokeWidth,
     strokeWidth,
     title,
-    titleTransitionName,
     transformState,
     visiblePresets,
   } = props;
@@ -50,9 +48,7 @@ const SvgPlaygroundRoot = (
       rippleHandlers,
       shareButton,
       slug,
-      slugTransitionName,
       title,
-      titleTransitionName,
     };
   }, [
     canShareUrl,
@@ -61,9 +57,7 @@ const SvgPlaygroundRoot = (
     rippleHandlers,
     shareButton,
     slug,
-    slugTransitionName,
     title,
-    titleTransitionName,
   ]);
   const presetValue = useMemo(() => {
     return {

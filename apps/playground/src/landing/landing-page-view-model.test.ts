@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { createLandingPageViewModel } from "./landing-page-view-model";
 
 describe("landing-page-view-model", () => {
-  it("builds hrefs, plural preset labels, and transition names from catalog entries", () => {
+  it("builds hrefs and plural preset labels from catalog entries", () => {
     const viewModel = createLandingPageViewModel([
       {
         packageName: "@scope/example-playground",
@@ -21,10 +21,8 @@ describe("landing-page-view-model", () => {
           packageName: "@scope/example-playground",
           presetCountLabel: "3 presets",
           slug: "example-playground",
-          slugTransitionName: "playground-slug-example-playground",
           summary: "Example summary",
           title: "Example title",
-          titleTransitionName: "playground-title-example-playground",
         },
       ],
     });

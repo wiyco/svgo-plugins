@@ -26,11 +26,9 @@ export type SvgPlaygroundRootProps = {
   shareButton: UseShareButtonResult;
   size: number;
   slug: string;
-  slugTransitionName: string;
   stepStrokeWidth: (delta: number) => void;
   strokeWidth: number;
   title: string;
-  titleTransitionName: string;
   transformState: TransformState;
   visiblePresets: readonly SvgPreset[];
 };
@@ -42,9 +40,7 @@ export type SvgPlaygroundHeaderContextValue = {
   rippleHandlers: RippleHandlers;
   shareButton: UseShareButtonResult;
   slug: string;
-  slugTransitionName: string;
   title: string;
-  titleTransitionName: string;
 };
 
 export type SvgPlaygroundPresetContextValue = {

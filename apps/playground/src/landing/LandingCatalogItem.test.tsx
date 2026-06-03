@@ -44,11 +44,9 @@ const HOIST_STROKE_WIDTH_PLAYGROUND = {
   packageName: "@wiyco/svgo-plugin-hoist-stroke-width",
   presetCountLabel: "3 presets",
   slug: "svgo-plugin-hoist-stroke-width",
-  slugTransitionName: "playground-slug-svgo-plugin-hoist-stroke-width",
   summary:
     "Try the hoist-stroke-width plugin against raw SVG input and inspect the optimized output, generated React source, and live preview.",
   title: "SVGO plugin playground for hoisting stroke width",
-  titleTransitionName: "playground-title-svgo-plugin-hoist-stroke-width",
 } as const;
 
 const CUSTOM_PLAYGROUND = {
@@ -56,10 +54,8 @@ const CUSTOM_PLAYGROUND = {
   packageName: null,
   presetCountLabel: "1 preset",
   slug: "custom-playground",
-  slugTransitionName: "playground-slug-custom-playground",
   summary: "Custom summary",
   title: "Custom title",
-  titleTransitionName: "playground-title-custom-playground",
 } as const;
 
 beforeEach(() => {
@@ -96,9 +92,6 @@ describe("LandingCatalogItem", () => {
     const playgroundLink = container.querySelector<HTMLAnchorElement>(
       'a[href="./svgo-plugin-hoist-stroke-width/"]',
     );
-    const slugChip = container.querySelector<HTMLElement>(".landing-item-slug");
-    const title = container.querySelector<HTMLElement>(".landing-item-title");
-
     if (playgroundLink === null) {
       throw new Error("Expected landing catalog link");
     }
@@ -112,12 +105,6 @@ describe("LandingCatalogItem", () => {
     expect(playgroundLink.textContent).toContain("3 presets");
     expect(playgroundLink.textContent).toContain(
       "SVGO plugin playground for hoisting stroke width",
-    );
-    expect(slugChip?.getAttribute("data-view-transition-name")).toBe(
-      "playground-slug-svgo-plugin-hoist-stroke-width",
-    );
-    expect(title?.getAttribute("data-view-transition-name")).toBe(
-      "playground-title-svgo-plugin-hoist-stroke-width",
     );
     expect(mocks.linkRef.current).toBe(playgroundLink);
 

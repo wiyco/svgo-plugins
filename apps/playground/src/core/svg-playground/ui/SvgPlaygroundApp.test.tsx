@@ -74,6 +74,16 @@ describe("SvgPlaygroundApp", () => {
     });
 
     expect(container.textContent).toContain("Booting the transform worker");
+    expect(container.textContent).toContain(
+      "SVGO plugin playground for hoisting stroke width",
+    );
+    expect(container.textContent).toContain("/svgo-plugin-hoist-stroke-width");
+    expect(container.textContent).toContain(
+      "@wiyco/svgo-plugin-hoist-stroke-width",
+    );
+
+    const slug = container.querySelector<HTMLAnchorElement>(".slug-chip");
+    expect(slug?.getAttribute("href")).toBe("../");
   });
 
   it("renders the shared page once the worker transform is available", async () => {

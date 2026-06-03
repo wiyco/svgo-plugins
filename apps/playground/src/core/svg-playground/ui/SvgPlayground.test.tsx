@@ -79,11 +79,9 @@ const createRootProps = (
     shareButton: createShareButton(),
     size: 128,
     slug: hoistStrokeWidthPlayground.slug,
-    slugTransitionName: "playground-slug-svgo-plugin-hoist-stroke-width",
     stepStrokeWidth: vi.fn<(delta: number) => void>(),
     strokeWidth: 2,
     title: hoistStrokeWidthPlayground.title,
-    titleTransitionName: "playground-title-svgo-plugin-hoist-stroke-width",
     transformState: {
       kind: "success",
       optimizedSvg: '<svg data-optimized="yes"></svg>',

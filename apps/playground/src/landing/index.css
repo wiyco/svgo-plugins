@@ -1,9 +1,5 @@
 @import "../tokens.css";
 
-@view-transition {
-  navigation: auto;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -40,20 +36,6 @@ code {
 
 #root {
   min-height: 100vh;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: var(--duration-medium);
-  animation-timing-function: var(--ease-standard);
-}
-
-::view-transition-old(root) {
-  animation-name: root-fade-out;
-}
-
-::view-transition-new(root) {
-  animation-name: root-fade-in;
 }
 
 .landing-shell {
@@ -242,30 +224,6 @@ code {
   }
 }
 
-@keyframes root-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.995);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes root-fade-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: scale(1.005);
-  }
-}
-
 @media (max-width: 720px) {
   .landing-shell {
     width: min(100vw - 16px, 980px);
@@ -306,11 +264,6 @@ code {
 
   .landing-item a {
     transition-duration: 1ms;
-  }
-
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 1ms;
   }
 
   .landing-item a:hover {

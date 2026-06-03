@@ -7,6 +7,7 @@ type MockRoot = {
 };
 
 const createRoot = vi.fn<(element: Element) => MockRoot>();
+const flushSync = vi.fn<(callback: () => void) => void>();
 const render = vi.fn<(element: unknown) => void>();
 const LandingPage = () => {
   return null;
@@ -14,11 +15,18 @@ const LandingPage = () => {
 const App = () => {
   return null;
 };
-const installViewTransitionErrorFilter = vi.fn<() => void>();
 
 const mockReactDomClient = () => {
   createRoot.mockReturnValue({
     render,
+  });
+  flushSync.mockImplementation((callback) => {
+    callback();
+  });
+  vi.doMock("react-dom", () => {
+    return {
+      flushSync,
+    };
   });
   vi.doMock("react-dom/client", () => {
     return {
@@ -30,16 +38,16 @@ const mockReactDomClient = () => {
 beforeEach(() => {
   document.body.innerHTML = "";
   createRoot.mockReset();
+  flushSync.mockReset();
   render.mockReset();
-  installViewTransitionErrorFilter.mockReset();
 });
 
 afterEach(() => {
   vi.resetModules();
+  vi.doUnmock("react-dom");
   vi.doUnmock("react-dom/client");
   vi.doUnmock("../landing/LandingPage");
   vi.doUnmock("../playgrounds/svgo-plugin-hoist-stroke-width/App");
-  vi.doUnmock("../view-transition-runtime");
 });
 
 describe("playground entrypoints", () => {
@@ -50,18 +58,13 @@ describe("playground entrypoints", () => {
         LandingPage,
       };
     });
-    vi.doMock("../view-transition-runtime", () => {
-      return {
-        installViewTransitionErrorFilter,
-      };
-    });
 
     document.body.innerHTML = '<div id="root"></div>';
 
     await import("./landing");
 
-    expect(installViewTransitionErrorFilter).toHaveBeenCalledTimes(1);
     expect(createRoot).toHaveBeenCalledWith(document.getElementById("root"));
+    expect(flushSync).toHaveBeenCalledTimes(1);
     expect(render).toHaveBeenCalledTimes(1);
     expect(
       (render.mock.calls[0]?.[0] as { type: unknown } | undefined)?.type,
@@ -75,11 +78,6 @@ describe("playground entrypoints", () => {
         LandingPage,
       };
     });
-    vi.doMock("../view-transition-runtime", () => {
-      return {
-        installViewTransitionErrorFilter,
-      };
-    });
 
     await expect(import("./landing")).rejects.toThrow("Missing #root element");
   });
@@ -91,18 +89,13 @@ describe("playground entrypoints", () => {
         default: App,
       };
     });
-    vi.doMock("../view-transition-runtime", () => {
-      return {
-        installViewTransitionErrorFilter,
-      };
-    });
 
     document.body.innerHTML = '<div id="root"></div>';
 
     await import("./svgo-plugin-hoist-stroke-width");
 
-    expect(installViewTransitionErrorFilter).toHaveBeenCalledTimes(1);
     expect(createRoot).toHaveBeenCalledWith(document.getElementById("root"));
+    expect(flushSync).toHaveBeenCalledTimes(1);
     expect(render).toHaveBeenCalledTimes(1);
     expect(
       (render.mock.calls[0]?.[0] as { type: unknown } | undefined)?.type,
@@ -114,11 +107,6 @@ describe("playground entrypoints", () => {
     vi.doMock("../playgrounds/svgo-plugin-hoist-stroke-width/App", () => {
       return {
         default: App,
-      };
-    });
-    vi.doMock("../view-transition-runtime", () => {
-      return {
-        installViewTransitionErrorFilter,
       };
     });
 
@@ -138,10 +126,12 @@ describe("playground entrypoints", () => {
 
     expect(landingCss).toContain('@import "../tokens.css";');
     expect(playgroundCss).toContain('@import "./tokens.css";');
-    expect(landingCss).toContain("@view-transition");
-    expect(playgroundCss).toContain("@view-transition");
-    expect(landingCss).toContain("navigation: auto;");
-    expect(playgroundCss).toContain("navigation: auto;");
+    expect(landingCss).not.toContain("@view-transition");
+    expect(playgroundCss).not.toContain("@view-transition");
+    expect(landingCss).not.toContain("::view-transition");
+    expect(playgroundCss).not.toContain("::view-transition");
+    expect(landingCss).not.toContain("navigation: auto;");
+    expect(playgroundCss).not.toContain("navigation: auto;");
     expect(landingCss).toContain("@media (prefers-reduced-motion: reduce)");
     expect(playgroundCss).toContain("@media (prefers-reduced-motion: reduce)");
     expect(landingCss).toContain("transition:");

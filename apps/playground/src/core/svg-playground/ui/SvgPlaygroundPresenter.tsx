@@ -4,7 +4,6 @@ import type { SvgPlaygroundDefinition } from "../model";
 import type { SvgPlaygroundViewModel } from "./controller/svg-playground-controller-types";
 
 import { getPlaygroundPackageName } from "../../../playgrounds/registry";
-import { getPlaygroundViewTransitionNames } from "../../../view-transition-names";
 import { SvgPlayground } from "./SvgPlayground/SvgPlayground";
 import { usePressRipple } from "./use-press-ripple";
 import { useShareButton } from "./use-share-button";
@@ -19,9 +18,6 @@ export const SvgPlaygroundPresenter = (props: SvgPlaygroundPresenterProps) => {
   const rippleHandlers = usePressRipple();
   const packageName = useMemo(() => {
     return getPlaygroundPackageName(definition.slug);
-  }, [definition.slug]);
-  const transitionNames = useMemo(() => {
-    return getPlaygroundViewTransitionNames(definition.slug);
   }, [definition.slug]);
   const shareButton = useShareButton({
     shareAnnouncement: viewModel.shareAnnouncement,
@@ -48,11 +44,9 @@ export const SvgPlaygroundPresenter = (props: SvgPlaygroundPresenterProps) => {
       shareButton={shareButton}
       size={viewModel.queryState.size}
       slug={definition.slug}
-      slugTransitionName={transitionNames.slug}
       stepStrokeWidth={viewModel.stepStrokeWidth}
       strokeWidth={viewModel.queryState.strokeWidth}
       title={definition.title}
-      titleTransitionName={transitionNames.title}
       transformState={viewModel.transformState}
       visiblePresets={viewModel.visiblePresets}
     >

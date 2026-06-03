@@ -79,10 +79,8 @@ describe("LandingPage", () => {
           packageName: "@scope/example-playground",
           presetCountLabel: "2 presets",
           slug: "example-playground",
-          slugTransitionName: "playground-slug-example-playground",
           summary: "Example summary",
           title: "Example title",
-          titleTransitionName: "playground-title-example-playground",
         },
       ],
     };

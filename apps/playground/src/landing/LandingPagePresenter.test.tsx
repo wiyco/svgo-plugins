@@ -40,20 +40,16 @@ const PRESENTER_PLAYGROUNDS = [
     packageName: "@scope/first",
     presetCountLabel: "2 presets",
     slug: "first",
-    slugTransitionName: "playground-slug-first",
     summary: "First summary",
     title: "First title",
-    titleTransitionName: "playground-title-first",
   },
   {
     href: "./second/",
     packageName: null,
     presetCountLabel: "1 preset",
     slug: "second",
-    slugTransitionName: "playground-slug-second",
     summary: "Second summary",
     title: "Second title",
-    titleTransitionName: "playground-title-second",
   },
 ] as const;
 

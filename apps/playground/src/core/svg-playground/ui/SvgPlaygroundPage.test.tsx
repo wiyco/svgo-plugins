@@ -95,11 +95,6 @@ describe("SvgPlaygroundPage", () => {
         .querySelector<HTMLAnchorElement>(".slug-chip")
         ?.getAttribute("href"),
     ).toBe("../");
-    expect(
-      container
-        .querySelector<HTMLElement>(".intro-title")
-        ?.getAttribute("data-view-transition-name"),
-    ).toContain("playground-title-svgo-plugin-hoist-stroke-width");
   });
 
   it("omits the package chip when the playground slug has no package mapping", async () => {

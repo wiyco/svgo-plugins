@@ -1,5 +1,4 @@
 import { PackageIcon } from "@primer/octicons-react";
-import { type CSSProperties } from "react";
 
 import type { LandingCatalogItemViewModel } from "./landing-page-view-model";
 
@@ -7,12 +6,6 @@ import { usePlaygroundLinkWarmup } from "./use-playground-link-warmup";
 
 type LandingCatalogItemProps = {
   playground: LandingCatalogItemViewModel;
-};
-
-const getViewTransitionStyle = (name: string): CSSProperties => {
-  return {
-    viewTransitionName: name,
-  };
 };
 
 export const LandingCatalogItem = (props: LandingCatalogItemProps) => {
@@ -29,13 +22,7 @@ export const LandingCatalogItem = (props: LandingCatalogItemProps) => {
       >
         <div className="landing-item-main">
           <div className="landing-item-meta">
-            <code
-              className="landing-item-slug"
-              data-view-transition-name={playground.slugTransitionName}
-              style={getViewTransitionStyle(playground.slugTransitionName)}
-            >
-              {playground.slug}
-            </code>
+            <code className="landing-item-slug">{playground.slug}</code>
             {playground.packageName !== null ? (
               <code className="landing-item-package">
                 <span aria-hidden="true" className="landing-item-package-icon">
@@ -49,13 +36,7 @@ export const LandingCatalogItem = (props: LandingCatalogItemProps) => {
             </span>
           </div>
           <div className="landing-item-copy">
-            <strong
-              className="landing-item-title"
-              data-view-transition-name={playground.titleTransitionName}
-              style={getViewTransitionStyle(playground.titleTransitionName)}
-            >
-              {playground.title}
-            </strong>
+            <strong className="landing-item-title">{playground.title}</strong>
             <p>{playground.summary}</p>
           </div>
         </div>

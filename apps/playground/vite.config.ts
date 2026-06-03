@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { defineConfig } from "vite";
 
 import { createPlaygroundPackageSourceAliases } from "../../scripts/playground-package-source-alias.mjs";
+import { restoreBackdropFilterBuildOutputPlugin } from "./plugins/restore-backdrop-filter-build-output-plugin";
 
 export default defineConfig({
   base: "./",
@@ -20,7 +21,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ["svgo/browser"],
   },
-  plugins: [react()],
+  plugins: [react(), restoreBackdropFilterBuildOutputPlugin()],
   resolve: {
     alias: createPlaygroundPackageSourceAliases(import.meta.url, [
       "svgo-plugin-hoist-stroke-width",

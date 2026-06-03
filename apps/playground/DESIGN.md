@@ -273,8 +273,8 @@ themes:
     component-editor-syntax-punctuation: "#AEAEB2"
     component-editor-syntax-comment: "#AEAEB2"
 typography:
-  font-sans: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", "Roboto Flex", "Noto Sans", sans-serif'
-  font-mono: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace'
+  font-sans: '-apple-system, BlinkMacSystemFont, "Geist Variable Fallback", "Segoe UI", "Roboto", "Noto Sans", sans-serif'
+  font-mono: '"SF Mono", "Geist Mono Variable Fallback", "IBM Plex Mono", "Roboto Mono", monospace'
   type-display-size: "clamp(1.45rem, 2.35vw, 1.95rem)"
   type-display-line-height: "1.02"
   type-display-weight: "610"

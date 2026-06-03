@@ -1,3 +1,27 @@
+@font-face {
+  font-family: "Geist Variable Fallback";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+  src: url("./assets/fonts/GeistVariableLatin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Geist Mono Variable Fallback";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+  src: url("./assets/fonts/GeistMonoVariableLatin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   --primitive-primary-300: #78c3ff;
   --primitive-primary-400: #35a0ff;
@@ -22,9 +46,11 @@
   --primitive-danger-700: #6b3138;
 
   --font-sans:
-    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-    "Segoe UI", "Roboto Flex", "Noto Sans", sans-serif;
-  --font-mono: "SF Mono", "IBM Plex Mono", "Roboto Mono", monospace;
+    -apple-system, BlinkMacSystemFont, "Geist Variable Fallback", "Segoe UI",
+    "Roboto", "Noto Sans", sans-serif;
+  --font-mono:
+    "SF Mono", "Geist Mono Variable Fallback", "IBM Plex Mono", "Roboto Mono",
+    monospace;
   --type-display-size: clamp(1.45rem, 2.35vw, 1.95rem);
   --type-display-line-height: 1.02;
   --type-display-weight: 610;
@@ -99,6 +125,7 @@
   --number-stepper-control-height: var(--component-control-row-height);
 
   font-family: var(--font-sans);
+  font-optical-sizing: auto;
   font-synthesis: none;
   line-height: var(--type-body-line-height);
   font-weight: var(--type-body-weight);

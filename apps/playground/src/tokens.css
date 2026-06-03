@@ -305,6 +305,15 @@
     rgba(255, 255, 255, 0.94),
     rgba(255, 255, 255, 0.84)
   );
+  --component-editor-syntax-keyword: #1e6ef4;
+  --component-editor-syntax-type: #b02fc2;
+  --component-editor-syntax-property: #1e6ef4;
+  --component-editor-syntax-variable: #007eae;
+  --component-editor-syntax-string: #008575;
+  --component-editor-syntax-literal: #e7124d;
+  --component-editor-syntax-operator: #c55300;
+  --component-editor-syntax-punctuation: #6c6c70;
+  --component-editor-syntax-comment: #6c6c70;
 }
 
 :root[data-theme="dark"] {
@@ -500,4 +509,13 @@
     rgba(36, 42, 50, 0.96),
     rgba(28, 34, 42, 0.9)
   );
+  --component-editor-syntax-keyword: #5cb8ff;
+  --component-editor-syntax-type: #ea8dff;
+  --component-editor-syntax-property: #5cb8ff;
+  --component-editor-syntax-variable: #6dd9ff;
+  --component-editor-syntax-string: #54dfcb;
+  --component-editor-syntax-literal: #ff8ac4;
+  --component-editor-syntax-operator: #ffa056;
+  --component-editor-syntax-punctuation: #aeaeb2;
+  --component-editor-syntax-comment: #aeaeb2;
 }

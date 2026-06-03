@@ -3,6 +3,7 @@ import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
 
+import "../../index.css";
 import App from "./App";
 
 const LOADING_MESSAGES = [
@@ -47,6 +48,60 @@ const waitForPanelsToSettle = async (): Promise<void> => {
     });
 };
 
+const waitForCodeSurfacesToLoad = async (): Promise<void> => {
+  await expect
+    .poll(() => {
+      return {
+        hasHighlightedTokens:
+          document.querySelectorAll(
+            '[data-code-surface="codemirror"] .cm-content span[class]',
+          ).length > 0,
+        loadedSurfaceCount: document.querySelectorAll(
+          '[data-code-surface="codemirror"] .cm-editor',
+        ).length,
+      };
+    })
+    .toEqual({
+      hasHighlightedTokens: true,
+      loadedSurfaceCount: 3,
+    });
+};
+
+const readReactSourceTokenColors = () => {
+  const tokenContainer = document.querySelector(
+    '[data-language="jsx"] .cm-content',
+  );
+  const tokenElements = Array.from(
+    tokenContainer?.querySelectorAll("span") ?? [],
+  );
+  const readColors = (tokenText: string) => {
+    return tokenElements
+      .filter((element) => {
+        return element.textContent === tokenText;
+      })
+      .map((element) => {
+        return getComputedStyle(element).color;
+      });
+  };
+  const readFirstColor = (tokenText: string) => {
+    const tokenColor = readColors(tokenText)[0];
+
+    if (tokenColor === undefined) {
+      return null;
+    }
+
+    return tokenColor;
+  };
+
+  return {
+    closeParen: readFirstColor(")"),
+    componentName: readFirstColor("SvgComponent"),
+    equals: readFirstColor("="),
+    openParen: readFirstColor("("),
+    props: readColors("props"),
+  };
+};
+
 let root: Root | null = null;
 
 beforeEach(() => {
@@ -87,6 +142,14 @@ describe("playground browser worker regression", () => {
       )
       .toBeInTheDocument();
     await waitForPanelsToSettle();
+    await waitForCodeSurfacesToLoad();
+    expect(readReactSourceTokenColors()).toEqual({
+      closeParen: "rgb(108, 108, 112)",
+      componentName: "rgb(176, 47, 194)",
+      equals: "rgb(197, 83, 0)",
+      openParen: "rgb(108, 108, 112)",
+      props: ["rgb(176, 47, 194)", "rgb(0, 126, 174)"],
+    });
   });
 
   it("shows unsafe state instead of hanging when script markup is pasted", async () => {
@@ -100,6 +163,7 @@ describe("playground browser worker regression", () => {
     });
 
     await waitForPanelsToSettle();
+    await waitForCodeSurfacesToLoad();
     await page.getByLabelText("Input SVG").fill(UNSAFE_SVG);
 
     await expect

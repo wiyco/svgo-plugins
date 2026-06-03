@@ -1,6 +1,7 @@
 import { memo } from "react";
 
 import { useSvgPlaygroundPanelsContext } from "../SvgPlaygroundContext";
+import { CodeSurface } from "./CodeSurface";
 import { renderPanelFallback } from "./renderPanelFallback";
 
 export const OptimizedPanel = memo(function OptimizedPanel() {
@@ -14,7 +15,12 @@ export const OptimizedPanel = memo(function OptimizedPanel() {
       </div>
       {(status === "success" || status === "unsafe") &&
       optimizedSvg.length > 0 ? (
-        <pre className="code-panel">{optimizedSvg}</pre>
+        <CodeSurface
+          ariaLabel="Optimized SVG"
+          language="svg"
+          readOnly={true}
+          value={optimizedSvg}
+        />
       ) : status === "loading" ? (
         renderPanelFallback("Rebuilding optimized SVG…")
       ) : status === "unsafe" ? (

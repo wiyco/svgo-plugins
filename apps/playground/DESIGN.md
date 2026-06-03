@@ -138,6 +138,15 @@ themes:
     component-preview-stage-background: "radial-gradient(circle at top, rgba(10, 132, 255, 0.06), transparent 46%), linear-gradient(180deg, var(--color-surface-standard), rgba(255, 255, 255, 0.82))"
     component-preview-stage-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.64)"
     component-editor-surface-background: "linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.84))"
+    component-editor-syntax-keyword: "#1E6EF4"
+    component-editor-syntax-type: "#B02FC2"
+    component-editor-syntax-property: "#1E6EF4"
+    component-editor-syntax-variable: "#007EAE"
+    component-editor-syntax-string: "#008575"
+    component-editor-syntax-literal: "#E7124D"
+    component-editor-syntax-operator: "#C55300"
+    component-editor-syntax-punctuation: "#6C6C70"
+    component-editor-syntax-comment: "#6C6C70"
   dark:
     color-canvas: "var(--primitive-neutral-900)"
     color-canvas-tint: "#161B22"
@@ -254,6 +263,15 @@ themes:
     component-preview-stage-background: "radial-gradient(circle at top, rgba(10, 132, 255, 0.14), transparent 46%), linear-gradient(180deg, var(--color-surface-standard), rgba(24, 28, 35, 0.92))"
     component-preview-stage-shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08)"
     component-editor-surface-background: "linear-gradient(180deg, rgba(36, 42, 50, 0.96), rgba(28, 34, 42, 0.90))"
+    component-editor-syntax-keyword: "#5CB8FF"
+    component-editor-syntax-type: "#EA8DFF"
+    component-editor-syntax-property: "#5CB8FF"
+    component-editor-syntax-variable: "#6DD9FF"
+    component-editor-syntax-string: "#54DFCB"
+    component-editor-syntax-literal: "#FF8AC4"
+    component-editor-syntax-operator: "#FFA056"
+    component-editor-syntax-punctuation: "#AEAEB2"
+    component-editor-syntax-comment: "#AEAEB2"
 typography:
   font-sans: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", "Roboto Flex", "Noto Sans", sans-serif'
   font-mono: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace'

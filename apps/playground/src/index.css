@@ -219,6 +219,7 @@ textarea {
 .color-swatch-row,
 .color-swatch-row input,
 .svg-textarea,
+.code-surface,
 .panel,
 .control-pod {
   transition:
@@ -318,7 +319,8 @@ textarea {
 .number-stepper button:focus-visible,
 .number-stepper input:focus-visible,
 .control-pod input:focus-visible,
-.svg-textarea:focus-visible {
+.svg-textarea:focus-visible,
+.code-surface:focus-within {
   outline: 3px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
@@ -641,6 +643,7 @@ textarea {
 .number-stepper input,
 .color-swatch-row,
 .svg-textarea,
+.code-surface,
 .code-panel,
 .preview-stage {
   border: 1px solid var(--color-outline);
@@ -949,6 +952,13 @@ textarea {
   overflow: auto;
 }
 
+.code-surface {
+  margin: 0;
+  padding: 0;
+  background: var(--component-editor-surface-background);
+  overflow: auto;
+}
+
 .svg-textarea {
   font-size: 0.89rem;
   line-height: 1.55;
@@ -962,8 +972,22 @@ textarea {
   word-break: break-word;
 }
 
+.code-surface.code-panel,
+.code-surface.svg-textarea {
+  padding: 0;
+}
+
+.code-surface-editable {
+  resize: vertical;
+}
+
+.code-surface .cm-editor {
+  border-radius: inherit;
+}
+
 .preview-stage,
 .svg-textarea,
+.code-surface,
 .code-panel,
 .panel-empty {
   min-height: var(--workbench-surface-min-height);
@@ -1106,6 +1130,7 @@ textarea {
   .control-pod,
   .preview-stage,
   .svg-textarea,
+  .code-surface,
   .code-panel {
     border-color: var(--color-outline-strong);
     box-shadow: none;
@@ -1152,6 +1177,7 @@ textarea {
   .color-swatch-row,
   .color-swatch-row input,
   .svg-textarea,
+  .code-surface,
   .panel,
   .control-pod {
     transition-duration: 1ms;

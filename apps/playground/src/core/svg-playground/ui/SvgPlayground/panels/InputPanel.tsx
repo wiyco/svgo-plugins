@@ -1,12 +1,13 @@
-import { type ChangeEvent, memo, useCallback } from "react";
+import { memo, useCallback } from "react";
 
 import { useSvgPlaygroundPanelsContext } from "../SvgPlaygroundContext";
+import { CodeSurface } from "./CodeSurface";
 
 export const InputPanel = memo(function InputPanel() {
   const { inputSvg, setSvg } = useSvgPlaygroundPanelsContext();
   const handleSvgChange = useCallback(
-    (event: ChangeEvent<HTMLTextAreaElement>): void => {
-      setSvg(event.currentTarget.value);
+    (nextSvg: string): void => {
+      setSvg(nextSvg);
     },
     [setSvg],
   );
@@ -17,10 +18,10 @@ export const InputPanel = memo(function InputPanel() {
         <h2>Input SVG</h2>
         <span className="status-pill">Editable</span>
       </div>
-      <textarea
-        aria-label="Input SVG"
-        className="svg-textarea"
-        spellCheck={false}
+      <CodeSurface
+        ariaLabel="Input SVG"
+        language="svg"
+        readOnly={false}
         value={inputSvg}
         onChange={handleSvgChange}
       />

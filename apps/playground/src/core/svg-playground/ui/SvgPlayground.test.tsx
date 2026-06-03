@@ -30,6 +30,24 @@ const changeFieldValue = (
   element.dispatchEvent(new Event("change", { bubbles: true }));
 };
 
+const getLabeledTextValue = (
+  container: HTMLElement,
+  ariaLabel: string,
+): string => {
+  const textarea = container.querySelector<HTMLTextAreaElement>(
+    `textarea[aria-label="${ariaLabel}"]`,
+  );
+
+  if (textarea !== null) {
+    return textarea.value;
+  }
+
+  return (
+    container.querySelector<HTMLElement>(`[aria-label="${ariaLabel}"]`)
+      ?.textContent ?? ""
+  );
+};
+
 const createRippleHandlers = (): RippleHandlers => {
   return {
     onBlur: vi.fn<NonNullable<RippleHandlers["onBlur"]>>(),
@@ -272,11 +290,17 @@ describe("SvgPlayground compound components", () => {
         '.preview-render svg[data-preview="yes"]',
       ),
     ).not.toBeNull();
+    expect(getLabeledTextValue(renderedTree.container, "Input SVG")).toContain(
+      "<svg",
+    );
     expect(
-      renderedTree.container.querySelector<HTMLTextAreaElement>(
-        'textarea[aria-label="Input SVG"]',
-      )?.value,
-    ).toContain("<svg");
+      renderedTree.container.querySelector(".panel-optimized pre.code-panel")
+        ?.textContent,
+    ).toBe('<svg data-optimized="yes"></svg>');
+    expect(
+      renderedTree.container.querySelector(".panel-react pre.code-panel")
+        ?.textContent,
+    ).toBe("export const Icon = () => <svg />;");
     expect(renderedTree.container.textContent).toContain(
       'data-optimized="yes"',
     );

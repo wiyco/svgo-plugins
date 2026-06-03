@@ -100,6 +100,44 @@ const changeFieldValue = (
   element.dispatchEvent(new Event("change", { bubbles: true }));
 };
 
+const getInputSvgTextarea = (
+  container: HTMLElement,
+): HTMLTextAreaElement | null => {
+  return container.querySelector<HTMLTextAreaElement>(
+    'textarea[aria-label="Input SVG"]',
+  );
+};
+
+const getInputSvgValue = (container: HTMLElement): string => {
+  const textarea = getInputSvgTextarea(container);
+
+  if (textarea !== null) {
+    return textarea.value;
+  }
+
+  return (
+    container.querySelector<HTMLElement>('[aria-label="Input SVG"]')
+      ?.textContent ?? ""
+  );
+};
+
+const changeInputSvgValue = (
+  container: HTMLElement,
+  nextValue: string,
+): void => {
+  const textarea = getInputSvgTextarea(container);
+
+  if (textarea === null) {
+    throw new Error("Expected the Input SVG fallback textarea to be editable.");
+  }
+
+  changeFieldValue(textarea, nextValue);
+};
+
+const getPanelCodeText = (container: HTMLElement, selector: string): string => {
+  return container.querySelector<HTMLElement>(selector)?.textContent ?? "";
+};
+
 const renderPlayground = async (
   transform: TransformFn,
   definition = hoistStrokeWidthPlayground,
@@ -212,9 +250,6 @@ describe("hoist stroke width playground", () => {
       await flush();
     });
 
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
     const optimizedPanel = renderedApp.container.textContent;
     const previewSvg = renderedApp.container.querySelector<SVGSVGElement>(
       'svg[data-optimized="multiple"]',
@@ -226,7 +261,7 @@ describe("hoist stroke width playground", () => {
       hoistStrokeWidthPlayground.defaultState,
     );
 
-    expect(textarea?.value).toBe(expectedSvg);
+    expect(getInputSvgValue(renderedApp.container)).toBe(expectedSvg);
     expect(optimizedPanel).toContain('data-optimized="multiple"');
     expect(optimizedPanel).toContain('data-source="multiple"');
     expect(optimizedPanel).toContain('stroke-width="2"');
@@ -264,14 +299,11 @@ describe("hoist stroke width playground", () => {
     const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
       'input[aria-label="Color"]',
     );
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
 
     expect(colorInput?.value).toBe("#0f766e");
     expect(renderedApp.container.textContent).toContain("240px");
     expect(renderedApp.container.textContent).toContain("3.5");
-    expect(textarea?.value).toBe(normalizedState.svg);
+    expect(getInputSvgValue(renderedApp.container)).toBe(normalizedState.svg);
     expect(window.location.search).toBe(`?${serialized}`);
 
     await act(async () => {
@@ -312,36 +344,31 @@ describe("hoist stroke width playground", () => {
 
   it("syncs command-dock controls back from direct svg edits", async () => {
     renderedApp = await renderPlayground(createTransformStub());
+    const app = renderedApp;
 
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
-    const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
+    const colorInput = app.container.querySelector<HTMLInputElement>(
       'input[aria-label="Color"]',
     );
-    const sizeInput = renderedApp.container.querySelector<HTMLInputElement>(
+    const sizeInput = app.container.querySelector<HTMLInputElement>(
       'input[aria-label="Size"]',
     );
-    const strokeWidthInput =
-      renderedApp.container.querySelector<HTMLInputElement>(
-        'input[aria-label="Stroke width"]',
-      );
+    const strokeWidthInput = app.container.querySelector<HTMLInputElement>(
+      'input[aria-label="Stroke width"]',
+    );
 
     await act(async () => {
-      if (textarea !== null) {
-        changeFieldValue(
-          textarea,
-          `<svg width="128" height="144" style="fill: none; color: #0f766e" viewBox="0 0 24 24"><path d="M0 0L24 24" stroke="currentColor" stroke-width="3.5" /><path d="M24 0L0 24" stroke="currentColor" stroke-width="3.5" /></svg>`,
-        );
-      }
+      changeInputSvgValue(
+        app.container,
+        `<svg width="128" height="144" style="fill: none; color: #0f766e" viewBox="0 0 24 24"><path d="M0 0L24 24" stroke="currentColor" stroke-width="3.5" /><path d="M24 0L0 24" stroke="currentColor" stroke-width="3.5" /></svg>`,
+      );
       await flush();
     });
 
     expect(colorInput?.value).toBe("#0f766e");
     expect(sizeInput?.value).toBe("128");
     expect(strokeWidthInput?.value).toBe("3.5");
-    expect(renderedApp.container.textContent).toContain("128px");
-    expect(renderedApp.container.textContent).toContain("3.5");
+    expect(app.container.textContent).toContain("128px");
+    expect(app.container.textContent).toContain("3.5");
   });
 
   it("shows loading placeholders first and falls back to idle placeholders for empty input", async () => {
@@ -358,35 +385,26 @@ describe("hoist stroke width playground", () => {
     };
 
     renderedApp = await renderPlayground(transform);
+    const app = renderedApp;
 
-    expect(renderedApp.container.textContent).toContain(
-      "Rebuilding optimized SVG",
-    );
-    expect(renderedApp.container.textContent).toContain(
+    expect(app.container.textContent).toContain("Rebuilding optimized SVG");
+    expect(app.container.textContent).toContain(
       "Rebuilding React component source",
     );
-    expect(renderedApp.container.textContent).toContain(
-      "Rebuilding live preview",
-    );
-
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
+    expect(app.container.textContent).toContain("Rebuilding live preview");
 
     await act(async () => {
-      if (textarea !== null) {
-        changeFieldValue(textarea, "   ");
-      }
+      changeInputSvgValue(app.container, "   ");
       await flush();
     });
 
-    expect(renderedApp.container.textContent).toContain(
+    expect(app.container.textContent).toContain(
       "Paste or pick an SVG preset to begin.",
     );
-    expect(renderedApp.container.textContent).toContain(
+    expect(app.container.textContent).toContain(
       "React source appears here after a successful transform.",
     );
-    expect(renderedApp.container.textContent).toContain(
+    expect(app.container.textContent).toContain(
       "Choose a preset or paste SVG markup.",
     );
 
@@ -414,22 +432,17 @@ describe("hoist stroke width playground", () => {
 
   it("shows a preview warning for unsafe svg input", async () => {
     renderedApp = await renderPlayground(createTransformStub());
-
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
+    const app = renderedApp;
 
     await act(async () => {
-      if (textarea !== null) {
-        changeFieldValue(
-          textarea,
-          `<svg viewBox="0 0 24 24"><script>alert("blocked")</script></svg>`,
-        );
-      }
+      changeInputSvgValue(
+        app.container,
+        `<svg viewBox="0 0 24 24"><script>alert("blocked")</script></svg>`,
+      );
       await flush();
     });
 
-    expect(renderedApp.container.textContent).toContain(
+    expect(app.container.textContent).toContain(
       "Preview disabled for unsafe SVG input.",
     );
   });
@@ -453,16 +466,12 @@ describe("hoist stroke width playground", () => {
     };
 
     renderedApp = await renderPlayground(transform);
+    const app = renderedApp;
 
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
-    const initialSvg = textarea?.value ?? "";
+    const initialSvg = getInputSvgValue(app.container);
 
     await act(async () => {
-      if (textarea !== null) {
-        changeFieldValue(textarea, nextSvg);
-      }
+      changeInputSvgValue(app.container, nextSvg);
       await flush();
     });
 
@@ -476,13 +485,9 @@ describe("hoist stroke width playground", () => {
       await flush();
     });
 
-    expect(renderedApp.container.textContent).toContain(
-      'data-optimized="mixed"',
-    );
+    expect(app.container.textContent).toContain('data-optimized="mixed"');
     expect(
-      renderedApp.container.querySelector<SVGSVGElement>(
-        'svg[data-optimized="mixed"]',
-      ),
+      app.container.querySelector<SVGSVGElement>('svg[data-optimized="mixed"]'),
     ).not.toBeNull();
   });
 
@@ -505,16 +510,12 @@ describe("hoist stroke width playground", () => {
     };
 
     renderedApp = await renderPlayground(transform);
+    const app = renderedApp;
 
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
-    const initialSvg = textarea?.value ?? "";
+    const initialSvg = getInputSvgValue(app.container);
 
     await act(async () => {
-      if (textarea !== null) {
-        changeFieldValue(textarea, nextSvg);
-      }
+      changeInputSvgValue(app.container, nextSvg);
       await flush();
     });
 
@@ -528,32 +529,25 @@ describe("hoist stroke width playground", () => {
       await flush();
     });
 
-    expect(renderedApp.container.textContent).toContain(
-      'data-optimized="mixed"',
-    );
-    expect(renderedApp.container.textContent).not.toContain("late failure");
+    expect(app.container.textContent).toContain('data-optimized="mixed"');
+    expect(app.container.textContent).not.toContain("late failure");
   });
 
   it("shows transform error panels when the worker returns an error result", async () => {
     renderedApp = await renderPlayground(createTransformStub());
-
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
+    const app = renderedApp;
 
     await act(async () => {
-      if (textarea !== null) {
-        changeFieldValue(
-          textarea,
-          `<svg viewBox="0 0 24 24"><path d="broken-payload" /></svg>`,
-        );
-      }
+      changeInputSvgValue(
+        app.container,
+        `<svg viewBox="0 0 24 24"><path d="broken-payload" /></svg>`,
+      );
       await flush();
     });
 
-    expect(renderedApp.container.textContent).toContain("SVGO said no.");
+    expect(app.container.textContent).toContain("SVGO said no.");
     expect(
-      renderedApp.container.querySelector('[role="alert"]')?.textContent,
+      app.container.querySelector('[role="alert"]')?.textContent,
     ).toContain("Transform failed.");
   });
 
@@ -748,20 +742,16 @@ describe("hoist stroke width playground", () => {
     });
 
     renderedApp = await renderPlayground(createTransformStub());
+    const app = renderedApp;
 
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
-    );
     const shareButton =
-      renderedApp.container.querySelector<HTMLButtonElement>(".share-button");
+      app.container.querySelector<HTMLButtonElement>(".share-button");
 
     await act(async () => {
-      if (textarea !== null) {
-        changeFieldValue(
-          textarea,
-          `<svg viewBox="0 0 24 24"><script>alert("blocked")</script></svg>`,
-        );
-      }
+      changeInputSvgValue(
+        app.container,
+        `<svg viewBox="0 0 24 24"><script>alert("blocked")</script></svg>`,
+      );
       await flush();
     });
 
@@ -779,14 +769,14 @@ describe("hoist stroke width playground", () => {
     expect(shareButton?.disabled).toBe(true);
     expect(writeText).not.toHaveBeenCalled();
     expect(
-      renderedApp.container.querySelector<HTMLElement>(".share-button-text")
+      app.container.querySelector<HTMLElement>(".share-button-text")
         ?.textContent,
     ).toBe("Sharing unavailable");
     expect(shareButton?.getAttribute("data-share-feedback-state")).toBe(
       "unsafe",
     );
     expect(
-      renderedApp.container.querySelector<HTMLElement>('[aria-live="polite"]')
+      app.container.querySelector<HTMLElement>('[aria-live="polite"]')
         ?.textContent,
     ).toBe("Sharing unavailable");
   });
@@ -819,30 +809,31 @@ describe("hoist stroke width playground", () => {
     });
     await flushDeferredReactSourceBuild();
 
-    const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
-      'textarea[aria-label="Input SVG"]',
+    const inputSvg = getInputSvgValue(renderedApp.container);
+    const optimizedPanelText = getPanelCodeText(
+      renderedApp.container,
+      ".panel-optimized .code-panel",
     );
-    const optimizedPanel = renderedApp.container.querySelector<HTMLElement>(
-      ".panel-optimized pre",
+    const reactPanelText = getPanelCodeText(
+      renderedApp.container,
+      ".panel-react .code-panel",
     );
-    const reactPanel =
-      renderedApp.container.querySelector<HTMLElement>(".panel-react pre");
     const previewSvg = renderedApp.container.querySelector<SVGSVGElement>(
       'svg[data-optimized="single"]',
     );
 
-    expect(textarea?.value).toContain('stroke-width="2.5"');
-    expect(textarea?.value).toContain('height="256"');
-    expect(textarea?.value).toContain('width="256"');
-    expect(textarea?.value).toContain("color: #ff6600");
-    expect(optimizedPanel?.textContent).toContain('stroke-width="2.5"');
-    expect(optimizedPanel?.textContent).toContain('height="256"');
-    expect(optimizedPanel?.textContent).toContain('width="256"');
-    expect(optimizedPanel?.textContent).toContain("color: #ff6600");
-    expect(reactPanel?.textContent).toContain('strokeWidth="2.5"');
-    expect(reactPanel?.textContent).toContain('height="256"');
-    expect(reactPanel?.textContent).toContain('width="256"');
-    expect(reactPanel?.textContent).toContain('color: "#ff6600"');
+    expect(inputSvg).toContain('stroke-width="2.5"');
+    expect(inputSvg).toContain('height="256"');
+    expect(inputSvg).toContain('width="256"');
+    expect(inputSvg).toContain("color: #ff6600");
+    expect(optimizedPanelText).toContain('stroke-width="2.5"');
+    expect(optimizedPanelText).toContain('height="256"');
+    expect(optimizedPanelText).toContain('width="256"');
+    expect(optimizedPanelText).toContain("color: #ff6600");
+    expect(reactPanelText).toContain('strokeWidth="2.5"');
+    expect(reactPanelText).toContain('height="256"');
+    expect(reactPanelText).toContain('width="256"');
+    expect(reactPanelText).toContain('color: "#ff6600"');
     expect(
       previewSvg?.querySelector("[stroke-width]")?.getAttribute("stroke-width"),
     ).toBe("2.5");

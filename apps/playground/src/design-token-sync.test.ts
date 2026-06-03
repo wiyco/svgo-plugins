@@ -1,13 +1,16 @@
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 type TokenBranch = {
   [key: string]: TokenBranch | string;
 };
 
-const DESIGN_PATH = resolve(process.cwd(), "apps/playground/DESIGN.md");
-const TOKENS_PATH = resolve(process.cwd(), "apps/playground/src/tokens.css");
+const SOURCE_DIR = dirname(fileURLToPath(import.meta.url));
+const PLAYGROUND_DIR = resolve(SOURCE_DIR, "..");
+const DESIGN_PATH = resolve(PLAYGROUND_DIR, "DESIGN.md");
+const TOKENS_PATH = resolve(SOURCE_DIR, "tokens.css");
 
 const normalizeValue = (value: string): string => {
   return value

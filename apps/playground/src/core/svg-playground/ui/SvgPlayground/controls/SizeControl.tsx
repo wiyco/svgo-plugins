@@ -26,12 +26,12 @@ export const SizeControl = memo(function SizeControl() {
     <section className="control-pod">
       <div className="control-pod-head">
         <label className="control-title" htmlFor="size-input">
-          size
+          Size
         </label>
         <output className="control-value">{Math.round(size)}px</output>
       </div>
       <input
-        aria-label="size"
+        aria-label="Size"
         className="size-slider"
         id="size-input"
         max={MAX_SIZE}

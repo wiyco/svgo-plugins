@@ -27,7 +27,7 @@ export const StrokeWidthControl = memo(function StrokeWidthControl() {
     <section className="control-pod">
       <div className="control-pod-head">
         <label className="control-title" htmlFor="stroke-width-input">
-          strokeWidth
+          Stroke width
         </label>
         <output className="control-value">
           {formatNumberLabel(strokeWidth)}
@@ -35,7 +35,7 @@ export const StrokeWidthControl = memo(function StrokeWidthControl() {
       </div>
       <div className="number-stepper">
         <button
-          aria-label="Decrease strokeWidth"
+          aria-label="Decrease stroke width"
           className="ripple-surface"
           type="button"
           onClick={handleDecreaseStrokeWidthClick}
@@ -46,7 +46,7 @@ export const StrokeWidthControl = memo(function StrokeWidthControl() {
           </span>
         </button>
         <input
-          aria-label="strokeWidth"
+          aria-label="Stroke width"
           id="stroke-width-input"
           max="8"
           min="0.25"
@@ -56,7 +56,7 @@ export const StrokeWidthControl = memo(function StrokeWidthControl() {
           onChange={handleStrokeWidthChange}
         />
         <button
-          aria-label="Increase strokeWidth"
+          aria-label="Increase stroke width"
           className="ripple-surface"
           type="button"
           onClick={handleIncreaseStrokeWidthClick}

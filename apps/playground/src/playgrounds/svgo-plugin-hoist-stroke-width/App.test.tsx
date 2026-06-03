@@ -262,7 +262,7 @@ describe("hoist stroke width playground", () => {
     renderedApp = await renderPlayground(createTransformStub());
 
     const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
-      'input[aria-label="color"]',
+      'input[aria-label="Color"]',
     );
     const textarea = renderedApp.container.querySelector<HTMLTextAreaElement>(
       'textarea[aria-label="Input SVG"]',
@@ -317,14 +317,14 @@ describe("hoist stroke width playground", () => {
       'textarea[aria-label="Input SVG"]',
     );
     const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
-      'input[aria-label="color"]',
+      'input[aria-label="Color"]',
     );
     const sizeInput = renderedApp.container.querySelector<HTMLInputElement>(
-      'input[aria-label="size"]',
+      'input[aria-label="Size"]',
     );
     const strokeWidthInput =
       renderedApp.container.querySelector<HTMLInputElement>(
-        'input[aria-label="strokeWidth"]',
+        'input[aria-label="Stroke width"]',
       );
 
     await act(async () => {
@@ -638,7 +638,7 @@ describe("hoist stroke width playground", () => {
     renderedApp = await renderPlayground(createTransformStub());
 
     const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
-      'input[aria-label="color"]',
+      'input[aria-label="Color"]',
     );
     const shareButton =
       renderedApp.container.querySelector<HTMLButtonElement>(".share-button");
@@ -797,13 +797,13 @@ describe("hoist stroke width playground", () => {
 
     const increaseButton =
       renderedApp.container.querySelector<HTMLButtonElement>(
-        'button[aria-label="Increase strokeWidth"]',
+        'button[aria-label="Increase stroke width"]',
       );
     const sizeInput = renderedApp.container.querySelector<HTMLInputElement>(
-      'input[aria-label="size"]',
+      'input[aria-label="Size"]',
     );
     const colorInput = renderedApp.container.querySelector<HTMLInputElement>(
-      'input[aria-label="color"]',
+      'input[aria-label="Color"]',
     );
 
     await act(async () => {
@@ -862,7 +862,7 @@ describe("hoist stroke width playground", () => {
     };
     const increaseButton =
       renderedApp.container.querySelector<HTMLButtonElement>(
-        'button[aria-label="Increase strokeWidth"]',
+        'button[aria-label="Increase stroke width"]',
       );
 
     expect(readStrokeWidthLabel()).toBe("2");
@@ -895,11 +895,11 @@ describe("hoist stroke width playground", () => {
 
     const strokeWidthInput =
       renderedApp.container.querySelector<HTMLInputElement>(
-        'input[aria-label="strokeWidth"]',
+        'input[aria-label="Stroke width"]',
       );
     const decreaseButton =
       renderedApp.container.querySelector<HTMLButtonElement>(
-        'button[aria-label="Decrease strokeWidth"]',
+        'button[aria-label="Decrease stroke width"]',
       );
 
     await act(async () => {

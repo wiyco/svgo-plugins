@@ -306,7 +306,7 @@ components:
   component-share-button-icon-size: "14px"
   component-control-row-height: "34px"
   component-color-well-padding: "3px"
-  component-control-title-size: "0.75rem"
+  component-control-title-size: "0.8125rem"
   component-control-value-size: "0.8rem"
   component-status-pill-font-size: "0.72rem"
   component-slider-track-height: "8px"

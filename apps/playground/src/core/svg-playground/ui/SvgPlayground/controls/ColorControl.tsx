@@ -15,13 +15,13 @@ export const ColorControl = memo(function ColorControl() {
     <section className="control-pod">
       <div className="control-pod-head">
         <label className="control-title" htmlFor="color-input">
-          color
+          Color
         </label>
         <code className="control-value">{color}</code>
       </div>
       <div className="color-swatch-row">
         <input
-          aria-label="color"
+          aria-label="Color"
           id="color-input"
           type="color"
           value={color}

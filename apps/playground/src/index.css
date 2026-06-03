@@ -568,8 +568,9 @@ textarea {
 .control-title {
   color: var(--color-secondary);
   font-size: var(--component-control-title-size);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  line-height: var(--type-label-line-height);
+  font-weight: var(--type-label-weight);
+  letter-spacing: 0;
 }
 
 .control-value {
@@ -624,6 +625,7 @@ textarea {
   min-width: 0;
   padding: 0 10px;
   background: var(--component-stepper-input-background);
+  font-size: var(--type-body-size);
 }
 
 .size-slider {

@@ -219,21 +219,21 @@ describe("SvgPlayground compound components", () => {
 
     const decreaseButton =
       renderedTree.container.querySelector<HTMLButtonElement>(
-        'button[aria-label="Decrease strokeWidth"]',
+        'button[aria-label="Decrease stroke width"]',
       );
     const increaseButton =
       renderedTree.container.querySelector<HTMLButtonElement>(
-        'button[aria-label="Increase strokeWidth"]',
+        'button[aria-label="Increase stroke width"]',
       );
     const strokeWidthInput =
       renderedTree.container.querySelector<HTMLInputElement>(
-        'input[aria-label="strokeWidth"]',
+        'input[aria-label="Stroke width"]',
       );
     const sizeInput = renderedTree.container.querySelector<HTMLInputElement>(
-      'input[aria-label="size"]',
+      'input[aria-label="Size"]',
     );
     const colorInput = renderedTree.container.querySelector<HTMLInputElement>(
-      'input[aria-label="color"]',
+      'input[aria-label="Color"]',
     );
 
     await act(async () => {

@@ -423,16 +423,6 @@ textarea {
   min-height: 30px;
 }
 
-.controls-label {
-  margin: 0;
-  color: var(--color-secondary);
-  font-size: var(--type-label-size);
-  line-height: var(--type-label-line-height);
-  font-weight: var(--type-label-weight);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-}
-
 .floating-preset-tabbar {
   position: fixed;
   left: 50%;

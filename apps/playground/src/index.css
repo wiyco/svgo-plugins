@@ -99,7 +99,9 @@ textarea {
   );
   display: grid;
   gap: var(--space-5);
-  padding-bottom: calc(56px + var(--floating-preset-tabbar-reserved-space));
+  padding-bottom: calc(
+    var(--space-4) + var(--floating-preset-tabbar-reserved-space)
+  );
 }
 
 .intro-band {

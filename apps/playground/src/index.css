@@ -144,6 +144,8 @@ textarea {
   flex-wrap: wrap;
   gap: var(--space-2);
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .intro-title {
@@ -190,7 +192,13 @@ textarea {
 }
 
 .package-chip {
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .package-chip-icon {
@@ -202,6 +210,15 @@ textarea {
 
 .package-chip-icon svg {
   display: block;
+}
+
+.package-chip-name {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .intro-actions {

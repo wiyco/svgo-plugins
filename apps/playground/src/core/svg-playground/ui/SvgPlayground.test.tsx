@@ -206,6 +206,10 @@ describe("SvgPlayground compound components", () => {
     expect(packageChip?.textContent).toContain(
       "@wiyco/svgo-plugin-hoist-stroke-width",
     );
+    expect(
+      packageChip?.querySelector<HTMLElement>(".package-chip-name")
+        ?.textContent,
+    ).toBe("@wiyco/svgo-plugin-hoist-stroke-width");
     expect(singlePresetButton?.getAttribute("aria-pressed")).toBe("true");
     expect(multiplePresetButton?.getAttribute("aria-pressed")).toBe("false");
 

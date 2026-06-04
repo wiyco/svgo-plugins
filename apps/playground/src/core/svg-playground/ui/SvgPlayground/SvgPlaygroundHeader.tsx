@@ -28,7 +28,7 @@ export const SvgPlaygroundIntro = memo(function SvgPlaygroundIntro(
               <span aria-hidden="true" className="package-chip-icon">
                 <PackageIcon size={12} />
               </span>
-              <span>{packageName}</span>
+              <span className="package-chip-name">{packageName}</span>
             </code>
           ) : null}
         </div>

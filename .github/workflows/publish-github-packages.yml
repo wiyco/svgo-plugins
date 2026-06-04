@@ -1,14 +1,19 @@
-name: Release Packages
+name: Publish GitHub Packages
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to publish, such as v0.1.0 or svgo-plugin-hoist-stroke-width@0.1.0"
+        required: true
+        type: string
 permissions: {}
 concurrency:
-  group: release-package-${{ github.event.release.tag_name }}
+  group: publish-github-packages-${{ inputs.release_tag }}
   cancel-in-progress: false
 jobs:
   resolve:
     name: Resolve release packages
+    if: success() && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -17,11 +22,11 @@ jobs:
       packages: ${{ steps.resolve.outputs.packages }}
     env:
       DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-      RELEASE_TAG: ${{ github.event.release.tag_name }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: refs/tags/${{ github.event.release.tag_name }}
+          ref: refs/tags/${{ inputs.release_tag }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
@@ -39,6 +44,7 @@ jobs:
   build:
     name: Build ${{ matrix.package.name }}
     needs: resolve
+    if: success() && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -54,7 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: refs/tags/${{ github.event.release.tag_name }}
+          ref: refs/tags/${{ inputs.release_tag }}
           persist-credentials: false
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
@@ -94,24 +100,23 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-  stage-npmjs:
-    name: Stage ${{ matrix.package.name }} on npmjs
+  publish-github-packages:
+    name: Publish ${{ matrix.package.name }} to GitHub Packages
     needs:
       - resolve
       - build
+    if: success() && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: npm-release
     permissions:
       contents: read
-      id-token: write
+      packages: write
     strategy:
       fail-fast: false
       matrix:
         package: ${{ fromJSON(needs.resolve.outputs.packages) }}
     env:
-      NPM_STAGE_CLI_VERSION: "11.16.0"
-      PACKAGE_NAME: ${{ matrix.package.name }}
       PACKAGE_SPEC: ${{ matrix.package.spec }}
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -121,43 +126,37 @@ jobs:
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version-file: package.json
-          registry-url: "https://registry.npmjs.org"
+          registry-url: "https://npm.pkg.github.com"
+          scope: ${{ matrix.package.scope }}
           package-manager-cache: false
-      - name: Ensure npm staged publishing support
-        run: |
-          if ! npm stage --help >/dev/null 2>&1; then
-            npm install --global "npm@$NPM_STAGE_CLI_VERSION" --ignore-scripts --no-audit --no-fund
-          fi
-
-          npm --version
-          npm stage --help >/dev/null
-      - name: Stage publish to npmjs
+      - name: Publish to GitHub Packages
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PACKAGE_TARBALL: ${{ runner.temp }}/${{ matrix.package.tarball }}
         run: |
           test -f "$PACKAGE_TARBALL"
 
-          if npm view "$PACKAGE_SPEC" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
-            npmjs_integrity="$(npm view "$PACKAGE_SPEC" dist.integrity --registry=https://registry.npmjs.org)"
-            local_integrity="sha512-$(openssl dgst -sha512 -binary "$PACKAGE_TARBALL" | openssl base64 -A)"
-
-            if [ -z "$npmjs_integrity" ]; then
-              echo "$PACKAGE_SPEC already exists on npmjs but does not expose dist.integrity; refusing to skip."
-              exit 1
-            fi
-
-            if [ "$local_integrity" != "$npmjs_integrity" ]; then
-              echo "$PACKAGE_SPEC already exists on npmjs but the local tarball does not match; refusing to skip."
-              exit 1
-            fi
-
-            echo "$PACKAGE_SPEC already exists on npmjs and matches the local tarball; skipping."
-            exit 0
-          fi
-
-          if ! npm view "$PACKAGE_NAME" name --registry=https://registry.npmjs.org >/dev/null 2>&1; then
-            echo "$PACKAGE_NAME does not exist on npmjs; staged publishing requires an existing package."
+          if ! npm view "$PACKAGE_SPEC" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "$PACKAGE_SPEC is not published on npmjs; approve the staged package before publishing to GitHub Packages."
             exit 1
           fi
 
-          npm stage publish "$PACKAGE_TARBALL" --access public --registry=https://registry.npmjs.org --ignore-scripts
+          npmjs_integrity="$(npm view "$PACKAGE_SPEC" dist.integrity --registry=https://registry.npmjs.org)"
+          local_integrity="sha512-$(openssl dgst -sha512 -binary "$PACKAGE_TARBALL" | openssl base64 -A)"
+
+          if [ -z "$npmjs_integrity" ]; then
+            echo "$PACKAGE_SPEC does not expose dist.integrity on npmjs; refusing to publish to GitHub Packages."
+            exit 1
+          fi
+
+          if [ "$local_integrity" != "$npmjs_integrity" ]; then
+            echo "$PACKAGE_SPEC tarball does not match the approved npmjs tarball; refusing to publish to GitHub Packages."
+            exit 1
+          fi
+
+          if npm view "$PACKAGE_SPEC" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "$PACKAGE_SPEC already exists on GitHub Packages; skipping."
+            exit 0
+          fi
+
+          npm publish "$PACKAGE_TARBALL" --registry=https://npm.pkg.github.com --ignore-scripts

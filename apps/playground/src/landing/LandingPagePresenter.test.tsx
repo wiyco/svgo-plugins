@@ -82,9 +82,11 @@ describe("LandingPagePresenter", () => {
       await flush();
     });
 
-    expect(container.textContent).toContain("SVGO playgrounds");
-    expect(container.textContent).toContain("Open a slug to paste SVG");
-    expect(container.textContent).toContain("Slug registry");
+    expect(container.textContent).toContain("SVGO Plugin Playground");
+    expect(container.textContent).toContain(
+      "Test focused SVGO plugins against real SVG input",
+    );
+    expect(container.textContent).toContain("Plugin playgrounds");
     expect(mocks.itemSpy).toHaveBeenCalledTimes(2);
     expect(mocks.itemSpy.mock.calls[0]?.[0]).toEqual({
       playground: PRESENTER_PLAYGROUNDS[0],

@@ -85,7 +85,7 @@ describe("playground initial load browser flow", () => {
     const frame = createFrame();
     await waitForFrameDocument(frame);
 
-    await waitForText(frame, "SVGO playgrounds");
+    await waitForText(frame, "SVGO Plugin Playground");
 
     const playgroundLink = await waitForElement<HTMLAnchorElement>(
       frame,
@@ -104,9 +104,7 @@ describe("playground initial load browser flow", () => {
       ".package-chip",
     );
 
-    expect(title.textContent).toContain(
-      "SVGO plugin playground for hoisting stroke width",
-    );
+    expect(title.textContent).toContain("Hoist Stroke Width");
     expect(slug.textContent).toContain(`/${PLAYGROUND_SLUG}`);
     expect(slug.getAttribute("href")).toBe("../");
     expect(packageChip.textContent).toContain(

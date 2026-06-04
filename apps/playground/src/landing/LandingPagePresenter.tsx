@@ -12,10 +12,10 @@ export const LandingPagePresenter = (props: LandingPagePresenterProps) => {
   return (
     <main className="landing-shell">
       <header className="landing-header">
-        <h1>SVGO playgrounds</h1>
+        <h1>SVGO Plugin Playground</h1>
         <p className="landing-copy">
-          Open a slug to paste SVG, tune the shared controls, and inspect the
-          transform output.
+          Test focused SVGO plugins against real SVG input, inspect optimized
+          output, and preview React-ready results.
         </p>
       </header>
 
@@ -23,7 +23,7 @@ export const LandingPagePresenter = (props: LandingPagePresenterProps) => {
         className="landing-catalog"
         aria-labelledby="playground-catalog-title"
       >
-        <h2 id="playground-catalog-title">Slug registry</h2>
+        <h2 id="playground-catalog-title">Plugin playgrounds</h2>
         <ul className="landing-list">
           {viewModel.playgrounds.map((playground) => {
             return (

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Hoist Stroke Width Playground">
+  <foreignObject x="0" y="0" width="1200" height="630">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:1200px;height:630px;overflow:hidden;background:#000000;">
+      <div style="position:absolute;right:-160px;top:-126px;width:720px;height:540px;border-radius:999px;background:rgba(255,255,255,0.32);filter:blur(62px);"></div>
+      <div style="position:absolute;right:14px;bottom:-176px;width:640px;height:480px;border-radius:999px;background:rgba(255,255,255,0.18);filter:blur(86px);"></div>
+      <div style="position:absolute;left:-170px;top:92px;width:520px;height:360px;border-radius:999px;background:rgba(255,255,255,0.12);filter:blur(76px);"></div>
+      <div style="position:absolute;left:420px;top:-220px;width:520px;height:760px;transform:rotate(24deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,0.13),transparent);filter:blur(42px);"></div>
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.48);backdrop-filter:blur(64px) saturate(150%);-webkit-backdrop-filter:blur(64px) saturate(150%);"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(circle at 82% 34%,rgba(255,255,255,0.16),transparent 26%),linear-gradient(90deg,rgba(0,0,0,0.98) 0%,rgba(0,0,0,0.86) 46%,rgba(0,0,0,0.38) 72%,rgba(0,0,0,0.68) 100%);"></div>
+      <div style="position:absolute;inset:24px;border-radius:46px;background:linear-gradient(135deg,rgba(255,255,255,0.105),rgba(255,255,255,0.028) 42%,rgba(255,255,255,0.07));border:1px solid rgba(255,255,255,0.16);box-shadow:inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 rgba(255,255,255,0.08),0 24px 90px rgba(0,0,0,0.46);backdrop-filter:blur(34px) saturate(170%);-webkit-backdrop-filter:blur(34px) saturate(170%);"></div>
+      <div style="position:absolute;left:48px;right:48px;top:28px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.62),rgba(255,255,255,0.16),transparent);"></div>
+      <div style="position:absolute;right:54px;top:56px;width:360px;height:190px;border-radius:999px;background:radial-gradient(circle at 52% 28%,rgba(255,255,255,0.34),rgba(255,255,255,0.08) 48%,transparent 70%);filter:blur(20px);"></div>
+      <div style="position:absolute;left:54px;bottom:44px;width:430px;height:120px;border-radius:999px;background:radial-gradient(circle at 28% 52%,rgba(255,255,255,0.12),transparent 70%);filter:blur(28px);"></div>
+    </div>
+  </foreignObject>
+  <path
+    d="M760 384C963 541 909 61 1112 218"
+    fill="none"
+    stroke="#ffffff"
+    stroke-linecap="round"
+    stroke-width="10"
+  />
+  <circle cx="760" cy="384" r="16" fill="#ffffff" />
+  <circle cx="1112" cy="218" r="16" fill="#ffffff" />
+  <text
+    x="72"
+    y="124"
+    fill="#ffffff"
+    opacity="0.78"
+    font-family="SF Mono, Geist Mono Variable Fallback, IBM Plex Mono, Roboto Mono, monospace"
+    font-size="28"
+    font-weight="650"
+    letter-spacing="3"
+  >SVGO PLUGIN</text>
+  <text
+    x="72"
+    y="246"
+    fill="#ffffff"
+    opacity="0.98"
+    font-family="-apple-system, BlinkMacSystemFont, SF Pro Display, Geist Variable Fallback, Segoe UI, sans-serif"
+    font-size="82"
+    font-weight="680"
+  >Hoist</text>
+  <text
+    x="72"
+    y="342"
+    fill="#ffffff"
+    opacity="0.98"
+    font-family="-apple-system, BlinkMacSystemFont, SF Pro Display, Geist Variable Fallback, Segoe UI, sans-serif"
+    font-size="82"
+    font-weight="680"
+  >Stroke Width</text>
+  <text
+    x="74"
+    y="438"
+    fill="#ffffff"
+    opacity="0.72"
+    font-family="-apple-system, BlinkMacSystemFont, Geist Variable Fallback, Segoe UI, sans-serif"
+    font-size="32"
+    font-weight="450"
+  >Hoist uniform stroke-width to the root &lt;svg&gt;.</text>
+  <text
+    x="76"
+    y="498"
+    fill="#ffffff"
+    opacity="0.54"
+    font-family="SF Mono, Geist Mono Variable Fallback, IBM Plex Mono, Roboto Mono, monospace"
+    font-size="24"
+    font-weight="520"
+  >@wiyco/svgo-plugin-hoist-stroke-width</text>
+</svg>

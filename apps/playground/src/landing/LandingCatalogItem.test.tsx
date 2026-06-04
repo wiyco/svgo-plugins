@@ -45,8 +45,8 @@ const HOIST_STROKE_WIDTH_PLAYGROUND = {
   presetCountLabel: "3 presets",
   slug: "svgo-plugin-hoist-stroke-width",
   summary:
-    "Try the hoist-stroke-width plugin against raw SVG input and inspect the optimized output, generated React source, and live preview.",
-  title: "SVGO plugin playground for hoisting stroke width",
+    "Move uniform descendant stroke-width values to the root SVG element so SVGR-generated React icons can override them from props or CSS.",
+  title: "Hoist Stroke Width",
 } as const;
 
 const CUSTOM_PLAYGROUND = {
@@ -103,9 +103,7 @@ describe("LandingCatalogItem", () => {
       "@wiyco/svgo-plugin-hoist-stroke-width",
     );
     expect(playgroundLink.textContent).toContain("3 presets");
-    expect(playgroundLink.textContent).toContain(
-      "SVGO plugin playground for hoisting stroke width",
-    );
+    expect(playgroundLink.textContent).toContain("Hoist Stroke Width");
     expect(mocks.linkRef.current).toBe(playgroundLink);
 
     await act(async () => {

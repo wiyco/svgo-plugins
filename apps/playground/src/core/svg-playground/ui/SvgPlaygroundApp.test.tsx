@@ -74,9 +74,7 @@ describe("SvgPlaygroundApp", () => {
     });
 
     expect(container.textContent).toContain("Booting the transform worker");
-    expect(container.textContent).toContain(
-      "SVGO plugin playground for hoisting stroke width",
-    );
+    expect(container.textContent).toContain("Hoist Stroke Width");
     expect(container.textContent).toContain("/svgo-plugin-hoist-stroke-width");
     expect(container.textContent).toContain(
       "@wiyco/svgo-plugin-hoist-stroke-width",
@@ -99,8 +97,6 @@ describe("SvgPlaygroundApp", () => {
       await flush();
     });
 
-    expect(container.textContent).toContain(
-      "SVGO plugin playground for hoisting stroke width",
-    );
+    expect(container.textContent).toContain("Hoist Stroke Width");
   });
 });

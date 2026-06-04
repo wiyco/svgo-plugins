@@ -138,9 +138,7 @@ describe("playground browser worker regression", () => {
     });
 
     await expect
-      .element(
-        page.getByText("SVGO plugin playground for hoisting stroke width"),
-      )
+      .element(page.getByText("Hoist Stroke Width"))
       .toBeInTheDocument();
     await waitForPanelsToSettle();
     await waitForCodeSurfacesToLoad();

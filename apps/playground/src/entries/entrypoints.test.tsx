@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -15,6 +16,13 @@ const LandingPage = () => {
 const App = () => {
   return null;
 };
+
+const LANDING_DESCRIPTION =
+  "Explore focused SVGO plugins for SVG-to-React workflows. Paste SVG, tune presets, and compare optimized output in a live playground.";
+const HOIST_STROKE_WIDTH_DESCRIPTION =
+  "Try an SVGO plugin that moves uniform descendant stroke-width values to the root SVG element, making SVGR-generated React icons easier to override.";
+const HOIST_STROKE_WIDTH_TITLE =
+  "Hoist Stroke Width Playground | SVGO Plugin Playground";
 
 const mockReactDomClient = () => {
   createRoot.mockReturnValue({
@@ -161,5 +169,341 @@ describe("playground entrypoints", () => {
     expect(playgroundCss).not.toContain("animation: none");
     expect(landingCss).toContain("translateY(-1px)");
     expect(playgroundCss).not.toContain("translateY(-1px)");
+  });
+
+  it("keeps favicon links and social metadata available for landing and playground pages", async () => {
+    const [landingHtml, playgroundHtml, siteManifestJson] = await Promise.all([
+      readFile(resolve(process.cwd(), "apps/playground/index.html"), "utf8"),
+      readFile(
+        resolve(
+          process.cwd(),
+          "apps/playground/svgo-plugin-hoist-stroke-width/index.html",
+        ),
+        "utf8",
+      ),
+      readFile(
+        resolve(process.cwd(), "apps/playground/public/site.webmanifest"),
+        "utf8",
+      ),
+    ]);
+    const siteManifest = JSON.parse(siteManifestJson) as {
+      background_color: string;
+      description: string;
+      display: string;
+      icons: Array<{
+        purpose: string;
+        sizes: string;
+        src: string;
+        type: string;
+      }>;
+      id: string;
+      name: string;
+      scope: string;
+      short_name: string;
+      start_url: string;
+      theme_color: string;
+    };
+
+    const landingDocument = new DOMParser().parseFromString(
+      landingHtml,
+      "text/html",
+    );
+    const playgroundDocument = new DOMParser().parseFromString(
+      playgroundHtml,
+      "text/html",
+    );
+    const expectElementAttributes = (
+      pageDocument: Document,
+      selector: string,
+      attributes: Record<string, string>,
+    ): void => {
+      const element = pageDocument.querySelector(selector);
+
+      expect(element).not.toBeNull();
+      Object.entries(attributes).forEach(([name, value]) => {
+        expect(element?.getAttribute(name)).toBe(value);
+      });
+    };
+    const expectFaviconMetadata = (
+      pageDocument: Document,
+      assetPrefix: string,
+    ): void => {
+      expectElementAttributes(
+        pageDocument,
+        'meta[name="theme-color"][media="(prefers-color-scheme: light)"]',
+        {
+          content: "#edf6ff",
+        },
+      );
+      expectElementAttributes(
+        pageDocument,
+        'meta[name="theme-color"][media="(prefers-color-scheme: dark)"]',
+        {
+          content: "#05070a",
+        },
+      );
+      expectElementAttributes(
+        pageDocument,
+        'link[rel="icon"][type="image/png"][sizes="32x32"]',
+        {
+          href: `${assetPrefix}favicon-32.png`,
+        },
+      );
+      expectElementAttributes(
+        pageDocument,
+        'link[rel="icon"][type="image/png"][sizes="48x48"]',
+        {
+          href: `${assetPrefix}favicon-48.png`,
+        },
+      );
+      expectElementAttributes(
+        pageDocument,
+        'link[rel="icon"][type="image/png"][sizes="512x512"]',
+        {
+          href: `${assetPrefix}favicon-512.png`,
+        },
+      );
+      expectElementAttributes(
+        pageDocument,
+        'link[rel="icon"][type="image/svg+xml"]',
+        {
+          href: `${assetPrefix}favicon.svg`,
+          sizes: "any",
+        },
+      );
+      expectElementAttributes(pageDocument, 'link[rel="apple-touch-icon"]', {
+        href: `${assetPrefix}apple-touch-icon.png`,
+        sizes: "180x180",
+      });
+      expectElementAttributes(pageDocument, 'link[rel="manifest"]', {
+        href: `${assetPrefix}site.webmanifest`,
+      });
+    };
+
+    expect(landingDocument.querySelector("title")?.textContent).toBe(
+      "SVGO Plugin Playground",
+    );
+    expect(playgroundDocument.querySelector("title")?.textContent).toBe(
+      HOIST_STROKE_WIDTH_TITLE,
+    );
+
+    expectElementAttributes(landingDocument, 'meta[name="description"]', {
+      content: LANDING_DESCRIPTION,
+    });
+    expectElementAttributes(landingDocument, 'meta[property="og:type"]', {
+      content: "website",
+    });
+    expectElementAttributes(landingDocument, 'meta[property="og:title"]', {
+      content: "SVGO Plugin Playground",
+    });
+    expectElementAttributes(
+      landingDocument,
+      'meta[property="og:description"]',
+      {
+        content: LANDING_DESCRIPTION,
+      },
+    );
+    expectElementAttributes(landingDocument, 'meta[property="og:image"]', {
+      content: "./og-image.png",
+    });
+    expectElementAttributes(
+      landingDocument,
+      'meta[property="og:image:width"]',
+      {
+        content: "1200",
+      },
+    );
+    expectElementAttributes(
+      landingDocument,
+      'meta[property="og:image:height"]',
+      {
+        content: "630",
+      },
+    );
+    expectElementAttributes(landingDocument, 'meta[property="og:image:type"]', {
+      content: "image/png",
+    });
+    expectElementAttributes(landingDocument, 'meta[name="twitter:card"]', {
+      content: "summary_large_image",
+    });
+    expectElementAttributes(landingDocument, 'meta[name="twitter:title"]', {
+      content: "SVGO Plugin Playground",
+    });
+    expectElementAttributes(
+      landingDocument,
+      'meta[name="twitter:description"]',
+      {
+        content: LANDING_DESCRIPTION,
+      },
+    );
+    expectElementAttributes(landingDocument, 'meta[name="twitter:image"]', {
+      content: "./og-image.png",
+    });
+    expectFaviconMetadata(landingDocument, "./");
+
+    expectElementAttributes(playgroundDocument, 'meta[name="description"]', {
+      content: HOIST_STROKE_WIDTH_DESCRIPTION,
+    });
+    expectElementAttributes(playgroundDocument, 'meta[property="og:type"]', {
+      content: "website",
+    });
+    expectElementAttributes(playgroundDocument, 'meta[property="og:title"]', {
+      content: HOIST_STROKE_WIDTH_TITLE,
+    });
+    expectElementAttributes(
+      playgroundDocument,
+      'meta[property="og:description"]',
+      {
+        content: HOIST_STROKE_WIDTH_DESCRIPTION,
+      },
+    );
+    expectElementAttributes(playgroundDocument, 'meta[property="og:image"]', {
+      content: "./og-image.png",
+    });
+    expectElementAttributes(
+      playgroundDocument,
+      'meta[property="og:image:width"]',
+      {
+        content: "1200",
+      },
+    );
+    expectElementAttributes(
+      playgroundDocument,
+      'meta[property="og:image:height"]',
+      {
+        content: "630",
+      },
+    );
+    expectElementAttributes(
+      playgroundDocument,
+      'meta[property="og:image:type"]',
+      {
+        content: "image/png",
+      },
+    );
+    expectElementAttributes(playgroundDocument, 'meta[name="twitter:card"]', {
+      content: "summary_large_image",
+    });
+    expectElementAttributes(playgroundDocument, 'meta[name="twitter:title"]', {
+      content: HOIST_STROKE_WIDTH_TITLE,
+    });
+    expectElementAttributes(
+      playgroundDocument,
+      'meta[name="twitter:description"]',
+      {
+        content: HOIST_STROKE_WIDTH_DESCRIPTION,
+      },
+    );
+    expectElementAttributes(playgroundDocument, 'meta[name="twitter:image"]', {
+      content: "./og-image.png",
+    });
+    expectFaviconMetadata(playgroundDocument, "../");
+
+    expect(siteManifest).toMatchObject({
+      background_color: "#edf6ff",
+      description: "Explore focused SVGO plugins for SVG-to-React workflows.",
+      display: "browser",
+      id: "./",
+      name: "SVGO Plugin Playground",
+      scope: "./",
+      short_name: "SVGO",
+      start_url: "./",
+      theme_color: "#edf6ff",
+    });
+    expect(siteManifest.icons).toEqual([
+      {
+        purpose: "any",
+        sizes: "any",
+        src: "./favicon.svg",
+        type: "image/svg+xml",
+      },
+      {
+        purpose: "any",
+        sizes: "192x192",
+        src: "./favicon-192.png",
+        type: "image/png",
+      },
+      {
+        purpose: "any",
+        sizes: "384x384",
+        src: "./favicon-384.png",
+        type: "image/png",
+      },
+      {
+        purpose: "any",
+        sizes: "512x512",
+        src: "./favicon-512.png",
+        type: "image/png",
+      },
+      {
+        purpose: "any",
+        sizes: "1024x1024",
+        src: "./favicon-1024.png",
+        type: "image/png",
+      },
+      {
+        purpose: "maskable",
+        sizes: "512x512",
+        src: "./favicon-maskable-512.png",
+        type: "image/png",
+      },
+      {
+        purpose: "maskable",
+        sizes: "1024x1024",
+        src: "./favicon-maskable-1024.png",
+        type: "image/png",
+      },
+    ]);
+  });
+
+  it("keeps OpenGraph image assets at the expected dimensions", async () => {
+    const assetPaths = [
+      "apps/playground/public/og-image",
+      "apps/playground/public/svgo-plugin-hoist-stroke-width/og-image",
+    ] as const;
+    const pngSignature = Buffer.from([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+    ]);
+
+    await Promise.all(
+      assetPaths.map(async (assetPath) => {
+        const [svg, png] = await Promise.all([
+          readFile(resolve(process.cwd(), `${assetPath}.svg`), "utf8"),
+          readFile(resolve(process.cwd(), `${assetPath}.png`)),
+        ]);
+
+        expect(svg).toContain('width="1200" height="630"');
+        expect(png.subarray(0, 8)).toEqual(pngSignature);
+        expect(png.readUInt32BE(16)).toBe(1200);
+        expect(png.readUInt32BE(20)).toBe(630);
+      }),
+    );
+  });
+
+  it("keeps favicon image assets at the expected dimensions", async () => {
+    const pngAssets = [
+      ["apps/playground/public/favicon-32.png", 32],
+      ["apps/playground/public/favicon-48.png", 48],
+      ["apps/playground/public/apple-touch-icon.png", 180],
+      ["apps/playground/public/favicon-192.png", 192],
+      ["apps/playground/public/favicon-384.png", 384],
+      ["apps/playground/public/favicon-512.png", 512],
+      ["apps/playground/public/favicon-1024.png", 1024],
+      ["apps/playground/public/favicon-maskable-512.png", 512],
+      ["apps/playground/public/favicon-maskable-1024.png", 1024],
+    ] as const;
+    const pngSignature = Buffer.from([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+    ]);
+
+    await Promise.all(
+      pngAssets.map(async ([assetPath, size]) => {
+        const png = await readFile(resolve(process.cwd(), assetPath));
+
+        expect(png.subarray(0, 8)).toEqual(pngSignature);
+        expect(png.readUInt32BE(16)).toBe(size);
+        expect(png.readUInt32BE(20)).toBe(size);
+      }),
+    );
   });
 });

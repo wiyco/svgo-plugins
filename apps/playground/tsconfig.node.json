@@ -12,6 +12,7 @@
     "vite.config.ts",
     "vitest.config.ts",
     "vitest.browser.config.ts",
+    "src/build/preload-font-build-output.ts",
     "src/build/restore-backdrop-filter-declarations.ts"
   ]
 }

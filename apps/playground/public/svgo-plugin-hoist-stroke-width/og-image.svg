@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Hoist Stroke Width Playground">
+  <!-- Apple system font names are intentionally avoided for OG image export. -->
   <foreignObject x="0" y="0" width="1200" height="630">
     <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:1200px;height:630px;overflow:hidden;background:#000000;">
       <div style="position:absolute;right:-160px;top:-126px;width:720px;height:540px;border-radius:999px;background:rgba(255,255,255,0.32);filter:blur(62px);"></div>
@@ -27,7 +28,7 @@
     y="124"
     fill="#ffffff"
     opacity="0.78"
-    font-family="SF Mono, Geist Mono Variable Fallback, IBM Plex Mono, Roboto Mono, monospace"
+    font-family="Geist Mono, Geist Mono Variable Fallback, monospace"
     font-size="28"
     font-weight="650"
     letter-spacing="3"
@@ -37,7 +38,7 @@
     y="246"
     fill="#ffffff"
     opacity="0.98"
-    font-family="-apple-system, BlinkMacSystemFont, SF Pro Display, Geist Variable Fallback, Segoe UI, sans-serif"
+    font-family="Geist, Geist Variable Fallback, sans-serif"
     font-size="82"
     font-weight="680"
   >Hoist</text>
@@ -46,7 +47,7 @@
     y="342"
     fill="#ffffff"
     opacity="0.98"
-    font-family="-apple-system, BlinkMacSystemFont, SF Pro Display, Geist Variable Fallback, Segoe UI, sans-serif"
+    font-family="Geist, Geist Variable Fallback, sans-serif"
     font-size="82"
     font-weight="680"
   >Stroke Width</text>
@@ -55,7 +56,7 @@
     y="438"
     fill="#ffffff"
     opacity="0.72"
-    font-family="-apple-system, BlinkMacSystemFont, Geist Variable Fallback, Segoe UI, sans-serif"
+    font-family="Geist, Geist Variable Fallback, sans-serif"
     font-size="32"
     font-weight="450"
   >Hoist uniform stroke-width to the root &lt;svg&gt;.</text>
@@ -64,7 +65,7 @@
     y="498"
     fill="#ffffff"
     opacity="0.54"
-    font-family="SF Mono, Geist Mono Variable Fallback, IBM Plex Mono, Roboto Mono, monospace"
+    font-family="Geist Mono, Geist Mono Variable Fallback, monospace"
     font-size="24"
     font-weight="520"
   >@wiyco/svgo-plugin-hoist-stroke-width</text>

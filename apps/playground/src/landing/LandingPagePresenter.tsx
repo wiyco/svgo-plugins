@@ -23,7 +23,12 @@ export const LandingPagePresenter = (props: LandingPagePresenterProps) => {
         className="landing-catalog"
         aria-labelledby="playground-catalog-title"
       >
-        <h2 id="playground-catalog-title">Plugin playgrounds</h2>
+        <div className="landing-catalog-header">
+          <h2 id="playground-catalog-title">Plugin playgrounds</h2>
+          <span className="landing-catalog-count">
+            {viewModel.playgroundCountLabel}
+          </span>
+        </div>
         <ul className="landing-list">
           {viewModel.playgrounds.map((playground) => {
             return (

@@ -1,4 +1,4 @@
-import { PackageIcon } from "@primer/octicons-react";
+import { ChevronRightIcon, PackageIcon } from "@primer/octicons-react";
 
 import type { LandingCatalogItemViewModel } from "./landing-page-view-model";
 
@@ -28,7 +28,9 @@ export const LandingCatalogItem = (props: LandingCatalogItemProps) => {
                 <span aria-hidden="true" className="landing-item-package-icon">
                   <PackageIcon size={12} />
                 </span>
-                <span>{playground.packageName}</span>
+                <span className="landing-item-package-name">
+                  {playground.packageName}
+                </span>
               </code>
             ) : null}
             <span className="landing-item-count">
@@ -36,7 +38,12 @@ export const LandingCatalogItem = (props: LandingCatalogItemProps) => {
             </span>
           </div>
           <div className="landing-item-copy">
-            <strong className="landing-item-title">{playground.title}</strong>
+            <span className="landing-item-title-row">
+              <strong className="landing-item-title">{playground.title}</strong>
+              <span aria-hidden="true" className="landing-item-disclosure">
+                <ChevronRightIcon size={14} />
+              </span>
+            </span>
             <p>{playground.summary}</p>
           </div>
         </div>

@@ -15,6 +15,7 @@ describe("landing-page-view-model", () => {
     ]);
 
     expect(viewModel).toEqual({
+      playgroundCountLabel: "1 playground",
       playgrounds: [
         {
           href: "./example-playground/",
@@ -40,5 +41,27 @@ describe("landing-page-view-model", () => {
     ]);
 
     expect(viewModel.playgrounds[0]?.presetCountLabel).toBe("1 preset");
+    expect(viewModel.playgroundCountLabel).toBe("1 playground");
+  });
+
+  it("uses the plural playground label for multiple playgrounds", () => {
+    const viewModel = createLandingPageViewModel([
+      {
+        packageName: null,
+        presetCount: 1,
+        slug: "first-playground",
+        summary: "First summary",
+        title: "First title",
+      },
+      {
+        packageName: null,
+        presetCount: 1,
+        slug: "second-playground",
+        summary: "Second summary",
+        title: "Second title",
+      },
+    ]);
+
+    expect(viewModel.playgroundCountLabel).toBe("2 playgrounds");
   });
 });

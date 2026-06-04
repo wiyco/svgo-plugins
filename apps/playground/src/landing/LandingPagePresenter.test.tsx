@@ -54,6 +54,7 @@ const PRESENTER_PLAYGROUNDS = [
 ] as const;
 
 const PRESENTER_VIEW_MODEL = {
+  playgroundCountLabel: "2 playgrounds",
   playgrounds: PRESENTER_PLAYGROUNDS,
 };
 
@@ -87,6 +88,17 @@ describe("LandingPagePresenter", () => {
       "Test focused SVGO plugins against real SVG input",
     );
     expect(container.textContent).toContain("Plugin playgrounds");
+    expect(
+      container
+        .querySelector(".landing-catalog")
+        ?.getAttribute("aria-labelledby"),
+    ).toBe("playground-catalog-title");
+    expect(container.querySelector("#playground-catalog-title")?.tagName).toBe(
+      "H2",
+    );
+    expect(container.querySelector(".landing-catalog-count")?.textContent).toBe(
+      "2 playgrounds",
+    );
     expect(mocks.itemSpy).toHaveBeenCalledTimes(2);
     expect(mocks.itemSpy.mock.calls[0]?.[0]).toEqual({
       playground: PRESENTER_PLAYGROUNDS[0],

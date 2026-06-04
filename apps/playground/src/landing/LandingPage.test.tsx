@@ -73,6 +73,7 @@ describe("LandingPage", () => {
       },
     ] as const;
     const viewModel: LandingPageViewModel = {
+      playgroundCountLabel: "1 playground",
       playgrounds: [
         {
           href: "./example-playground/",
@@ -106,5 +107,52 @@ describe("LandingPage", () => {
     expect(
       container.querySelector('[data-slot="landing-page-presenter"]'),
     ).not.toBeNull();
+  });
+
+  it("does not rebuild the static view model on rerender", async () => {
+    const catalog = [
+      {
+        packageName: null,
+        presetCount: 1,
+        slug: "stable-playground",
+        summary: "Stable summary",
+        title: "Stable title",
+      },
+    ] as const;
+    const viewModel: LandingPageViewModel = {
+      playgroundCountLabel: "1 playground",
+      playgrounds: [
+        {
+          href: "./stable-playground/",
+          packageName: null,
+          presetCountLabel: "1 preset",
+          slug: "stable-playground",
+          summary: "Stable summary",
+          title: "Stable title",
+        },
+      ],
+    };
+
+    vi.doMock("../playgrounds/catalog", () => {
+      return {
+        PLAYGROUND_CATALOG: catalog,
+      };
+    });
+    mocks.createLandingPageViewModel.mockReturnValue(viewModel);
+
+    const { LandingPage } = await import("./LandingPage");
+
+    await act(async () => {
+      root.render(<LandingPage />);
+      await flush();
+    });
+    await act(async () => {
+      root.render(<LandingPage />);
+      await flush();
+    });
+
+    expect(mocks.createLandingPageViewModel).toHaveBeenCalledTimes(1);
+    expect(mocks.presenterSpy).toHaveBeenCalledTimes(2);
+    expect(mocks.presenterSpy).toHaveBeenLastCalledWith({ viewModel });
   });
 });

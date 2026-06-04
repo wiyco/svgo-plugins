@@ -106,6 +106,13 @@ describe("LandingCatalogItem", () => {
     expect(playgroundLink.textContent).toContain("Hoist Stroke Width");
     expect(mocks.linkRef.current).toBe(playgroundLink);
 
+    const disclosure = container.querySelector<HTMLElement>(
+      ".landing-item-disclosure",
+    );
+    expect(disclosure).not.toBeNull();
+    expect(disclosure?.getAttribute("aria-hidden")).toBe("true");
+    expect(disclosure?.querySelector("svg")).not.toBeNull();
+
     await act(async () => {
       playgroundLink.dispatchEvent(
         new PointerEvent("pointerover", { bubbles: true }),

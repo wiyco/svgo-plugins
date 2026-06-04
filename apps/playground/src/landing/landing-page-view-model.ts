@@ -10,6 +10,7 @@ export type LandingCatalogItemViewModel = {
 };
 
 export type LandingPageViewModel = {
+  playgroundCountLabel: string;
   playgrounds: readonly LandingCatalogItemViewModel[];
 };
 
@@ -17,10 +18,15 @@ const getPresetCountLabel = (presetCount: number): string => {
   return `${presetCount} preset${presetCount === 1 ? "" : "s"}`;
 };
 
+const getPlaygroundCountLabel = (playgroundCount: number): string => {
+  return `${playgroundCount} playground${playgroundCount === 1 ? "" : "s"}`;
+};
+
 export const createLandingPageViewModel = (
   catalog: readonly PlaygroundCatalogEntry[],
 ): LandingPageViewModel => {
   return {
+    playgroundCountLabel: getPlaygroundCountLabel(catalog.length),
     playgrounds: catalog.map((playground) => {
       return {
         href: `./${playground.slug}/`,

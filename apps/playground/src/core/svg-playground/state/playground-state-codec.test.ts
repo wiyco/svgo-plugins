@@ -21,6 +21,18 @@ describe("playground-state-codec", () => {
     expect(parsed).toEqual(input);
   });
 
+  it("round-trips an explicitly empty svg through the query string", () => {
+    const input = {
+      ...DEFAULT_QUERY_STATE,
+      svg: "",
+    };
+
+    const serialized = playgroundStateCodec.serialize(input);
+    const parsed = playgroundStateCodec.parse(serialized);
+
+    expect(parsed.svg).toBe("");
+  });
+
   it("falls back to defaults when query params are invalid", () => {
     const parsed = playgroundStateCodec.parse(
       "?svg=%%%&color=nope&size=9999&strokeWidth=oops",

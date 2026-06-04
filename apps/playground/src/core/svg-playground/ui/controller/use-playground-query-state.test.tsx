@@ -38,6 +38,14 @@ const QueryStateHarness = () => {
       };
     });
   }, [setQueryState]);
+  const handleClearSvgClick = useCallback(() => {
+    setQueryState((currentState: PlaygroundQueryState) => {
+      return {
+        ...currentState,
+        svg: "",
+      };
+    });
+  }, [setQueryState]);
 
   return (
     <div>
@@ -49,6 +57,9 @@ const QueryStateHarness = () => {
       </button>
       <button type="button" onClick={handleStepSizeClick}>
         Step size
+      </button>
+      <button type="button" onClick={handleClearSvgClick}>
+        Clear SVG
       </button>
     </div>
   );
@@ -172,5 +183,35 @@ describe("use-playground-query-state", () => {
       (container.querySelector("textarea") as HTMLTextAreaElement | null)
         ?.value,
     ).toBe(nextSvg);
+  });
+
+  it("keeps an explicitly empty svg after syncing it to the URL", async () => {
+    await act(async () => {
+      root.render(<QueryStateHarness />);
+      await flush();
+    });
+
+    await act(async () => {
+      container.querySelectorAll("button")[2]?.click();
+      await flush();
+    });
+
+    expect(
+      (container.querySelector("textarea") as HTMLTextAreaElement | null)
+        ?.value,
+    ).toBe("");
+
+    await act(async () => {
+      vi.advanceTimersByTime(PLAYGROUND_URL_SYNC_DELAY_MS);
+      await flush();
+    });
+
+    expect(
+      hoistStrokeWidthPlayground.parseState(window.location.search).svg,
+    ).toBe("");
+    expect(
+      (container.querySelector("textarea") as HTMLTextAreaElement | null)
+        ?.value,
+    ).toBe("");
   });
 });

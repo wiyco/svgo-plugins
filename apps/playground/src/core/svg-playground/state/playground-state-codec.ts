@@ -37,6 +37,8 @@ const parseFiniteNumber = (
   return clamp(parsed, min, max);
 };
 
+const COMPRESSED_EMPTY_SVG = compressToEncodedURIComponent("");
+
 export const createPlaygroundStateCodec = (
   defaultState: PlaygroundQueryState,
 ): PlaygroundStateCodec => {
@@ -55,7 +57,10 @@ export const createPlaygroundStateCodec = (
 
     const decompressed = decompressFromEncodedURIComponent(value);
 
-    if (decompressed !== null && decompressed.length > 0) {
+    if (
+      decompressed !== null &&
+      (decompressed.length > 0 || value === COMPRESSED_EMPTY_SVG)
+    ) {
       return decompressed;
     }
 

@@ -4,7 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TransformState } from "./svg-playground-controller-types";
 
-import { useReactSourceState } from "./use-react-source-state";
+import {
+  REACT_SOURCE_PENDING_DELAY_MS,
+  useReactSourceState,
+} from "./use-react-source-state";
 
 const flush = async (): Promise<void> => {
   await Promise.resolve();
@@ -107,7 +110,7 @@ describe("use-react-source-state", () => {
 
     expect(
       container.querySelector('[data-testid="pending"]')?.textContent,
-    ).toBe("yes");
+    ).toBe("no");
     expect(container.querySelector('[data-testid="source"]')?.textContent).toBe(
       "",
     );
@@ -123,7 +126,7 @@ describe("use-react-source-state", () => {
 
     expect(
       container.querySelector('[data-testid="pending"]')?.textContent,
-    ).toBe("yes");
+    ).toBe("no");
 
     await act(async () => {
       vi.runAllTimers();
@@ -141,6 +144,98 @@ describe("use-react-source-state", () => {
     ).not.toContain('data-source="first"');
   });
 
+  it("shows pending only after the delay while keeping the previous successful source", async () => {
+    const idleCallbacks: IdleRequestCallback[] = [];
+    const requestIdleCallback = vi.fn<
+      (callback: IdleRequestCallback, options?: IdleRequestOptions) => number
+    >((callback: IdleRequestCallback) => {
+      idleCallbacks.push(callback);
+      return idleCallbacks.length;
+    });
+
+    Object.defineProperty(window, "requestIdleCallback", {
+      configurable: true,
+      value: requestIdleCallback,
+    });
+    Object.defineProperty(window, "cancelIdleCallback", {
+      configurable: true,
+      value: vi.fn<(id: number) => void>(),
+    });
+
+    await act(async () => {
+      root.render(
+        <ReactSourceStateHarness
+          transformState={FIRST_SUCCESS_TRANSFORM_STATE}
+        />,
+      );
+      await flush();
+    });
+
+    await act(async () => {
+      idleCallbacks[0]?.({
+        didTimeout: false,
+        timeRemaining: () => {
+          return 50;
+        },
+      });
+      await flush();
+    });
+
+    expect(
+      container.querySelector('[data-testid="source"]')?.textContent,
+    ).toContain('data-source="first"');
+
+    await act(async () => {
+      root.render(
+        <ReactSourceStateHarness
+          transformState={SECOND_SUCCESS_TRANSFORM_STATE}
+        />,
+      );
+      await flush();
+    });
+
+    await act(async () => {
+      vi.advanceTimersByTime(REACT_SOURCE_PENDING_DELAY_MS - 1);
+      await flush();
+    });
+
+    expect(
+      container.querySelector('[data-testid="pending"]')?.textContent,
+    ).toBe("no");
+    expect(
+      container.querySelector('[data-testid="source"]')?.textContent,
+    ).toContain('data-source="first"');
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+      await flush();
+    });
+
+    expect(
+      container.querySelector('[data-testid="pending"]')?.textContent,
+    ).toBe("yes");
+    expect(container.querySelector('[data-testid="source"]')?.textContent).toBe(
+      "",
+    );
+
+    await act(async () => {
+      idleCallbacks[1]?.({
+        didTimeout: false,
+        timeRemaining: () => {
+          return 50;
+        },
+      });
+      await flush();
+    });
+
+    expect(
+      container.querySelector('[data-testid="pending"]')?.textContent,
+    ).toBe("no");
+    expect(
+      container.querySelector('[data-testid="source"]')?.textContent,
+    ).toContain('data-source="second"');
+  });
+
   it("reports React source generation errors after the deferred build runs", async () => {
     await act(async () => {
       root.render(
@@ -153,7 +248,7 @@ describe("use-react-source-state", () => {
 
     expect(
       container.querySelector('[data-testid="pending"]')?.textContent,
-    ).toBe("yes");
+    ).toBe("no");
 
     await act(async () => {
       vi.runAllTimers();
@@ -199,6 +294,15 @@ describe("use-react-source-state", () => {
     expect(requestIdleCallback).toHaveBeenCalledWith(expect.any(Function), {
       timeout: 150,
     });
+    expect(
+      container.querySelector('[data-testid="pending"]')?.textContent,
+    ).toBe("no");
+
+    await act(async () => {
+      vi.advanceTimersByTime(REACT_SOURCE_PENDING_DELAY_MS);
+      await flush();
+    });
+
     expect(
       container.querySelector('[data-testid="pending"]')?.textContent,
     ).toBe("yes");

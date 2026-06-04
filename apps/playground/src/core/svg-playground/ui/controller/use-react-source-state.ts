@@ -37,6 +37,7 @@ const EMPTY_REACT_SOURCE_BUILD_STATE = {
 } satisfies ReactSourceBuildState;
 
 const REACT_SOURCE_BUILD_TIMEOUT_MS = 150;
+export const REACT_SOURCE_PENDING_DELAY_MS = 200;
 
 const createBuiltReactSourceState = (
   optimizedSvg: string,
@@ -92,20 +93,33 @@ const getRequestedOptimizedSvg = (transformState: TransformState): string => {
 const toReactSourceState = (
   buildState: ReactSourceBuildState,
   requestedOptimizedSvg: string,
+  pendingOptimizedSvg: string,
 ): ReactSourceState => {
   if (requestedOptimizedSvg.length === 0) {
     return EMPTY_REACT_SOURCE_STATE;
   }
 
-  if (buildState.optimizedSvg !== requestedOptimizedSvg) {
+  if (buildState.optimizedSvg === requestedOptimizedSvg) {
+    return {
+      error: buildState.error,
+      isPending: false,
+      source: buildState.source,
+    };
+  }
+
+  if (pendingOptimizedSvg === requestedOptimizedSvg) {
     return LOADING_REACT_SOURCE_STATE;
   }
 
-  return {
-    error: buildState.error,
-    isPending: false,
-    source: buildState.source,
-  };
+  if (buildState.error.length === 0 && buildState.source.length > 0) {
+    return {
+      error: "",
+      isPending: false,
+      source: buildState.source,
+    };
+  }
+
+  return EMPTY_REACT_SOURCE_STATE;
 };
 
 export const useReactSourceState = (
@@ -115,19 +129,29 @@ export const useReactSourceState = (
   const [buildState, setBuildState] = useState<ReactSourceBuildState>(
     EMPTY_REACT_SOURCE_BUILD_STATE,
   );
+  const [pendingOptimizedSvg, setPendingOptimizedSvg] = useState("");
 
   useEffect(() => {
     if (requestedOptimizedSvg.length === 0) {
       setBuildState(EMPTY_REACT_SOURCE_BUILD_STATE);
+      setPendingOptimizedSvg("");
       return;
     }
 
     let isStale = false;
+    const pendingTimeoutId = window.setTimeout(() => {
+      setPendingOptimizedSvg(requestedOptimizedSvg);
+    }, REACT_SOURCE_PENDING_DELAY_MS);
+
+    setPendingOptimizedSvg("");
+
     const scheduledBuild = scheduleReactSourceBuild(() => {
       const nextState = createBuiltReactSourceState(requestedOptimizedSvg);
 
       startTransition(() => {
         if (!isStale) {
+          window.clearTimeout(pendingTimeoutId);
+          setPendingOptimizedSvg("");
           setBuildState(nextState);
         }
       });
@@ -135,9 +159,14 @@ export const useReactSourceState = (
 
     return () => {
       isStale = true;
+      window.clearTimeout(pendingTimeoutId);
       cancelReactSourceBuild(scheduledBuild);
     };
   }, [requestedOptimizedSvg]);
 
-  return toReactSourceState(buildState, requestedOptimizedSvg);
+  return toReactSourceState(
+    buildState,
+    requestedOptimizedSvg,
+    pendingOptimizedSvg,
+  );
 };

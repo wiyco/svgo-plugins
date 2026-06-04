@@ -3,6 +3,7 @@ import { type PropsWithChildren, useMemo } from "react";
 import {
   SvgPlaygroundControlsContext,
   SvgPlaygroundHeaderContext,
+  SvgPlaygroundInputPanelContext,
   SvgPlaygroundPanelsContext,
   SvgPlaygroundPresetContext,
   type SvgPlaygroundRootProps,
@@ -98,33 +99,31 @@ const SvgPlaygroundRoot = (
     transformState.kind === "error" || transformState.kind === "unsafe"
       ? transformState.message
       : "";
-  const panelsValue = useMemo(() => {
+  const inputPanelValue = useMemo(() => {
     return {
       inputSvg,
+      setSvg,
+    };
+  }, [inputSvg, setSvg]);
+  const panelsValue = useMemo(() => {
+    return {
       optimizedSvg,
       previewHtml,
       reactSourceState,
-      setSvg,
       status,
       statusMessage,
     };
-  }, [
-    inputSvg,
-    optimizedSvg,
-    previewHtml,
-    reactSourceState,
-    setSvg,
-    status,
-    statusMessage,
-  ]);
+  }, [optimizedSvg, previewHtml, reactSourceState, status, statusMessage]);
 
   return (
     <SvgPlaygroundHeaderContext.Provider value={headerValue}>
       <SvgPlaygroundPresetContext.Provider value={presetValue}>
         <SvgPlaygroundControlsContext.Provider value={controlsValue}>
-          <SvgPlaygroundPanelsContext.Provider value={panelsValue}>
-            <main className="app-shell playground-shell">{children}</main>
-          </SvgPlaygroundPanelsContext.Provider>
+          <SvgPlaygroundInputPanelContext.Provider value={inputPanelValue}>
+            <SvgPlaygroundPanelsContext.Provider value={panelsValue}>
+              <main className="app-shell playground-shell">{children}</main>
+            </SvgPlaygroundPanelsContext.Provider>
+          </SvgPlaygroundInputPanelContext.Provider>
         </SvgPlaygroundControlsContext.Provider>
       </SvgPlaygroundPresetContext.Provider>
     </SvgPlaygroundHeaderContext.Provider>

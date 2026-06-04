@@ -4,7 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TransformFn } from "../../model";
 
-import { useSvgTransformState } from "./use-svg-transform-state";
+import {
+  REBUILDING_FALLBACK_DELAY_MS,
+  useSvgTransformState,
+} from "./use-svg-transform-state";
 
 const flush = async (): Promise<void> => {
   await Promise.resolve();
@@ -51,6 +54,7 @@ afterEach(async () => {
     root.unmount();
     await flush();
   });
+  vi.useRealTimers();
 });
 
 describe("use-svg-transform-state", () => {
@@ -100,6 +104,138 @@ describe("use-svg-transform-state", () => {
     expect(
       container.querySelector('[data-testid="optimized"]')?.textContent,
     ).toBe("<svg data-optimized />");
+  });
+
+  it("shows loading only after a slow transform exceeds the delay", async () => {
+    vi.useFakeTimers();
+    let resolveTransform: (
+      value: Awaited<ReturnType<TransformFn>>,
+    ) => void = () => undefined;
+    const transform = vi.fn<TransformFn>(async () => {
+      return await new Promise<Awaited<ReturnType<TransformFn>>>((resolve) => {
+        resolveTransform = resolve;
+      });
+    });
+
+    await act(async () => {
+      root.render(
+        <TransformStateHarness svg="<svg />" transform={transform} />,
+      );
+      await flush();
+    });
+
+    expect(container.querySelector('[data-testid="kind"]')?.textContent).toBe(
+      "idle",
+    );
+
+    await act(async () => {
+      vi.advanceTimersByTime(REBUILDING_FALLBACK_DELAY_MS - 1);
+      await flush();
+    });
+
+    expect(container.querySelector('[data-testid="kind"]')?.textContent).toBe(
+      "idle",
+    );
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+      await flush();
+    });
+
+    expect(container.querySelector('[data-testid="kind"]')?.textContent).toBe(
+      "loading",
+    );
+
+    await act(async () => {
+      resolveTransform({
+        kind: "success",
+        optimizedSvg: "<svg data-optimized />",
+      });
+      await flush();
+    });
+
+    expect(container.querySelector('[data-testid="kind"]')?.textContent).toBe(
+      "success",
+    );
+  });
+
+  it("keeps the previous success while a new transform is inside the delay", async () => {
+    vi.useFakeTimers();
+    let resolveSecondTransform:
+      | ((value: Awaited<ReturnType<TransformFn>>) => void)
+      | null = null;
+    const transform = vi.fn<TransformFn>(async ({ svg }) => {
+      if (svg.includes("second")) {
+        return await new Promise<Awaited<ReturnType<TransformFn>>>(
+          (resolve) => {
+            resolveSecondTransform = resolve;
+          },
+        );
+      }
+
+      return {
+        kind: "success",
+        optimizedSvg: "<svg data-source='first' />",
+      };
+    });
+
+    await act(async () => {
+      root.render(
+        <TransformStateHarness
+          svg="<svg data-source='first' />"
+          transform={transform}
+        />,
+      );
+      await flush();
+    });
+
+    expect(container.querySelector('[data-testid="kind"]')?.textContent).toBe(
+      "success",
+    );
+    expect(
+      container.querySelector('[data-testid="optimized"]')?.textContent,
+    ).toBe("<svg data-source='first' />");
+
+    await act(async () => {
+      root.render(
+        <TransformStateHarness
+          svg="<svg data-source='second' />"
+          transform={transform}
+        />,
+      );
+      await flush();
+    });
+
+    expect(container.querySelector('[data-testid="kind"]')?.textContent).toBe(
+      "success",
+    );
+    expect(
+      container.querySelector('[data-testid="optimized"]')?.textContent,
+    ).toBe("<svg data-source='first' />");
+
+    await act(async () => {
+      vi.advanceTimersByTime(REBUILDING_FALLBACK_DELAY_MS);
+      await flush();
+    });
+
+    expect(container.querySelector('[data-testid="kind"]')?.textContent).toBe(
+      "loading",
+    );
+
+    await act(async () => {
+      resolveSecondTransform?.({
+        kind: "success",
+        optimizedSvg: "<svg data-source='second' />",
+      });
+      await flush();
+    });
+
+    expect(container.querySelector('[data-testid="kind"]')?.textContent).toBe(
+      "success",
+    );
+    expect(
+      container.querySelector('[data-testid="optimized"]')?.textContent,
+    ).toBe("<svg data-source='second' />");
   });
 
   it("returns unsafe and error states from transform failures", async () => {

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { TransformFn } from "../../core/svg-playground/model";
 
 import { PLAYGROUND_URL_SYNC_DELAY_MS } from "../../core/svg-playground/ui/controller/use-playground-query-state";
+import { REBUILDING_FALLBACK_DELAY_MS } from "../../core/svg-playground/ui/controller/use-svg-transform-state";
 import { SvgPlaygroundPage } from "../../core/svg-playground/ui/SvgPlaygroundPage";
 import { applyControlsToSvg } from "../../core/svg-playground/utils/svg-controls";
 import { hoistStrokeWidthPlayground } from "./definition";
@@ -371,7 +372,8 @@ describe("hoist stroke width playground", () => {
     expect(app.container.textContent).toContain("3.5");
   });
 
-  it("shows loading placeholders first and falls back to idle placeholders for empty input", async () => {
+  it("shows delayed loading placeholders and falls back to idle placeholders for empty input", async () => {
+    vi.useFakeTimers();
     let resolveTransform: () => void = () => undefined;
     const transform: TransformFn = async () => {
       await new Promise<void>((resolve) => {
@@ -386,6 +388,17 @@ describe("hoist stroke width playground", () => {
 
     renderedApp = await renderPlayground(transform);
     const app = renderedApp;
+
+    expect(app.container.textContent).not.toContain("Rebuilding optimized SVG");
+    expect(app.container.textContent).not.toContain(
+      "Rebuilding React component source",
+    );
+    expect(app.container.textContent).not.toContain("Rebuilding live preview");
+
+    await act(async () => {
+      vi.advanceTimersByTime(REBUILDING_FALLBACK_DELAY_MS);
+      await flush();
+    });
 
     expect(app.container.textContent).toContain("Rebuilding optimized SVG");
     expect(app.container.textContent).toContain(

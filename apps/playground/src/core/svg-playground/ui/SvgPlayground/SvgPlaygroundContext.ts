@@ -61,13 +61,16 @@ export type SvgPlaygroundControlsContextValue = {
 };
 
 export type SvgPlaygroundPanelsContextValue = {
-  inputSvg: string;
   optimizedSvg: string;
   previewHtml: { __html: string } | null;
   reactSourceState: ReactSourceState;
-  setSvg: (svg: string) => void;
   status: TransformState["kind"];
   statusMessage: string;
+};
+
+export type SvgPlaygroundInputPanelContextValue = {
+  inputSvg: string;
+  setSvg: (svg: string) => void;
 };
 
 export const SvgPlaygroundHeaderContext =
@@ -76,6 +79,8 @@ export const SvgPlaygroundPresetContext =
   createContext<SvgPlaygroundPresetContextValue | null>(null);
 export const SvgPlaygroundControlsContext =
   createContext<SvgPlaygroundControlsContextValue | null>(null);
+export const SvgPlaygroundInputPanelContext =
+  createContext<SvgPlaygroundInputPanelContextValue | null>(null);
 export const SvgPlaygroundPanelsContext =
   createContext<SvgPlaygroundPanelsContextValue | null>(null);
 
@@ -105,6 +110,13 @@ export const useSvgPlaygroundControlsContext = () => {
   return useRequiredContext(
     "SvgPlayground.Controls",
     useContext(SvgPlaygroundControlsContext),
+  );
+};
+
+export const useSvgPlaygroundInputPanelContext = () => {
+  return useRequiredContext(
+    "SvgPlayground.InputPanel",
+    useContext(SvgPlaygroundInputPanelContext),
   );
 };
 

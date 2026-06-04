@@ -7,6 +7,8 @@ const IDLE_TRANSFORM_STATE = {
   kind: "idle",
 } satisfies TransformState;
 
+export const REBUILDING_FALLBACK_DELAY_MS = 200;
+
 export const useSvgTransformState = (
   svg: string,
   transform: TransformFn,
@@ -24,9 +26,16 @@ export const useSvgTransformState = (
     }
 
     let isStale = false;
+    const loadingTimeoutId = window.setTimeout(() => {
+      setTransformState({
+        kind: "loading",
+      });
+    }, REBUILDING_FALLBACK_DELAY_MS);
 
-    setTransformState({
-      kind: "loading",
+    setTransformState((currentState) => {
+      return currentState.kind === "success" || currentState.kind === "loading"
+        ? currentState
+        : IDLE_TRANSFORM_STATE;
     });
 
     void (async () => {
@@ -38,6 +47,8 @@ export const useSvgTransformState = (
         if (isStale) {
           return;
         }
+
+        window.clearTimeout(loadingTimeoutId);
 
         if (result.kind === "success") {
           setTransformState({
@@ -56,6 +67,7 @@ export const useSvgTransformState = (
           return;
         }
 
+        window.clearTimeout(loadingTimeoutId);
         setTransformState({
           kind: "error",
           message:
@@ -68,6 +80,7 @@ export const useSvgTransformState = (
 
     return () => {
       isStale = true;
+      window.clearTimeout(loadingTimeoutId);
     };
   }, [deferredSvg, transform]);
 

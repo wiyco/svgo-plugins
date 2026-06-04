@@ -1,10 +1,10 @@
 import { memo, useCallback } from "react";
 
-import { useSvgPlaygroundPanelsContext } from "../SvgPlaygroundContext";
+import { useSvgPlaygroundInputPanelContext } from "../SvgPlaygroundContext";
 import { CodeSurface } from "./CodeSurface";
 
 export const InputPanel = memo(function InputPanel() {
-  const { inputSvg, setSvg } = useSvgPlaygroundPanelsContext();
+  const { inputSvg, setSvg } = useSvgPlaygroundInputPanelContext();
   const handleSvgChange = useCallback(
     (nextSvg: string): void => {
       setSvg(nextSvg);

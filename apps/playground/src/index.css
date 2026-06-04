@@ -61,7 +61,7 @@ textarea {
 }
 
 .app-shell {
-  width: min(1440px, calc(100vw - 24px));
+  width: min(1440px, calc(100% - 24px));
   margin: 0 auto;
   padding: clamp(18px, 3vw, 32px) 0 56px;
 }
@@ -1187,7 +1187,7 @@ textarea {
 
 @media (max-width: 720px) {
   .app-shell {
-    width: min(100vw - 16px, 1440px);
+    width: min(calc(100% - 16px), 1440px);
     padding-top: 12px;
   }
 

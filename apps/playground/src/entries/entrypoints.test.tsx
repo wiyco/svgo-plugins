@@ -116,7 +116,11 @@ describe("playground entrypoints", () => {
   });
 
   it("keeps both entry stylesheets on the shared token layer", async () => {
-    const [landingCss, playgroundCss] = await Promise.all([
+    const [tokensCss, landingCss, playgroundCss] = await Promise.all([
+      readFile(
+        resolve(process.cwd(), "apps/playground/src/tokens.css"),
+        "utf8",
+      ),
       readFile(
         resolve(process.cwd(), "apps/playground/src/landing/index.css"),
         "utf8",
@@ -126,6 +130,11 @@ describe("playground entrypoints", () => {
 
     expect(landingCss).toContain('@import "../tokens.css";');
     expect(playgroundCss).toContain('@import "./tokens.css";');
+    expect(tokensCss).toContain("scrollbar-gutter: stable;");
+    expect(landingCss).toContain("width: min(980px, calc(100% - 24px));");
+    expect(landingCss).toContain("width: min(calc(100% - 16px), 980px);");
+    expect(playgroundCss).toContain("width: min(1440px, calc(100% - 24px));");
+    expect(playgroundCss).toContain("width: min(calc(100% - 16px), 1440px);");
     expect(landingCss).not.toContain("@view-transition");
     expect(playgroundCss).not.toContain("@view-transition");
     expect(landingCss).not.toContain("::view-transition");

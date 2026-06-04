@@ -2,8 +2,10 @@
   "name": "svgo-plugins-workspace",
   "private": true,
   "scripts": {
-    "typecheck": "tsc -b",
+    "typecheck": "tsgo -b",
+    "typecheck:tsc": "tsc -b",
     "typecheck:playground": "pnpm --filter ./apps/playground typecheck",
+    "typecheck:playground:tsc": "pnpm --filter ./apps/playground typecheck:tsc",
     "dev:playground": "pnpm --filter ./apps/playground dev",
     "build": "pnpm -r build",
     "build:playground": "node ./scripts/build-playground.mjs",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.12.4",
+    "@typescript/native-preview": "beta",
     "@vitest/coverage-v8": "^4.1.8",
     "lefthook": "^2.1.9",
     "oxfmt": "0.52.0",

@@ -7,9 +7,9 @@ import "../../index.css";
 import App from "./App";
 
 const LOADING_MESSAGES = [
-  "Rebuilding live preview…",
-  "Rebuilding optimized SVG…",
-  "Rebuilding React component source…",
+  "Rebuilding live preview...",
+  "Rebuilding optimized SVG...",
+  "Rebuilding React component source...",
 ] as const;
 
 const UNSAFE_SVG =
@@ -142,6 +142,18 @@ describe("playground browser worker regression", () => {
       .toBeInTheDocument();
     await waitForPanelsToSettle();
     await waitForCodeSurfacesToLoad();
+
+    const reactSourceContent = document.querySelector<HTMLElement>(
+      '[data-language="jsx"] .cm-content',
+    );
+
+    if (reactSourceContent === null) {
+      throw new Error("Expected React source CodeMirror content.");
+    }
+
+    expect(getComputedStyle(reactSourceContent).fontVariantLigatures).toBe(
+      "none",
+    );
     expect(readReactSourceTokenColors()).toEqual({
       closeParen: "rgb(108, 108, 112)",
       componentName: "rgb(176, 47, 194)",

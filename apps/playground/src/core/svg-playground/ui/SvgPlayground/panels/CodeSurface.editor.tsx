@@ -21,6 +21,8 @@ const codeSurfaceTheme = EditorView.theme({
     color: "var(--color-ink)",
     background: "transparent",
     fontFamily: "var(--font-mono)",
+    fontFeatureSettings: '"liga" 0, "calt" 0',
+    fontVariantLigatures: "none",
     fontSize: "inherit",
   },
   "&.cm-focused": {

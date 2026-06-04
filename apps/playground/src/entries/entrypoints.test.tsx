@@ -23,6 +23,8 @@ const HOIST_STROKE_WIDTH_DESCRIPTION =
   "Try an SVGO plugin that moves uniform descendant stroke-width values to the root SVG element, making SVGR-generated React icons easier to override.";
 const HOIST_STROKE_WIDTH_TITLE =
   "Hoist Stroke Width Playground | SVGO Plugin Playground";
+const PLAYGROUND_PUBLIC_BASE_URL = "https://wiyco.github.io/svgo-plugins/";
+const HOIST_STROKE_WIDTH_PUBLIC_BASE_URL = `${PLAYGROUND_PUBLIC_BASE_URL}svgo-plugin-hoist-stroke-width/`;
 
 const mockReactDomClient = () => {
   createRoot.mockReturnValue({
@@ -226,7 +228,8 @@ describe("playground entrypoints", () => {
     };
     const expectFaviconMetadata = (
       pageDocument: Document,
-      assetPrefix: string,
+      iconBaseUrl: string,
+      manifestHref: string,
     ): void => {
       expectElementAttributes(
         pageDocument,
@@ -246,37 +249,37 @@ describe("playground entrypoints", () => {
         pageDocument,
         'link[rel="icon"][type="image/png"][sizes="32x32"]',
         {
-          href: `${assetPrefix}favicon-32.png`,
+          href: `${iconBaseUrl}favicon-32.png`,
         },
       );
       expectElementAttributes(
         pageDocument,
         'link[rel="icon"][type="image/png"][sizes="48x48"]',
         {
-          href: `${assetPrefix}favicon-48.png`,
+          href: `${iconBaseUrl}favicon-48.png`,
         },
       );
       expectElementAttributes(
         pageDocument,
         'link[rel="icon"][type="image/png"][sizes="512x512"]',
         {
-          href: `${assetPrefix}favicon-512.png`,
+          href: `${iconBaseUrl}favicon-512.png`,
         },
       );
       expectElementAttributes(
         pageDocument,
         'link[rel="icon"][type="image/svg+xml"]',
         {
-          href: `${assetPrefix}favicon.svg`,
+          href: `${iconBaseUrl}favicon.svg`,
           sizes: "any",
         },
       );
       expectElementAttributes(pageDocument, 'link[rel="apple-touch-icon"]', {
-        href: `${assetPrefix}apple-touch-icon.png`,
+        href: `${iconBaseUrl}apple-touch-icon.png`,
         sizes: "180x180",
       });
       expectElementAttributes(pageDocument, 'link[rel="manifest"]', {
-        href: `${assetPrefix}site.webmanifest`,
+        href: manifestHref,
       });
     };
 
@@ -304,7 +307,7 @@ describe("playground entrypoints", () => {
       },
     );
     expectElementAttributes(landingDocument, 'meta[property="og:image"]', {
-      content: "./og-image.png",
+      content: `${PLAYGROUND_PUBLIC_BASE_URL}og-image.png`,
     });
     expectElementAttributes(
       landingDocument,
@@ -337,9 +340,13 @@ describe("playground entrypoints", () => {
       },
     );
     expectElementAttributes(landingDocument, 'meta[name="twitter:image"]', {
-      content: "./og-image.png",
+      content: `${PLAYGROUND_PUBLIC_BASE_URL}og-image.png`,
     });
-    expectFaviconMetadata(landingDocument, "./");
+    expectFaviconMetadata(
+      landingDocument,
+      PLAYGROUND_PUBLIC_BASE_URL,
+      "./site.webmanifest",
+    );
 
     expectElementAttributes(playgroundDocument, 'meta[name="description"]', {
       content: HOIST_STROKE_WIDTH_DESCRIPTION,
@@ -358,7 +365,7 @@ describe("playground entrypoints", () => {
       },
     );
     expectElementAttributes(playgroundDocument, 'meta[property="og:image"]', {
-      content: "./og-image.png",
+      content: `${HOIST_STROKE_WIDTH_PUBLIC_BASE_URL}og-image.png`,
     });
     expectElementAttributes(
       playgroundDocument,
@@ -395,9 +402,13 @@ describe("playground entrypoints", () => {
       },
     );
     expectElementAttributes(playgroundDocument, 'meta[name="twitter:image"]', {
-      content: "./og-image.png",
+      content: `${HOIST_STROKE_WIDTH_PUBLIC_BASE_URL}og-image.png`,
     });
-    expectFaviconMetadata(playgroundDocument, "../");
+    expectFaviconMetadata(
+      playgroundDocument,
+      PLAYGROUND_PUBLIC_BASE_URL,
+      "../site.webmanifest",
+    );
 
     expect(siteManifest).toMatchObject({
       background_color: "#edf6ff",

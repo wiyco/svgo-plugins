@@ -1,0 +1,184 @@
+name: Release Packages
+on:
+  release:
+    types: [published]
+permissions: {}
+concurrency:
+  group: release-package-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+jobs:
+  resolve:
+    name: Resolve release packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      packages: ${{ steps.resolve.outputs.packages }}
+    env:
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Validate release source
+        run: git merge-base --is-ancestor "$GITHUB_SHA" "origin/$DEFAULT_BRANCH"
+      - name: Resolve release packages
+        id: resolve
+        run: node ./scripts/resolve-release-packages.mjs
+
+  build:
+    name: Build ${{ matrix.package.name }}
+    needs: resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.resolve.outputs.packages) }}
+    env:
+      PACKAGE_DIR: ${{ matrix.package.dir }}
+      PACKAGE_SPEC: ${{ matrix.package.spec }}
+      TEST_PROJECT: ${{ matrix.package.testProject }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high
+      - name: Typecheck package
+        run: pnpm --filter "./$PACKAGE_DIR" run --if-present typecheck
+      - name: Lint and format check package
+        run: |
+          pnpm exec oxlint -c .oxlintrc.json "$PACKAGE_DIR"
+          pnpm exec oxfmt -c .oxfmtrc.json --check "$PACKAGE_DIR"
+      - name: Test package
+        run: |
+          if [ -z "$TEST_PROJECT" ]; then
+            echo "$PACKAGE_SPEC does not define a Vitest project; skipping tests."
+            exit 0
+          fi
+
+          pnpm vitest run --project "$TEST_PROJECT" --coverage
+      - name: Build package
+        run: pnpm --filter "./$PACKAGE_DIR" run --if-present build
+      - name: Pack package
+        env:
+          PACKAGE_TARBALL: ${{ runner.temp }}/${{ matrix.package.tarball }}
+        run: |
+          npm pack "./$PACKAGE_DIR" --pack-destination "$RUNNER_TEMP" --ignore-scripts
+          test -f "$PACKAGE_TARBALL"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ matrix.package.tarball }}
+          path: ${{ runner.temp }}/${{ matrix.package.tarball }}
+          retention-days: 1
+          if-no-files-found: error
+
+  publish-github-packages:
+    name: Publish ${{ matrix.package.name }} to GitHub Packages
+    needs:
+      - resolve
+      - build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm-release
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.resolve.outputs.packages) }}
+    env:
+      PACKAGE_SPEC: ${{ matrix.package.spec }}
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ matrix.package.tarball }}
+          path: ${{ runner.temp }}
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+          registry-url: "https://npm.pkg.github.com"
+          scope: ${{ matrix.package.scope }}
+          package-manager-cache: false
+      - name: Publish to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_TARBALL: ${{ runner.temp }}/${{ matrix.package.tarball }}
+        run: |
+          if npm view "$PACKAGE_SPEC" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "$PACKAGE_SPEC already exists on GitHub Packages; skipping."
+            exit 0
+          fi
+
+          npm publish "$PACKAGE_TARBALL" --registry=https://npm.pkg.github.com --ignore-scripts
+
+  stage-npmjs:
+    name: Stage ${{ matrix.package.name }} on npmjs
+    needs:
+      - resolve
+      - build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.resolve.outputs.packages) }}
+    env:
+      NPM_STAGE_CLI_VERSION: "11.16.0"
+      PACKAGE_NAME: ${{ matrix.package.name }}
+      PACKAGE_SPEC: ${{ matrix.package.spec }}
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ matrix.package.tarball }}
+          path: ${{ runner.temp }}
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+      - name: Ensure npm staged publishing support
+        run: |
+          if ! npm stage --help >/dev/null 2>&1; then
+            npm install --global "npm@$NPM_STAGE_CLI_VERSION" --ignore-scripts --no-audit --no-fund
+          fi
+
+          npm --version
+          npm stage --help >/dev/null
+      - name: Stage publish to npmjs
+        env:
+          PACKAGE_TARBALL: ${{ runner.temp }}/${{ matrix.package.tarball }}
+        run: |
+          if npm view "$PACKAGE_SPEC" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "$PACKAGE_SPEC already exists on npmjs; skipping."
+            exit 0
+          fi
+
+          if ! npm view "$PACKAGE_NAME" name --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "$PACKAGE_NAME does not exist on npmjs; staged publishing requires an existing package."
+            exit 1
+          fi
+
+          npm stage publish "$PACKAGE_TARBALL" --access public --registry=https://registry.npmjs.org --ignore-scripts

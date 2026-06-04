@@ -53,6 +53,33 @@ Relevant docs:
 - [`vite-plugin-svgr` options](https://github.com/pd4d10/vite-plugin-svgr#options)
 - [SVGR `svgo` option](https://react-svgr.com/docs/options/#svgo)
 
+## Example
+
+Before:
+
+```xml
+<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none">
+  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" />
+</svg>
+```
+
+After:
+
+```xml
+<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke-width="2">
+  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" />
+</svg>
+```
+
+Because `stroke-width` is now on the root `<svg>`, consumers can override it from the generated SVGR component:
+
+```tsx
+import Icon from "./icon.svg?react";
+
+<Icon strokeWidth={1.5} />;
+<Icon className="stroke-1" />;
+```
+
 ## Behavior
 
 The plugin hoists `stroke-width` only when all of the following are true:

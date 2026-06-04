@@ -3,9 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc -b tsconfig.json",
+    "typecheck": "tsgo -b tsconfig.json",
+    "typecheck:tsc": "tsc -b tsconfig.json",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsgo -b && vite build",
     "generate:favicons": "node ./scripts/generate-favicons.mjs",
     "generate:og-images": "node ./scripts/generate-og-images.mjs",
     "preview": "vite preview"

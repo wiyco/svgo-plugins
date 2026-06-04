@@ -1306,7 +1306,7 @@ textarea {
   .intro-actions {
     width: 100%;
     align-self: stretch;
-    justify-items: start;
+    justify-items: end;
   }
 
   .dock-row-controls {

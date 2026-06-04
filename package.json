@@ -7,6 +7,8 @@
     "dev:playground": "pnpm --filter ./apps/playground dev",
     "build": "pnpm -r build",
     "build:playground": "node ./scripts/build-playground.mjs",
+    "generate:favicons:playground": "pnpm --filter ./apps/playground generate:favicons",
+    "generate:og-images:playground": "pnpm --filter ./apps/playground generate:og-images",
     "preview:playground": "pnpm --filter ./apps/playground preview --host",
     "lint": "oxlint -c .oxlintrc.json .",
     "lint:fix": "oxlint -c .oxlintrc.json --fix .",

@@ -14,15 +14,6 @@
       <div style="position:absolute;left:54px;bottom:44px;width:430px;height:120px;border-radius:999px;background:radial-gradient(circle at 28% 52%,rgba(255,255,255,0.12),transparent 70%);filter:blur(28px);"></div>
     </div>
   </foreignObject>
-  <path
-    d="M760 384C963 541 909 61 1112 218"
-    fill="none"
-    stroke="#ffffff"
-    stroke-linecap="round"
-    stroke-width="10"
-  />
-  <circle cx="760" cy="384" r="16" fill="#ffffff" />
-  <circle cx="1112" cy="218" r="16" fill="#ffffff" />
   <text
     x="72"
     y="124"

@@ -2,7 +2,7 @@ import { act } from "react";
 import { type Root, createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { usePlaygroundLinkWarmup } from "./use-playground-link-warmup";
+import { useLandingLinkWarmup } from "./use-landing-link-warmup";
 
 const flush = async (): Promise<void> => {
   await Promise.resolve();
@@ -27,36 +27,36 @@ const mocks = vi.hoisted(() => {
       linkRef,
     };
   });
-  const warmPlaygroundRoute = vi.fn<(slug: string) => Promise<void>>();
+  const warmLandingRoute = vi.fn<() => Promise<void>>();
 
   return {
     handleWarmup,
     linkRef,
     useLinkWarmup,
-    warmPlaygroundRoute,
+    warmLandingRoute,
   };
 });
 
-vi.mock("../core/link-warmup", () => {
+vi.mock("../../../link-warmup", () => {
   return {
     useLinkWarmup: mocks.useLinkWarmup,
   };
 });
 
-vi.mock("../playgrounds/preload-registry", () => {
+vi.mock("../../../../playgrounds/preload-registry", () => {
   return {
-    warmPlaygroundRoute: mocks.warmPlaygroundRoute,
+    warmLandingRoute: mocks.warmLandingRoute,
   };
 });
 
-type HarnessState = ReturnType<typeof usePlaygroundLinkWarmup>;
+type HarnessState = ReturnType<typeof useLandingLinkWarmup>;
 
-const Harness = (props: { slug: string }) => {
-  latestHarnessState = usePlaygroundLinkWarmup(props.slug);
+const Harness = () => {
+  latestHarnessState = useLandingLinkWarmup();
 
   return (
-    <a ref={latestHarnessState.linkRef} href={`./${props.slug}/`}>
-      Open {props.slug}
+    <a ref={latestHarnessState.linkRef} href="../">
+      Back to landing
     </a>
   );
 };
@@ -69,7 +69,7 @@ beforeEach(() => {
   mocks.handleWarmup.mockReset();
   mocks.linkRef.current = null;
   mocks.useLinkWarmup.mockClear();
-  mocks.warmPlaygroundRoute.mockReset();
+  mocks.warmLandingRoute.mockReset();
   container = document.createElement("div");
   root = createRoot(container);
   document.body.innerHTML = "";
@@ -87,16 +87,16 @@ afterEach(async () => {
   });
 });
 
-describe("use-playground-link-warmup", () => {
-  it("adapts the playground slug to the shared link warmup hook", async () => {
+describe("useLandingLinkWarmup", () => {
+  it("adapts the landing route to the shared link warmup hook", async () => {
     await act(async () => {
-      root.render(<Harness slug="svgo-plugin-hoist-stroke-width" />);
+      root.render(<Harness />);
       await flush();
     });
 
     expect(mocks.useLinkWarmup).toHaveBeenCalledTimes(1);
     expect(mocks.useLinkWarmup.mock.calls[0]?.[1]).toEqual({
-      warmupKey: "svgo-plugin-hoist-stroke-width",
+      warmupKey: "landing",
     });
     expect(latestHarnessState).toEqual({
       handleWarmup: mocks.handleWarmup,
@@ -104,9 +104,9 @@ describe("use-playground-link-warmup", () => {
     });
   });
 
-  it("warms the matching playground route", async () => {
+  it("warms the landing route", async () => {
     await act(async () => {
-      root.render(<Harness slug="svgo-plugin-hoist-stroke-width" />);
+      root.render(<Harness />);
       await flush();
     });
 
@@ -118,9 +118,6 @@ describe("use-playground-link-warmup", () => {
 
     warmup();
 
-    expect(mocks.warmPlaygroundRoute).toHaveBeenCalledTimes(1);
-    expect(mocks.warmPlaygroundRoute).toHaveBeenCalledWith(
-      "svgo-plugin-hoist-stroke-width",
-    );
+    expect(mocks.warmLandingRoute).toHaveBeenCalledTimes(1);
   });
 });

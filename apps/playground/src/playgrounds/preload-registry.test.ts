@@ -60,6 +60,38 @@ describe("preload-registry", () => {
     ).toHaveLength(2);
   });
 
+  it("adds warmup links for the landing route without duplication", async () => {
+    window.history.replaceState(
+      null,
+      "",
+      "/apps/playground/svgo-plugin-hoist-stroke-width/",
+    );
+
+    const { warmLandingRoute } = await import("./preload-registry");
+
+    await warmLandingRoute();
+
+    const documentLink = document.head.querySelector<HTMLLinkElement>(
+      'link[data-playground-warmup="landing"][data-warmup-kind="document"]',
+    );
+    const styleLink = document.head.querySelector<HTMLLinkElement>(
+      'link[data-playground-warmup="landing"][data-warmup-kind="style"]',
+    );
+
+    expect(documentLink?.rel).toBe("prefetch");
+    expect(documentLink?.href).toBe("http://localhost:3000/apps/playground/");
+    expect(styleLink?.rel).toBe("prefetch");
+    expect(
+      document.head.querySelectorAll('link[data-playground-warmup="landing"]'),
+    ).toHaveLength(2);
+
+    await warmLandingRoute();
+
+    expect(
+      document.head.querySelectorAll('link[data-playground-warmup="landing"]'),
+    ).toHaveLength(2);
+  });
+
   it("falls back to a document prefetch when no warmup definition exists", async () => {
     const { warmPlaygroundRoute } = await import("./preload-registry");
 

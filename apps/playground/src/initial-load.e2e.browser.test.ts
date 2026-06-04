@@ -110,5 +110,11 @@ describe("playground initial load browser flow", () => {
     expect(packageChip.textContent).toContain(
       "@wiyco/svgo-plugin-hoist-stroke-width",
     );
+
+    slug.click();
+
+    await waitForPath(frame, "/");
+    await waitForFrameDocument(frame);
+    await waitForText(frame, "SVGO Plugin Playground");
   });
 });

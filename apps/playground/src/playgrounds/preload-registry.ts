@@ -1,4 +1,5 @@
 import playgroundStylesheetHref from "../index.css?url";
+import landingStylesheetHref from "../landing/index.css?url";
 import { PLAYGROUND_CATALOG } from "./catalog";
 
 type PlaygroundWarmupDefinition = {
@@ -63,6 +64,21 @@ const ensurePlaygroundAssetWarmupLinks = (slug: string): void => {
       slug,
     });
   }
+};
+
+export const warmLandingRoute = async (): Promise<void> => {
+  ensureWarmupLink({
+    href: new URL("../", window.location.href).toString(),
+    kind: "document",
+    rel: "prefetch",
+    slug: "landing",
+  });
+  ensureWarmupLink({
+    href: landingStylesheetHref,
+    kind: "style",
+    rel: "prefetch",
+    slug: "landing",
+  });
 };
 
 export const warmPlaygroundRoute = async (slug: string): Promise<void> => {

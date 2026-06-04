@@ -2,6 +2,7 @@ import { PackageIcon } from "@primer/octicons-react";
 import { type ReactNode, memo } from "react";
 
 import { useSvgPlaygroundHeaderContext } from "./SvgPlaygroundContext";
+import { useLandingLinkWarmup } from "./use-landing-link-warmup";
 
 type SvgPlaygroundIntroProps = {
   actions?: ReactNode;
@@ -14,13 +15,20 @@ export const SvgPlaygroundIntro = memo(function SvgPlaygroundIntro(
   props: SvgPlaygroundIntroProps,
 ) {
   const { actions, packageName, slug, title } = props;
+  const { handleWarmup, linkRef } = useLandingLinkWarmup();
 
   return (
     <section className="intro-band">
       <div className="intro-copy">
         <h1 className="intro-title">{title}</h1>
         <div className="intro-meta">
-          <a className="slug-chip" href="../">
+          <a
+            ref={linkRef}
+            className="slug-chip"
+            href="../"
+            onFocus={handleWarmup}
+            onPointerEnter={handleWarmup}
+          >
             /{slug}
           </a>
           {packageName !== null ? (

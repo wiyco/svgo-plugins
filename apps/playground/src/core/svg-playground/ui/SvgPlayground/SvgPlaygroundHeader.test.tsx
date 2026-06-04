@@ -73,7 +73,8 @@ describe("SvgPlaygroundIntro", () => {
     });
 
     const slugChip = container.querySelector<HTMLAnchorElement>(".slug-chip");
-    const packageChip = container.querySelector<HTMLElement>(".package-chip");
+    const packageChip =
+      container.querySelector<HTMLAnchorElement>(".package-chip");
 
     if (slugChip === null) {
       throw new Error("Expected slug chip");
@@ -82,6 +83,11 @@ describe("SvgPlaygroundIntro", () => {
     expect(mocks.useLandingLinkWarmup).toHaveBeenCalledTimes(1);
     expect(slugChip.getAttribute("href")).toBe("../");
     expect(slugChip.textContent).toContain("/svgo-plugin-hoist-stroke-width");
+    expect(packageChip?.getAttribute("href")).toBe(
+      "https://www.npmjs.com/package/@wiyco/svgo-plugin-hoist-stroke-width",
+    );
+    expect(packageChip?.getAttribute("target")).toBe("_blank");
+    expect(packageChip?.getAttribute("rel")).toBe("noopener noreferrer");
     expect(packageChip?.textContent).toContain(
       "@wiyco/svgo-plugin-hoist-stroke-width",
     );

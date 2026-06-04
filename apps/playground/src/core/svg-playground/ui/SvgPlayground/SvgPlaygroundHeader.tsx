@@ -32,12 +32,17 @@ export const SvgPlaygroundIntro = memo(function SvgPlaygroundIntro(
             /{slug}
           </a>
           {packageName !== null ? (
-            <code className="package-chip">
+            <a
+              className="package-chip"
+              href={`https://www.npmjs.com/package/${packageName}`}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <span aria-hidden="true" className="package-chip-icon">
                 <PackageIcon size={12} />
               </span>
               <span className="package-chip-name">{packageName}</span>
-            </code>
+            </a>
           ) : null}
         </div>
       </div>

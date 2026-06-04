@@ -81,7 +81,13 @@ describe("SvgPlaygroundApp", () => {
     );
 
     const slug = container.querySelector<HTMLAnchorElement>(".slug-chip");
+    const packageChip =
+      container.querySelector<HTMLAnchorElement>(".package-chip");
+
     expect(slug?.getAttribute("href")).toBe("../");
+    expect(packageChip?.getAttribute("href")).toBe(
+      "https://www.npmjs.com/package/@wiyco/svgo-plugin-hoist-stroke-width",
+    );
   });
 
   it("renders the shared page once the worker transform is available", async () => {

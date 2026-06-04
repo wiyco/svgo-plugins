@@ -176,7 +176,8 @@ textarea {
     box-shadow var(--duration-medium) var(--motion-spring-like);
 }
 
-.slug-chip {
+.slug-chip,
+.package-chip {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -186,7 +187,14 @@ textarea {
   box-shadow: var(--component-chip-interactive-hover-shadow);
 }
 
-.slug-chip:focus-visible {
+.package-chip:hover {
+  border-color: rgba(203, 56, 55, 0.18);
+  background: var(--component-chip-interactive-hover-background);
+  box-shadow: var(--component-chip-interactive-hover-shadow);
+}
+
+.slug-chip:focus-visible,
+.package-chip:focus-visible {
   outline: 3px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
@@ -1432,6 +1440,7 @@ textarea {
   }
 
   .slug-chip:hover,
+  .package-chip:hover,
   .share-button:hover,
   .floating-preset-button:hover,
   .number-stepper button:hover,

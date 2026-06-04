@@ -181,7 +181,7 @@ describe("SvgPlayground compound components", () => {
     const slugChip =
       renderedTree.container.querySelector<HTMLAnchorElement>(".slug-chip");
     const packageChip =
-      renderedTree.container.querySelector<HTMLElement>(".package-chip");
+      renderedTree.container.querySelector<HTMLAnchorElement>(".package-chip");
     const singlePresetButton =
       renderedTree.container.querySelector<HTMLButtonElement>(
         'button[aria-label="Single Weight"]',
@@ -203,6 +203,11 @@ describe("SvgPlayground compound components", () => {
         ?.textContent,
     ).toBe("Copied.");
     expect(slugChip?.getAttribute("href")).toBe("../");
+    expect(packageChip?.getAttribute("href")).toBe(
+      "https://www.npmjs.com/package/@wiyco/svgo-plugin-hoist-stroke-width",
+    );
+    expect(packageChip?.getAttribute("target")).toBe("_blank");
+    expect(packageChip?.getAttribute("rel")).toBe("noopener noreferrer");
     expect(packageChip?.textContent).toContain(
       "@wiyco/svgo-plugin-hoist-stroke-width",
     );

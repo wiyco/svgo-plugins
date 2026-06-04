@@ -47,7 +47,9 @@ const SvgPlaygroundBootShell = (props: {
         title={definition.title}
       />
       <section className="panel panel-boot">
-        <div className="preview-placeholder">Booting the transform worker…</div>
+        <div className="preview-placeholder">
+          Booting the transform worker...
+        </div>
       </section>
     </main>
   );

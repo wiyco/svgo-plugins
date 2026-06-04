@@ -22,7 +22,7 @@ export const OptimizedPanel = memo(function OptimizedPanel() {
           value={optimizedSvg}
         />
       ) : status === "loading" ? (
-        renderPanelFallback("Rebuilding optimized SVG…")
+        renderPanelFallback("Rebuilding optimized SVG...")
       ) : status === "unsafe" ? (
         renderPanelFallback(statusMessage)
       ) : status === "error" ? (

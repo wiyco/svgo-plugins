@@ -357,6 +357,7 @@ components:
 - Structure tokens in three layers: primitives, theme semantics, then shared component chrome.
 - Keep light as the live default. Dark tokens exist for future activation, but no runtime theme switching is introduced in this pass.
 - Promote only values that shape shared UI language: state colors, glass/card surfaces, chips, buttons, controls, slider chrome, and floating preset chrome. One-off page sizing stays in CSS.
+- Keep bundled Geist in the font stack for cross-platform weight consistency. Avoid literal U+2026 in app chrome so runtime font ranges can stay narrower, and disable code ligatures so spread syntax renders literally.
 
 ## Color System
 

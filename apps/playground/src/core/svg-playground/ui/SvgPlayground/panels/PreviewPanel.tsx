@@ -37,7 +37,7 @@ export const PreviewPanel = memo(function PreviewPanel() {
             <span>{statusMessage}</span>
           </div>
         ) : status === "loading" ? (
-          <div className="preview-placeholder">Rebuilding live preview…</div>
+          <div className="preview-placeholder">Rebuilding live preview...</div>
         ) : (
           <div className="preview-placeholder">
             Choose a preset or paste SVG markup.

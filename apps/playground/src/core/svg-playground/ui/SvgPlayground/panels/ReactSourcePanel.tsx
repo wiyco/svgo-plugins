@@ -14,7 +14,7 @@ export const ReactSourcePanel = memo(function ReactSourcePanel() {
         <h2>React source</h2>
       </div>
       {status === "success" && reactSourceState.isPending === true ? (
-        renderPanelFallback("Rebuilding React component source…")
+        renderPanelFallback("Rebuilding React component source...")
       ) : status === "success" && reactSourceState.source.length > 0 ? (
         <CodeSurface
           ariaLabel="React source"
@@ -25,7 +25,7 @@ export const ReactSourcePanel = memo(function ReactSourcePanel() {
       ) : status === "success" && reactSourceState.error.length > 0 ? (
         renderPanelFallback(reactSourceState.error)
       ) : status === "loading" ? (
-        renderPanelFallback("Rebuilding React component source…")
+        renderPanelFallback("Rebuilding React component source...")
       ) : status === "unsafe" ? (
         renderPanelFallback(statusMessage)
       ) : status === "error" ? (

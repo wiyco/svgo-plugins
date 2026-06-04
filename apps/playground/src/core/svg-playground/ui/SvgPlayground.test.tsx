@@ -334,13 +334,13 @@ describe("SvgPlayground compound components", () => {
     );
 
     expect(renderedTree.container.textContent).toContain(
-      "Rebuilding live preview…",
+      "Rebuilding live preview...",
     );
     expect(renderedTree.container.textContent).toContain(
-      "Rebuilding optimized SVG…",
+      "Rebuilding optimized SVG...",
     );
     expect(renderedTree.container.textContent).toContain(
-      "Rebuilding React component source…",
+      "Rebuilding React component source...",
     );
   });
 
@@ -357,7 +357,7 @@ describe("SvgPlayground compound components", () => {
     );
 
     expect(renderedTree.container.textContent).toContain(
-      "Rebuilding React component source…",
+      "Rebuilding React component source...",
     );
     expect(renderedTree.container.textContent).not.toContain(
       "export const Icon = () => <svg />;",

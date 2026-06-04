@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declarationDir": "./node_modules/.cache/types/node",
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.node.tsbuildinfo"
+  },
+  "include": [
+    "plugins/**/*.ts",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "vitest.browser.config.ts",
+    "src/build/restore-backdrop-filter-declarations.ts"
+  ]
+}

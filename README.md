@@ -18,6 +18,12 @@ See the package README for the public API and usage examples.
 ├─ packages/
 │  └─ svgo-plugin-hoist-stroke-width/
 └─ apps/
+   └─ playground/
+      ├─ src/
+      │  ├─ core/
+      │  └─ playgrounds/
+      │     └─ svgo-plugin-hoist-stroke-width/
+      └─ svgo-plugin-hoist-stroke-width/
 ```
 
-> `apps/*` is reserved for future playgrounds and end-to-end fixtures. For now, the repository only contains the package intended for publication.
+`apps/playground` is a single Vite app. Each package playground lives under `src/playgrounds/<slug>`, while the published GitHub Pages URL stays slug-based at `/<slug>/` via a dedicated nested `index.html`.

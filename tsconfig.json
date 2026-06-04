@@ -6,6 +6,9 @@
     },
     {
       "path": "./packages/svgo-plugin-hoist-stroke-width"
+    },
+    {
+      "path": "./apps/playground"
     }
   ]
 }

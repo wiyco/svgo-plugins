@@ -23,6 +23,23 @@ jobs:
       - run: pnpm audit --audit-level=high
       - run: pnpm run check
       - run: pnpm run test:coverage
+      - name: Get Playwright version
+        id: playwright-version
+        run: |
+          version=$(node -p "require('./apps/playground/node_modules/playwright/package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ steps.playwright-version.outputs.version }}-chromium
+      - name: Install Playwright system dependencies
+        run: pnpm --filter ./apps/playground exec playwright install-deps chromium
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter ./apps/playground exec playwright install chromium
+      - run: pnpm run test:browser:playground
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         id: upload-coverage
         with:

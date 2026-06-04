@@ -1,0 +1,45 @@
+import type { LandingPageViewModel } from "./landing-page-view-model";
+
+import { LandingCatalogItem } from "./LandingCatalogItem";
+
+type LandingPagePresenterProps = {
+  viewModel: LandingPageViewModel;
+};
+
+export const LandingPagePresenter = (props: LandingPagePresenterProps) => {
+  const { viewModel } = props;
+
+  return (
+    <main className="landing-shell">
+      <header className="landing-header">
+        <h1>SVGO Plugin Playground</h1>
+        <p className="landing-copy">
+          Test focused SVGO plugins against real SVG input, inspect optimized
+          output, and preview React-ready results.
+        </p>
+      </header>
+
+      <section
+        className="landing-catalog"
+        aria-labelledby="playground-catalog-title"
+      >
+        <div className="landing-catalog-header">
+          <h2 id="playground-catalog-title">Plugin playgrounds</h2>
+          <span className="landing-catalog-count">
+            {viewModel.playgroundCountLabel}
+          </span>
+        </div>
+        <ul className="landing-list">
+          {viewModel.playgrounds.map((playground) => {
+            return (
+              <LandingCatalogItem
+                key={playground.slug}
+                playground={playground}
+              />
+            );
+          })}
+        </ul>
+      </section>
+    </main>
+  );
+};

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="SVGO playground">
+  <defs>
+    <radialGradient id="background" cx="34%" cy="24%" r="92%">
+      <stop offset="0" stop-color="#fbfdff" />
+      <stop offset="0.58" stop-color="#edf6ff" />
+      <stop offset="1" stop-color="#dcefff" />
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="254" fill="url(#background)" />
+  <path
+    d="M99 330C280 470 232 42 413 182"
+    fill="none"
+    stroke="#1e6ef4"
+    stroke-linecap="round"
+    stroke-width="18"
+  />
+  <circle cx="99" cy="330" r="28" fill="#1e6ef4" />
+  <circle cx="413" cy="182" r="28" fill="#1e6ef4" />
+</svg>

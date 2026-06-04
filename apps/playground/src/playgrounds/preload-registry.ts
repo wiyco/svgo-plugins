@@ -1,0 +1,115 @@
+import playgroundStylesheetHref from "../index.css?url";
+import landingStylesheetHref from "../landing/index.css?url";
+import { PLAYGROUND_CATALOG } from "./catalog";
+
+type PlaygroundWarmupDefinition = {
+  stylesheetHref?: string;
+};
+
+type WarmupLinkOptions = {
+  href: string;
+  kind: string;
+  rel: string;
+  slug: string;
+};
+
+const playgroundWarmupDefinitions: Record<string, PlaygroundWarmupDefinition> =
+  {
+    "svgo-plugin-hoist-stroke-width": {
+      stylesheetHref: playgroundStylesheetHref,
+    },
+  };
+
+const ensureWarmupLink = (options: WarmupLinkOptions): HTMLLinkElement => {
+  const { href, kind, rel, slug } = options;
+  const selector = [
+    `link[data-playground-warmup="${slug}"]`,
+    `[data-warmup-kind="${kind}"]`,
+  ].join("");
+  const existingLink = document.head.querySelector<HTMLLinkElement>(selector);
+
+  if (existingLink !== null) {
+    return existingLink;
+  }
+
+  const link = document.createElement("link");
+
+  link.rel = rel;
+  link.href = href;
+  link.dataset.playgroundWarmup = slug;
+  link.dataset.warmupKind = kind;
+
+  document.head.append(link);
+
+  return link;
+};
+
+const ensurePlaygroundDocumentPrefetch = (slug: string): void => {
+  ensureWarmupLink({
+    href: new URL(`${slug}/`, window.location.href).toString(),
+    kind: "document",
+    rel: "prefetch",
+    slug,
+  });
+};
+
+const ensurePlaygroundAssetWarmupLinks = (slug: string): void => {
+  const definition = playgroundWarmupDefinitions[slug];
+
+  if (definition?.stylesheetHref !== undefined) {
+    ensureWarmupLink({
+      href: definition.stylesheetHref,
+      kind: "style",
+      rel: "prefetch",
+      slug,
+    });
+  }
+};
+
+export const warmLandingRoute = async (): Promise<void> => {
+  ensureWarmupLink({
+    href: new URL("../", window.location.href).toString(),
+    kind: "document",
+    rel: "prefetch",
+    slug: "landing",
+  });
+  ensureWarmupLink({
+    href: landingStylesheetHref,
+    kind: "style",
+    rel: "prefetch",
+    slug: "landing",
+  });
+};
+
+export const warmPlaygroundRoute = async (slug: string): Promise<void> => {
+  ensurePlaygroundDocumentPrefetch(slug);
+  ensurePlaygroundAssetWarmupLinks(slug);
+};
+
+export const warmPlaygroundRoutes = async (
+  slugs: readonly string[],
+): Promise<void> => {
+  await Promise.all(
+    Array.from(new Set(slugs)).map((slug) => {
+      return warmPlaygroundRoute(slug);
+    }),
+  );
+};
+
+export const schedulePlaygroundWarmup = (
+  slugs: readonly string[] = PLAYGROUND_CATALOG.map(({ slug }) => slug),
+): void => {
+  const runWarmup = () => {
+    void warmPlaygroundRoutes(slugs);
+  };
+  const requestIdleCallback = window.requestIdleCallback;
+
+  if (typeof requestIdleCallback === "function") {
+    requestIdleCallback(runWarmup, {
+      timeout: 250,
+    });
+    return;
+  }
+
+  window.setTimeout(runWarmup, 0);
+};

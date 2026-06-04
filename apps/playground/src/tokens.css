@@ -1,0 +1,549 @@
+@font-face {
+  font-family: "Geist Variable Fallback";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+  src: url("./assets/fonts/GeistVariableLatin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Geist Mono Variable Fallback";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+  src: url("./assets/fonts/GeistMonoVariableLatin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --primitive-primary-300: #78c3ff;
+  --primitive-primary-400: #35a0ff;
+  --primitive-primary-500: #0a84ff;
+  --primitive-primary-600: #1e6ef4;
+  --primitive-primary-700: #005ecb;
+  --primitive-secondary-500: #647586;
+  --primitive-tertiary-400: #9cb6ce;
+  --primitive-neutral-0: #ffffff;
+  --primitive-neutral-50: #fbfbfd;
+  --primitive-neutral-100: #f5f5f7;
+  --primitive-neutral-150: #eef1f5;
+  --primitive-neutral-200: #dfe4ea;
+  --primitive-neutral-400: #8c97a4;
+  --primitive-neutral-600: #566170;
+  --primitive-neutral-700: #3f4954;
+  --primitive-neutral-800: #252b31;
+  --primitive-neutral-900: #101418;
+  --primitive-danger-400: #ff6674;
+  --primitive-danger-500: #d70015;
+  --primitive-danger-600: #8e1723;
+  --primitive-danger-700: #6b3138;
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Geist Variable Fallback", "Segoe UI",
+    "Roboto", "Noto Sans", sans-serif;
+  --font-mono:
+    "SF Mono", "Geist Mono Variable Fallback", "IBM Plex Mono", "Roboto Mono",
+    monospace;
+  --type-display-size: clamp(1.45rem, 2.35vw, 1.95rem);
+  --type-display-line-height: 1.02;
+  --type-display-weight: 610;
+  --type-headline-size: clamp(1.25rem, 2vw, 1.6rem);
+  --type-headline-line-height: 1.05;
+  --type-headline-weight: 600;
+  --type-title-size: 1rem;
+  --type-title-line-height: 1.25;
+  --type-title-weight: 590;
+  --type-body-size: 0.9375rem;
+  --type-body-line-height: 1.5;
+  --type-body-weight: 400;
+  --type-label-size: 0.6875rem;
+  --type-label-line-height: 1.2;
+  --type-label-weight: 600;
+
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 22px;
+  --space-6: 28px;
+  --space-7: 36px;
+  --space-8: 44px;
+
+  --radius-control: 12px;
+  --radius-card: 18px;
+  --radius-panel: 22px;
+  --radius-hero: 24px;
+  --radius-pill: 999px;
+
+  --blur-glass: 18px;
+  --blur-soft: 10px;
+
+  --duration-fast: 140ms;
+  --duration-medium: 220ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.24, 0.86, 0.28, 1);
+  --motion-spring-like: cubic-bezier(0.22, 0.9, 0.3, 1);
+
+  --component-chip-gap: 6px;
+  --component-chip-padding: 6px 10px;
+  --component-chip-font-size: 0.8rem;
+  --component-share-button-gap: 8px;
+  --component-share-button-padding: 10px 14px;
+  --component-share-button-icon-size: 14px;
+  --component-control-row-height: 34px;
+  --component-color-well-padding: 3px;
+  --component-control-title-size: 0.8125rem;
+  --component-control-value-size: 0.8rem;
+  --component-status-pill-font-size: 0.72rem;
+  --component-slider-track-height: 8px;
+  --component-slider-thumb-width: 24px;
+  --component-slider-thumb-height: 20px;
+  --component-workbench-surface-min-height: 320px;
+
+  --floating-preset-tabbar-height: 64px;
+  --floating-preset-tabbar-edge-gap: 20px;
+  --floating-preset-tabbar-offset-base: 30px;
+  --floating-preset-tabbar-safe-area-extra: 18px;
+  --floating-preset-tabbar-reserved-gap: 8px;
+  --floating-preset-tabbar-padding: 4px;
+  --floating-preset-tabbar-gap: 4px;
+  --floating-preset-button-min-width: 68px;
+  --floating-preset-button-min-height: 54px;
+  --floating-preset-button-gap: 2px;
+  --floating-preset-button-padding: 7px 12px 6px;
+  --floating-preset-icon-size: 20px;
+  --floating-preset-glyph-size: 15px;
+  --floating-preset-label-size: 0.6rem;
+  --number-stepper-control-height: var(--component-control-row-height);
+
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  font-synthesis: none;
+  line-height: var(--type-body-line-height);
+  font-weight: var(--type-body-weight);
+  scrollbar-gutter: stable;
+}
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-canvas: var(--primitive-neutral-100);
+  --color-canvas-tint: #f4f6f9;
+  --color-surface-standard: rgba(255, 255, 255, 0.9);
+  --color-surface-raised: rgba(255, 255, 255, 0.96);
+  --color-surface-glass: rgba(255, 255, 255, 0.76);
+  --color-surface-glass-strong: rgba(255, 255, 255, 0.88);
+  --color-surface-scrim: rgba(247, 248, 250, 0.88);
+  --color-container-emphasis: rgba(10, 132, 255, 0.06);
+  --color-ink: var(--primitive-neutral-900);
+  --color-ink-muted: var(--primitive-neutral-600);
+  --color-primary: var(--primitive-primary-500);
+  --color-primary-strong: var(--primitive-primary-700);
+  --color-secondary: var(--primitive-secondary-500);
+  --color-tertiary: var(--primitive-tertiary-400);
+  --color-tertiary-emphasis: rgba(156, 182, 206, 0.12);
+  --color-outline: rgba(16, 20, 24, 0.08);
+  --color-outline-strong: rgba(16, 20, 24, 0.16);
+  --color-contrast-strong: rgba(16, 20, 24, 0.72);
+  --color-danger: var(--primitive-danger-500);
+  --color-focus-ring: rgba(10, 132, 255, 0.24);
+  --color-stage-glow: rgba(10, 132, 255, 0.08);
+  --shadow-raised: 0 12px 30px rgba(16, 20, 24, 0.08);
+  --shadow-floating: 0 18px 44px rgba(16, 20, 24, 0.1);
+
+  --component-card-hover-border-color: rgba(10, 132, 255, 0.1);
+  --component-card-hover-background: rgba(255, 255, 255, 0.98);
+  --component-card-hover-shadow: 0 14px 34px rgba(16, 20, 24, 0.08);
+
+  --component-chip-background: rgba(255, 255, 255, 0.66);
+  --component-chip-color: var(--color-contrast-strong);
+  --component-chip-accent-border-color: rgba(10, 132, 255, 0.16);
+  --component-chip-accent-background: var(--color-container-emphasis);
+  --component-chip-accent-color: var(--color-primary-strong);
+  --component-chip-interactive-background: rgba(255, 255, 255, 0.64);
+  --component-chip-interactive-hover-border-color: rgba(10, 132, 255, 0.14);
+  --component-chip-interactive-hover-background: rgba(255, 255, 255, 0.9);
+  --component-chip-interactive-hover-shadow: 0 10px 24px rgba(16, 20, 24, 0.06);
+
+  --component-ripple-color: rgba(10, 132, 255, 0.16);
+
+  --component-share-button-background: rgba(255, 255, 255, 0.84);
+  --component-share-button-color: var(--color-contrast-strong);
+  --component-share-button-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 18px rgba(16, 20, 24, 0.05);
+  --component-share-button-hover-border-color: rgba(10, 132, 255, 0.12);
+  --component-share-button-hover-background: rgba(255, 255, 255, 0.96);
+  --component-share-button-hover-color: var(--color-ink);
+  --component-share-button-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 12px 22px rgba(16, 20, 24, 0.07);
+  --component-share-button-pressed-border-color: rgba(10, 132, 255, 0.14);
+  --component-share-button-pressed-background: rgba(250, 251, 253, 0.98);
+  --component-share-button-pressed-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 6px 14px rgba(16, 20, 24, 0.05);
+  --component-share-button-disabled-background: rgba(255, 255, 255, 0.72);
+  --component-share-button-disabled-color: var(--color-ink-muted);
+  --component-share-button-disabled-border-color: var(--color-outline);
+  --component-share-button-flash-start-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 0 0 rgba(16, 20, 24, 0);
+  --component-share-button-flash-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 10px 18px rgba(16, 20, 24, 0.05);
+  --component-share-button-success-border-color: rgba(0, 136, 255, 0.2);
+  --component-share-button-success-color: var(--primitive-primary-600);
+  --component-share-button-success-background: rgba(0, 136, 255, 0.08);
+  --component-share-button-unavailable-border-color: rgba(0, 136, 255, 0.2);
+  --component-share-button-unavailable-color: var(--primitive-primary-600);
+  --component-share-button-unavailable-background: rgba(0, 136, 255, 0.08);
+  --component-share-button-failed-border-color: rgba(215, 0, 21, 0.14);
+  --component-share-button-failed-color: var(--primitive-danger-600);
+  --component-share-button-failed-background: rgba(215, 0, 21, 0.04);
+  --component-share-button-unsafe-border-color: rgba(215, 0, 21, 0.12);
+  --component-share-button-unsafe-color: var(--primitive-danger-700);
+  --component-share-button-unsafe-background: rgba(215, 0, 21, 0.03);
+
+  --component-liquid-glass-border-color: rgba(255, 255, 255, 0.48);
+  --component-liquid-glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 20px 44px rgba(16, 20, 24, 0.08), 0 8px 22px rgba(16, 20, 24, 0.04);
+  --component-liquid-glass-surface:
+    radial-gradient(
+      circle at top left,
+      rgba(255, 255, 255, 0.28),
+      transparent 56%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.48),
+      rgba(255, 255, 255, 0.16)
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0.05)
+    );
+  --component-liquid-glass-backdrop-filter: blur(36px) saturate(185%);
+  --component-liquid-glass-sheen:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.44), transparent 54%),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0.02) 38%,
+      rgba(255, 255, 255, 0)
+    );
+
+  --floating-preset-tabbar-border-color: var(
+    --component-liquid-glass-border-color
+  );
+  --floating-preset-tabbar-shadow: var(--component-liquid-glass-shadow);
+  --floating-preset-tabbar-surface: var(--component-liquid-glass-surface);
+  --floating-preset-tabbar-backdrop-filter: var(
+    --component-liquid-glass-backdrop-filter
+  );
+  --floating-preset-tabbar-sheen: var(--component-liquid-glass-sheen);
+  --floating-preset-selection-surface:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.84),
+      rgba(255, 255, 255, 0.46)
+    ),
+    rgba(10, 132, 255, 0.1);
+  --floating-preset-selection-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    inset 0 0 24px rgba(10, 132, 255, 0.14), 0 10px 20px rgba(16, 20, 24, 0.08);
+  --floating-preset-selected-icon-color: var(--color-primary-strong);
+  --component-floating-preset-button-hover-background: rgba(
+    255,
+    255,
+    255,
+    0.26
+  );
+  --component-floating-preset-button-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.52), 0 8px 18px rgba(16, 20, 24, 0.05);
+  --component-floating-preset-button-active-background: rgba(
+    255,
+    255,
+    255,
+    0.3
+  );
+  --component-floating-preset-button-active-shadow: inset 0 1px 0
+    rgba(255, 255, 255, 0.5);
+
+  --component-control-surface-background: var(--color-surface-raised);
+  --component-control-surface-hover-border-color: rgba(10, 132, 255, 0.1);
+  --component-control-surface-hover-background: rgba(255, 255, 255, 0.98);
+  --component-control-surface-hover-shadow: 0 14px 34px rgba(16, 20, 24, 0.08);
+
+  --component-stepper-button-background: rgba(255, 255, 255, 0.8);
+  --component-stepper-button-hover-border-color: rgba(10, 132, 255, 0.14);
+  --component-stepper-button-hover-background: rgba(255, 255, 255, 0.94);
+  --component-stepper-button-hover-shadow: 0 8px 18px rgba(16, 20, 24, 0.06);
+  --component-stepper-button-active-background: rgba(10, 132, 255, 0.08);
+  --component-stepper-button-active-shadow: inset 0 1px 0
+    rgba(255, 255, 255, 0.58);
+  --component-stepper-input-background: rgba(255, 255, 255, 0.88);
+  --component-color-well-background: rgba(255, 255, 255, 0.92);
+  --component-color-well-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  --component-color-well-hover-border-color: rgba(10, 132, 255, 0.14);
+  --component-color-well-hover-background: rgba(255, 255, 255, 0.98);
+  --component-color-well-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 8px 18px rgba(16, 20, 24, 0.05);
+  --component-color-well-focus-shadow:
+    0 0 0 4px var(--color-focus-ring), inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  --component-color-well-swatch-shadow: inset 0 0 0 1px rgba(16, 20, 24, 0.08);
+
+  --component-slider-track-background: rgba(16, 20, 24, 0.1);
+  --component-slider-thumb-background: rgba(255, 255, 255, 0.98);
+  --component-slider-thumb-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 4px 12px rgba(16, 20, 24, 0.16);
+  --component-slider-thumb-hover-background: #fff;
+  --component-slider-thumb-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 6px 16px rgba(16, 20, 24, 0.2);
+  --component-slider-thumb-active-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96), 0 3px 10px rgba(16, 20, 24, 0.16);
+  --component-slider-thumb-focus-shadow:
+    0 0 0 5px var(--color-focus-ring), inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 6px 16px rgba(16, 20, 24, 0.18);
+
+  --component-status-pill-background: rgba(255, 255, 255, 0.72);
+  --component-status-pill-color: var(--color-contrast-strong);
+  --component-status-pill-loading-color: var(--color-primary-strong);
+  --component-status-pill-success-color: var(--color-secondary);
+  --component-status-pill-danger-border-color: rgba(215, 0, 21, 0.16);
+  --component-status-pill-danger-background: rgba(215, 0, 21, 0.08);
+  --component-status-pill-danger-color: var(--color-danger);
+
+  --component-preview-stage-background:
+    radial-gradient(circle at top, rgba(10, 132, 255, 0.06), transparent 46%),
+    linear-gradient(
+      180deg,
+      var(--color-surface-standard),
+      rgba(255, 255, 255, 0.82)
+    );
+  --component-preview-stage-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.64);
+  --component-editor-surface-background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.94),
+    rgba(255, 255, 255, 0.84)
+  );
+  --component-editor-syntax-keyword: #1e6ef4;
+  --component-editor-syntax-type: #b02fc2;
+  --component-editor-syntax-property: #1e6ef4;
+  --component-editor-syntax-variable: #007eae;
+  --component-editor-syntax-string: #008575;
+  --component-editor-syntax-literal: #e7124d;
+  --component-editor-syntax-operator: #c55300;
+  --component-editor-syntax-punctuation: #6c6c70;
+  --component-editor-syntax-comment: #6c6c70;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-canvas: var(--primitive-neutral-900);
+  --color-canvas-tint: #161b22;
+  --color-surface-standard: rgba(24, 28, 35, 0.92);
+  --color-surface-raised: rgba(24, 28, 35, 0.96);
+  --color-surface-glass: rgba(29, 35, 44, 0.76);
+  --color-surface-glass-strong: rgba(29, 35, 44, 0.88);
+  --color-surface-scrim: rgba(11, 15, 20, 0.88);
+  --color-container-emphasis: rgba(10, 132, 255, 0.16);
+  --color-ink: rgba(248, 250, 252, 0.96);
+  --color-ink-muted: rgba(233, 238, 244, 0.72);
+  --color-primary: var(--primitive-primary-400);
+  --color-primary-strong: var(--primitive-primary-300);
+  --color-secondary: rgba(220, 228, 236, 0.74);
+  --color-tertiary: #b6c9dc;
+  --color-tertiary-emphasis: rgba(156, 182, 206, 0.18);
+  --color-outline: rgba(255, 255, 255, 0.12);
+  --color-outline-strong: rgba(255, 255, 255, 0.24);
+  --color-contrast-strong: rgba(248, 250, 252, 0.86);
+  --color-danger: var(--primitive-danger-400);
+  --color-focus-ring: rgba(10, 132, 255, 0.34);
+  --color-stage-glow: rgba(10, 132, 255, 0.18);
+  --shadow-raised: 0 16px 36px rgba(0, 0, 0, 0.32);
+  --shadow-floating: 0 24px 54px rgba(0, 0, 0, 0.42);
+
+  --component-card-hover-border-color: rgba(53, 160, 255, 0.22);
+  --component-card-hover-background: rgba(36, 42, 50, 0.98);
+  --component-card-hover-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
+
+  --component-chip-background: rgba(255, 255, 255, 0.08);
+  --component-chip-color: var(--color-contrast-strong);
+  --component-chip-accent-border-color: rgba(53, 160, 255, 0.24);
+  --component-chip-accent-background: rgba(10, 132, 255, 0.16);
+  --component-chip-accent-color: var(--color-primary-strong);
+  --component-chip-interactive-background: rgba(255, 255, 255, 0.08);
+  --component-chip-interactive-hover-border-color: rgba(53, 160, 255, 0.28);
+  --component-chip-interactive-hover-background: rgba(40, 46, 55, 0.92);
+  --component-chip-interactive-hover-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+
+  --component-ripple-color: rgba(53, 160, 255, 0.24);
+
+  --component-share-button-background: rgba(28, 34, 42, 0.88);
+  --component-share-button-color: var(--color-contrast-strong);
+  --component-share-button-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 24px rgba(0, 0, 0, 0.32);
+  --component-share-button-hover-border-color: rgba(53, 160, 255, 0.28);
+  --component-share-button-hover-background: rgba(36, 42, 50, 0.96);
+  --component-share-button-hover-color: var(--color-ink);
+  --component-share-button-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 14px 28px rgba(0, 0, 0, 0.34);
+  --component-share-button-pressed-border-color: rgba(53, 160, 255, 0.3);
+  --component-share-button-pressed-background: rgba(30, 35, 43, 0.98);
+  --component-share-button-pressed-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 8px 18px rgba(0, 0, 0, 0.28);
+  --component-share-button-disabled-background: rgba(255, 255, 255, 0.06);
+  --component-share-button-disabled-color: var(--color-ink-muted);
+  --component-share-button-disabled-border-color: var(--color-outline);
+  --component-share-button-flash-start-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 0 rgba(0, 0, 0, 0);
+  --component-share-button-flash-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 12px 24px rgba(0, 0, 0, 0.34);
+  --component-share-button-success-border-color: rgba(83, 164, 255, 0.38);
+  --component-share-button-success-color: var(--color-primary-strong);
+  --component-share-button-success-background: rgba(10, 132, 255, 0.18);
+  --component-share-button-unavailable-border-color: rgba(83, 164, 255, 0.38);
+  --component-share-button-unavailable-color: var(--color-primary-strong);
+  --component-share-button-unavailable-background: rgba(10, 132, 255, 0.18);
+  --component-share-button-failed-border-color: rgba(255, 102, 116, 0.32);
+  --component-share-button-failed-color: var(--color-danger);
+  --component-share-button-failed-background: rgba(255, 102, 116, 0.1);
+  --component-share-button-unsafe-border-color: rgba(255, 102, 116, 0.24);
+  --component-share-button-unsafe-color: rgba(255, 176, 184, 0.92);
+  --component-share-button-unsafe-background: rgba(255, 102, 116, 0.07);
+
+  --component-liquid-glass-border-color: rgba(255, 255, 255, 0.14);
+  --component-liquid-glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 28px 56px rgba(0, 0, 0, 0.34),
+    0 10px 24px rgba(0, 0, 0, 0.2);
+  --component-liquid-glass-surface:
+    radial-gradient(
+      circle at top left,
+      rgba(255, 255, 255, 0.08),
+      transparent 58%
+    ),
+    linear-gradient(180deg, rgba(39, 45, 55, 0.58), rgba(18, 22, 29, 0.24)),
+    linear-gradient(135deg, rgba(83, 164, 255, 0.08), rgba(255, 255, 255, 0.02));
+  --component-liquid-glass-backdrop-filter: blur(38px) saturate(155%);
+  --component-liquid-glass-sheen:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 54%),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.01) 38%,
+      rgba(255, 255, 255, 0)
+    );
+
+  --floating-preset-tabbar-border-color: var(
+    --component-liquid-glass-border-color
+  );
+  --floating-preset-tabbar-shadow: var(--component-liquid-glass-shadow);
+  --floating-preset-tabbar-surface: var(--component-liquid-glass-surface);
+  --floating-preset-tabbar-backdrop-filter: var(
+    --component-liquid-glass-backdrop-filter
+  );
+  --floating-preset-tabbar-sheen: var(--component-liquid-glass-sheen);
+  --floating-preset-selection-surface:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.16),
+      rgba(255, 255, 255, 0.06)
+    ),
+    rgba(10, 132, 255, 0.18);
+  --floating-preset-selection-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 24px rgba(10, 132, 255, 0.24), 0 12px 24px rgba(0, 0, 0, 0.28);
+  --floating-preset-selected-icon-color: var(--color-primary-strong);
+  --component-floating-preset-button-hover-background: rgba(
+    255,
+    255,
+    255,
+    0.08
+  );
+  --component-floating-preset-button-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 22px rgba(0, 0, 0, 0.26);
+  --component-floating-preset-button-active-background: rgba(
+    255,
+    255,
+    255,
+    0.1
+  );
+  --component-floating-preset-button-active-shadow: inset 0 1px 0
+    rgba(255, 255, 255, 0.14);
+
+  --component-control-surface-background: var(--color-surface-raised);
+  --component-control-surface-hover-border-color: rgba(53, 160, 255, 0.22);
+  --component-control-surface-hover-background: rgba(36, 42, 50, 0.98);
+  --component-control-surface-hover-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
+
+  --component-stepper-button-background: rgba(255, 255, 255, 0.1);
+  --component-stepper-button-hover-border-color: rgba(53, 160, 255, 0.28);
+  --component-stepper-button-hover-background: rgba(40, 46, 55, 0.94);
+  --component-stepper-button-hover-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  --component-stepper-button-active-background: rgba(10, 132, 255, 0.16);
+  --component-stepper-button-active-shadow: inset 0 1px 0
+    rgba(255, 255, 255, 0.16);
+  --component-stepper-input-background: rgba(255, 255, 255, 0.12);
+  --component-color-well-background: rgba(36, 42, 50, 0.92);
+  --component-color-well-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --component-color-well-hover-border-color: rgba(53, 160, 255, 0.28);
+  --component-color-well-hover-background: rgba(40, 46, 55, 0.98);
+  --component-color-well-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 22px rgba(0, 0, 0, 0.24);
+  --component-color-well-focus-shadow:
+    0 0 0 4px var(--color-focus-ring), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --component-color-well-swatch-shadow: inset 0 0 0 1px
+    rgba(255, 255, 255, 0.12);
+
+  --component-slider-track-background: rgba(255, 255, 255, 0.16);
+  --component-slider-thumb-background: rgba(36, 42, 50, 0.98);
+  --component-slider-thumb-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 18px rgba(0, 0, 0, 0.34);
+  --component-slider-thumb-hover-background: rgba(44, 50, 60, 1);
+  --component-slider-thumb-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 22px rgba(0, 0, 0, 0.36);
+  --component-slider-thumb-active-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 14px rgba(0, 0, 0, 0.32);
+  --component-slider-thumb-focus-shadow:
+    0 0 0 5px var(--color-focus-ring), inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 8px 22px rgba(0, 0, 0, 0.34);
+
+  --component-status-pill-background: rgba(255, 255, 255, 0.08);
+  --component-status-pill-color: var(--color-contrast-strong);
+  --component-status-pill-loading-color: var(--color-primary-strong);
+  --component-status-pill-success-color: var(--color-secondary);
+  --component-status-pill-danger-border-color: rgba(255, 102, 116, 0.28);
+  --component-status-pill-danger-background: rgba(255, 102, 116, 0.1);
+  --component-status-pill-danger-color: var(--color-danger);
+
+  --component-preview-stage-background:
+    radial-gradient(circle at top, rgba(10, 132, 255, 0.14), transparent 46%),
+    linear-gradient(
+      180deg,
+      var(--color-surface-standard),
+      rgba(24, 28, 35, 0.92)
+    );
+  --component-preview-stage-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --component-editor-surface-background: linear-gradient(
+    180deg,
+    rgba(36, 42, 50, 0.96),
+    rgba(28, 34, 42, 0.9)
+  );
+  --component-editor-syntax-keyword: #5cb8ff;
+  --component-editor-syntax-type: #ea8dff;
+  --component-editor-syntax-property: #5cb8ff;
+  --component-editor-syntax-variable: #6dd9ff;
+  --component-editor-syntax-string: #54dfcb;
+  --component-editor-syntax-literal: #ff8ac4;
+  --component-editor-syntax-operator: #ffa056;
+  --component-editor-syntax-punctuation: #aeaeb2;
+  --component-editor-syntax-comment: #aeaeb2;
+}

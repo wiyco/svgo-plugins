@@ -1,5 +1,6 @@
-import { optimize } from "svgo";
 import type { XastChild, XastElement } from "svgo";
+
+import { optimize } from "svgo";
 import { describe, expect, it } from "vitest";
 
 import { hoistStrokeWidthToSvgRoot } from "../src/hoist-stroke-width";

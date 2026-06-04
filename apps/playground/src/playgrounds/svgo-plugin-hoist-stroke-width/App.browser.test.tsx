@@ -123,6 +123,7 @@ afterEach(async () => {
   root = null;
   document.body.innerHTML = "";
   window.history.replaceState({}, "", "/");
+  await page.viewport(960, 720);
 });
 
 describe("playground browser worker regression", () => {
@@ -183,5 +184,134 @@ describe("playground browser worker regression", () => {
         });
       })
       .toBe(false);
+  });
+
+  it("keeps the command dock compact above presets on an iPhone-width viewport", async () => {
+    await page.viewport(390, 844);
+
+    const container = document.createElement("div");
+    document.body.append(container);
+    root = createRoot(container);
+
+    await act(async () => {
+      root?.render(<App />);
+      await flush();
+    });
+
+    await waitForPanelsToSettle();
+
+    const commandDock = document.querySelector<HTMLElement>(".command-dock");
+    const commandSummary = document.querySelector<HTMLElement>(
+      ".command-dock-summary",
+    );
+    const commandDetails = document.querySelector<HTMLElement>(
+      ".command-dock-details",
+    );
+    const commandDetailsInner = document.querySelector<HTMLElement>(
+      ".command-dock-details-inner",
+    );
+    const commandGear = document.querySelector<SVGElement>(
+      ".command-dock-summary-icon svg",
+    );
+    const commandChevron = document.querySelector<SVGElement>(
+      ".command-dock-summary-chevron svg",
+    );
+    const presetBar = document.querySelector<HTMLElement>(
+      ".floating-preset-tabbar",
+    );
+
+    if (
+      commandDock === null ||
+      commandSummary === null ||
+      commandDetails === null ||
+      commandDetailsInner === null ||
+      commandGear === null ||
+      commandChevron === null ||
+      presetBar === null
+    ) {
+      throw new Error("Expected mobile command dock and preset bar.");
+    }
+
+    await expect
+      .poll(() => {
+        return window.matchMedia("(max-width: 720px)").matches;
+      })
+      .toBe(true);
+    await expect
+      .poll(() => {
+        return getComputedStyle(commandDock).position;
+      })
+      .toBe("fixed");
+    await expect
+      .poll(() => {
+        return getComputedStyle(commandSummary).display;
+      })
+      .toBe("flex");
+    await expect
+      .poll(() => {
+        return getComputedStyle(commandDetails).display;
+      })
+      .toBe("grid");
+    await expect
+      .poll(() => {
+        return getComputedStyle(commandDetails).visibility;
+      })
+      .toBe("hidden");
+    await expect
+      .poll(() => {
+        return commandDetails.getBoundingClientRect().height;
+      })
+      .toBeLessThan(1);
+    await expect
+      .poll(() => {
+        return commandDock.getBoundingClientRect().height;
+      })
+      .toBeLessThan(window.innerHeight * 0.2);
+    expect(getComputedStyle(commandGear).transform).toBe("none");
+    expect(getComputedStyle(commandChevron).transform).toBe("none");
+    expect(getComputedStyle(commandDetails).transitionProperty).toContain(
+      "grid-template-rows",
+    );
+    expect(getComputedStyle(commandDetailsInner).transitionProperty).toContain(
+      "transform",
+    );
+
+    const collapsedDockRect = commandDock.getBoundingClientRect();
+    const presetBarRect = presetBar.getBoundingClientRect();
+
+    expect(collapsedDockRect.bottom).toBeLessThanOrEqual(presetBarRect.top - 4);
+
+    await act(async () => {
+      await page.getByLabelText("Expand playground controls").click();
+      await flush();
+    });
+
+    await expect
+      .poll(() => {
+        return commandDock.dataset.expanded;
+      })
+      .toBe("true");
+    await expect
+      .poll(() => {
+        return getComputedStyle(commandDetails).visibility;
+      })
+      .toBe("visible");
+    await expect
+      .poll(() => {
+        return commandDetails.getBoundingClientRect().height;
+      })
+      .toBeGreaterThan(1);
+    await expect
+      .poll(() => {
+        return getComputedStyle(commandDetailsInner).opacity;
+      })
+      .toBe("1");
+    expect(getComputedStyle(commandGear).transform).not.toBe("none");
+    expect(getComputedStyle(commandChevron).transform).not.toBe("none");
+    await expect
+      .poll(() => {
+        return commandDock.getBoundingClientRect().height;
+      })
+      .toBeLessThan(window.innerHeight * 0.56);
   });
 });

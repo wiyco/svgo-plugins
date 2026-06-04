@@ -67,6 +67,7 @@ textarea {
 }
 
 .playground-shell {
+  --command-dock-reserved-space: 0px;
   --floating-preset-tabbar-offset: max(
     var(--floating-preset-tabbar-offset-base),
     calc(
@@ -82,7 +83,8 @@ textarea {
   display: grid;
   gap: var(--space-5);
   padding-bottom: calc(
-    var(--space-4) + var(--floating-preset-tabbar-reserved-space)
+    var(--space-4) + var(--floating-preset-tabbar-reserved-space) +
+      var(--command-dock-reserved-space)
   );
 }
 
@@ -214,6 +216,7 @@ textarea {
 .share-button,
 .floating-preset-tabbar,
 .preset-button,
+.command-dock-summary,
 .number-stepper button,
 .number-stepper input,
 .color-swatch-row,
@@ -316,6 +319,7 @@ textarea {
 
 .share-button:focus-visible,
 .preset-button:focus-visible,
+.command-dock-summary:focus-visible,
 .number-stepper button:focus-visible,
 .number-stepper input:focus-visible,
 .control-pod input:focus-visible,
@@ -381,6 +385,8 @@ textarea {
 }
 
 .command-dock {
+  --command-dock-icon-duration: 520ms;
+  --command-dock-sheet-duration: 460ms;
   position: sticky;
   top: 12px;
   z-index: 10;
@@ -389,6 +395,112 @@ textarea {
   padding: var(--space-5);
   border-radius: var(--radius-panel);
   animation-delay: 40ms;
+}
+
+.command-dock-summary {
+  display: none;
+}
+
+.command-dock-summary,
+.command-dock-details {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.command-dock-details {
+  display: grid;
+}
+
+.command-dock-details-inner {
+  min-width: 0;
+}
+
+.command-dock-summary-metrics {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.command-dock-summary-metric {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-pill);
+  background: var(--component-chip-background);
+  color: var(--color-contrast-strong);
+  font-size: 0.75rem;
+  line-height: var(--type-label-line-height);
+  font-weight: 520;
+  white-space: nowrap;
+}
+
+.command-dock-summary-metric code {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
+.command-dock-summary-swatch {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--color-outline-strong);
+  border-radius: 50%;
+  box-shadow: var(--component-color-well-swatch-shadow);
+}
+
+.command-dock-summary-icon,
+.command-dock-summary-chevron {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.command-dock-summary-icon,
+.command-dock-summary-chevron {
+  width: var(--component-control-row-height);
+  height: var(--component-control-row-height);
+}
+
+.command-dock-summary-icon {
+  border: 1px solid var(--color-outline);
+  border-radius: 50%;
+  background: var(--component-chip-background);
+  color: var(--color-primary-strong);
+}
+
+.command-dock-summary-icon,
+.command-dock-summary-chevron {
+  transform: translateZ(0);
+}
+
+.command-dock-summary-icon svg,
+.command-dock-summary-chevron svg {
+  display: block;
+  transform-origin: center;
+  transition: transform var(--command-dock-icon-duration)
+    var(--motion-spring-like);
+  will-change: transform;
+}
+
+.command-dock-summary-chevron {
+  color: var(--color-contrast-strong);
+}
+
+.command-dock[data-expanded="true"] .command-dock-summary-chevron svg {
+  transform: rotate(180deg);
+}
+
+.command-dock[data-expanded="true"] .command-dock-summary-icon svg {
+  transform: rotate(330deg);
 }
 
 .dock-row {
@@ -1079,9 +1191,101 @@ textarea {
     padding-top: 12px;
   }
 
+  .playground-shell {
+    --command-dock-reserved-space: 78px;
+  }
+
   .intro-band,
   .command-dock {
     padding: var(--space-4);
+  }
+
+  .command-dock {
+    --command-dock-details-gap: 0px;
+    --command-dock-details-opacity: 0;
+    --command-dock-details-row-size: 0fr;
+    --command-dock-details-translate-y: 6px;
+    position: fixed;
+    top: auto;
+    bottom: calc(var(--floating-preset-tabbar-reserved-space) + 8px);
+    left: 50%;
+    z-index: 25;
+    width: min(calc(100vw - 16px), 480px);
+    max-height: calc(
+      100dvh - var(--floating-preset-tabbar-reserved-space) - 24px
+    );
+    gap: 0;
+    padding: var(--space-2);
+    border-radius: var(--radius-panel);
+    transform: translateX(-50%);
+    transition:
+      border-color var(--duration-fast) var(--ease-standard),
+      background-color var(--duration-fast) var(--ease-standard),
+      box-shadow var(--duration-medium) var(--motion-spring-like);
+  }
+
+  .command-dock[data-expanded="true"] {
+    --command-dock-details-gap: var(--space-2);
+    --command-dock-details-opacity: 1;
+    --command-dock-details-row-size: 1fr;
+    --command-dock-details-translate-y: 0px;
+  }
+
+  .command-dock-summary {
+    display: flex;
+    width: 100%;
+    min-height: 52px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border: 0;
+    border-radius: calc(var(--radius-panel) - var(--space-2));
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+    text-align: start;
+  }
+
+  .command-dock-summary:hover {
+    background: var(--component-floating-preset-button-hover-background);
+    box-shadow: var(--component-floating-preset-button-hover-shadow);
+  }
+
+  .command-dock-summary:active {
+    background: var(--component-floating-preset-button-active-background);
+    box-shadow: var(--component-floating-preset-button-active-shadow);
+  }
+
+  .command-dock-details {
+    display: grid;
+    grid-template-rows: var(--command-dock-details-row-size);
+    max-height: min(56dvh, 420px);
+    margin-top: var(--command-dock-details-gap);
+    overflow: hidden;
+    visibility: hidden;
+    transition:
+      grid-template-rows var(--command-dock-sheet-duration)
+        var(--motion-spring-like),
+      margin-top var(--duration-slow) var(--motion-spring-like),
+      visibility 0s linear var(--command-dock-sheet-duration);
+  }
+
+  .command-dock[data-expanded="true"] .command-dock-details {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .command-dock-details-inner {
+    min-height: 0;
+    opacity: var(--command-dock-details-opacity);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    transform: translateY(var(--command-dock-details-translate-y));
+    transition:
+      opacity var(--duration-slow) var(--ease-standard),
+      transform var(--command-dock-sheet-duration) var(--motion-spring-like);
   }
 
   .intro-band,
@@ -1107,6 +1311,14 @@ textarea {
 
   .dock-row-controls {
     grid-template-columns: 1fr;
+  }
+
+  .control-pod {
+    grid-template-rows:
+      minmax(var(--component-control-row-height), auto)
+      minmax(var(--component-control-row-height), auto);
+    gap: var(--space-3);
+    padding: var(--space-3);
   }
 
   .panel-preview,
@@ -1172,6 +1384,14 @@ textarea {
 
   .share-button,
   .preset-button,
+  .command-dock,
+  .command-dock-summary,
+  .command-dock-summary-icon,
+  .command-dock-summary-icon svg,
+  .command-dock-summary-chevron,
+  .command-dock-summary-chevron svg,
+  .command-dock-details,
+  .command-dock-details-inner,
   .number-stepper button,
   .number-stepper input,
   .color-swatch-row,
@@ -1181,6 +1401,12 @@ textarea {
   .panel,
   .control-pod {
     transition-duration: 1ms;
+  }
+
+  .command-dock[data-expanded="true"] .command-dock-summary-icon svg,
+  .command-dock[data-expanded="true"] .command-dock-summary-chevron svg,
+  .command-dock-details-inner {
+    transform: none;
   }
 
   .ripple-surface[data-ripple-state="active"]::after,

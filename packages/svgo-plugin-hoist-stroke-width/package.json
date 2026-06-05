@@ -12,7 +12,7 @@
     "vite",
     "vite-plugin-svgr"
   ],
-  "homepage": "https://github.com/wiyco/svgo-plugins/tree/main/packages/svgo-plugin-hoist-stroke-width#readme",
+  "homepage": "https://wiyco.github.io/svgo-plugins/svgo-plugin-hoist-stroke-width",
   "bugs": {
     "url": "https://github.com/wiyco/svgo-plugins/issues"
   },

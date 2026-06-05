@@ -1,6 +1,6 @@
 {
   "name": "@wiyco/svgo-plugin-hoist-stroke-width",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "SVGO plugin that hoists uniform descendant stroke-width values to the root <svg> so SVGR-generated React components can override them.",
   "keywords": [
     "react",

@@ -1,5 +1,4 @@
 lefthook: pnpm exec lefthook
-glob_matcher: doublestar
 
 pre-commit:
   parallel: true
@@ -9,44 +8,50 @@ pre-commit:
         piped: true
         jobs:
           - name: lint root
-            root: "."
-            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
+            glob:
+              - "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
+              - "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
+            exclude:
+              - "apps/**"
+              - "packages/**"
             run: pnpm exec oxlint -c .oxlintrc.json --fix {staged_files}
             stage_fixed: true
           - name: format root
-            root: "."
-            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
+            glob:
+              - "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
+              - "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
+            exclude:
+              - "apps/**"
+              - "packages/**"
             run: pnpm exec oxfmt -c .oxfmtrc.json {staged_files}
             stage_fixed: true
 
     - name: packages
+      root: "packages/"
       group:
         piped: true
         jobs:
           - name: lint packages
-            root: "packages/"
-            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
-            run: pnpm exec oxlint -c .oxlintrc.json --fix {staged_files}
+            glob: "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
+            run: pnpm exec oxlint --fix {staged_files}
             stage_fixed: true
           - name: format packages
-            root: "packages/"
-            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
-            run: pnpm exec oxfmt -c .oxfmtrc.json {staged_files}
+            glob: "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
+            run: pnpm exec oxfmt {staged_files}
             stage_fixed: true
 
     - name: apps
+      root: "apps/"
       group:
         piped: true
         jobs:
           - name: lint apps
-            root: "apps/"
-            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
-            run: pnpm exec oxlint -c .oxlintrc.json --fix {staged_files}
+            glob: "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}"
+            run: pnpm exec oxlint --fix {staged_files}
             stage_fixed: true
           - name: format apps
-            root: "apps/"
-            glob: "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
-            run: pnpm exec oxfmt -c .oxfmtrc.json {staged_files}
+            glob: "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,md,json,yml,yaml}"
+            run: pnpm exec oxfmt {staged_files}
             stage_fixed: true
 
     - name: typecheck

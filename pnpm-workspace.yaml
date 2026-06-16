@@ -3,3 +3,5 @@ packages:
   - apps/playground
 allowBuilds:
   lefthook: true
+overrides:
+  vite@>=8.0.0 <=8.0.15: ">=8.0.16"

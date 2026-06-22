@@ -27,10 +27,10 @@ export const PreviewPanel = memo(function PreviewPanel() {
             <span>Expected optimized SVG to contain a root svg element.</span>
           </div>
         ) : status === "unsafe" ? (
-          <div className="preview-warning" role="status">
+          <output className="preview-warning">
             <strong>{PREVIEW_BLOCKED_MESSAGE}</strong>
             <span>{statusMessage}</span>
-          </div>
+          </output>
         ) : status === "error" ? (
           <div className="preview-warning" role="alert">
             <strong>Transform failed.</strong>

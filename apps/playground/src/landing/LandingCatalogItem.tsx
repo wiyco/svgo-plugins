@@ -16,6 +16,7 @@ export const LandingCatalogItem = (props: LandingCatalogItemProps) => {
     <li className="landing-item">
       <a
         ref={linkRef}
+        aria-label={`Open ${playground.title}`}
         href={playground.href}
         onFocus={handleWarmup}
         onPointerEnter={handleWarmup}

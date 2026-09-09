@@ -42,10 +42,10 @@
     "build": "tsgo -b && tsdown"
   },
   "devDependencies": {
-    "svgo": "^4.0.1"
+    "svgo": "^4.1.0"
   },
   "peerDependencies": {
-    "svgo": "^4.0.1"
+    "svgo": "^4.1.0"
   },
   "engines": {
     "node": ">=24"

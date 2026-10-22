@@ -38,5 +38,3 @@ workerScope.addEventListener(
     void handleRequest(event.data);
   },
 );
-
-export {};

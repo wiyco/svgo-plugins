@@ -55,7 +55,7 @@ pre-commit:
             stage_fixed: true
 
     - name: typecheck
-      run: pnpm exec tsgo -b
+      run: pnpm exec tsc -b
 
 post-merge:
   jobs:

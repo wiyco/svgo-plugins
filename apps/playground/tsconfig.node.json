@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "composite": true,
     "declarationDir": "./node_modules/.cache/types/node",
     "emitDeclarationOnly": true,

@@ -11,6 +11,7 @@ coverage/
 !.env.example
 
 .vitest-attachments/
+.vitest/
 __screenshots__/
 
 .vscode/*

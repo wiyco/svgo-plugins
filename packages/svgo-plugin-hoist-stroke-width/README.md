@@ -49,8 +49,8 @@ pnpm i -D @wiyco/svgo-plugin-hoist-stroke-width
 ## Usage with SVGO
 
 ```ts
-import { optimize } from "svgo";
 import { createHoistStrokeWidthPlugin } from "@wiyco/svgo-plugin-hoist-stroke-width";
+import { optimize } from "svgo";
 
 const result = optimize(
   '<svg><path stroke="currentColor" stroke-width="2" /></svg>',
@@ -65,9 +65,9 @@ See the [SVGO plugin docs](https://svgo.dev/docs/plugins/) for the full plugin c
 ## Usage with vite-plugin-svgr
 
 ```ts
+import { createHoistStrokeWidthPlugin } from "@wiyco/svgo-plugin-hoist-stroke-width";
 import { defineConfig } from "vite";
 import svgr from "vite-plugin-svgr";
-import { createHoistStrokeWidthPlugin } from "@wiyco/svgo-plugin-hoist-stroke-width";
 
 export default defineConfig({
   plugins: [

@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 const PLAYGROUND_SLUG = "svgo-plugin-hoist-stroke-width";
+const APP_BASE = "/__playground__";
 
 const createFrame = (): HTMLIFrameElement => {
   const frame = document.createElement("iframe");
-  frame.src = "/index.html";
+  frame.src = `${APP_BASE}/index.html`;
   frame.style.width = "960px";
   frame.style.height = "720px";
   document.body.append(frame);
@@ -94,7 +95,7 @@ describe("playground initial load browser flow", () => {
 
     playgroundLink.click();
 
-    await waitForPath(frame, `/${PLAYGROUND_SLUG}/`);
+    await waitForPath(frame, `${APP_BASE}/${PLAYGROUND_SLUG}/`);
     await waitForFrameDocument(frame);
 
     const title = await waitForElement<HTMLElement>(frame, ".intro-title");
@@ -113,7 +114,7 @@ describe("playground initial load browser flow", () => {
 
     slug.click();
 
-    await waitForPath(frame, "/");
+    await waitForPath(frame, `${APP_BASE}/`);
     await waitForFrameDocument(frame);
     await waitForText(frame, "SVGO Plugin Playground");
   });

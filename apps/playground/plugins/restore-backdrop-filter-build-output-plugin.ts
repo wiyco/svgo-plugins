@@ -1,6 +1,6 @@
 import { type PluginOption } from "vite";
 
-import { restoreBackdropFilterDeclarations } from "../src/build/restore-backdrop-filter-declarations";
+import { restoreBackdropFilterDeclarations } from "../src/build/restore-backdrop-filter-declarations.ts";
 
 /**
  * @see https://github.com/parcel-bundler/lightningcss/issues/695

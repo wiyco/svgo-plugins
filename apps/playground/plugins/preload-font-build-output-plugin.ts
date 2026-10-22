@@ -1,6 +1,6 @@
 import { type PluginOption } from "vite";
 
-import { preloadInitialFontBuildOutput } from "../src/build/preload-font-build-output";
+import { preloadInitialFontBuildOutput } from "../src/build/preload-font-build-output.ts";
 
 export const preloadFontBuildOutputPlugin = (): PluginOption => {
   return {

@@ -33,10 +33,10 @@
     <img alt="Node.js version" src="https://img.shields.io/badge/node-%3E%3D24-339933?style=flat&amp;labelColor=24292E&amp;logo=nodedotjs&amp;logoColor=white" />
   </a>
   <a href="./pnpm-lock.yaml">
-    <img alt="pnpm version" src="https://img.shields.io/badge/pnpm-10.33.4-F69220?style=flat&amp;labelColor=24292E&amp;logo=pnpm&amp;logoColor=white" />
+    <img alt="pnpm version" src="https://img.shields.io/badge/pnpm-12.15.0-F69220?style=flat&amp;labelColor=24292E&amp;logo=pnpm&amp;logoColor=white" />
   </a>
   <a href="./package.json">
-    <img alt="TypeScript version" src="https://img.shields.io/badge/typescript-7%20beta-3178C6?style=flat&amp;labelColor=24292E&amp;logo=typescript&amp;logoColor=white" />
+    <img alt="TypeScript version" src="https://img.shields.io/badge/typescript-7.0.2-3178C6?style=flat&amp;labelColor=24292E&amp;logo=typescript&amp;logoColor=white" />
   </a>
 </p>
 
@@ -75,4 +75,6 @@ See the package README for the public API and usage examples.
 
 ## Tooling
 
-Type-checking runs on TypeScript 7 beta through `tsgo` from `@typescript/native-preview`. Each workspace app/package uses `typecheck` for `tsgo` and `typecheck:tsc` as the TypeScript 6 fallback. Build tooling still keeps `typescript` 6.x installed side-by-side because the stable TypeScript 7 programmatic API is not available yet.
+Type-checking and builds use the stable TypeScript 7 compiler through `tsc`. The `typecheck:tsc` commands remain aliases for `typecheck`. Node.js is pinned in `.node-version`, and pnpm is pinned in `package.json`.
+
+React Compiler is not enabled. The new compiler checks `react/refs` and `react/set-state-in-effect` remain disabled for the existing ref and effect synchronization patterns; `react/globals` is disabled only in test harnesses that capture hook results during rendering.

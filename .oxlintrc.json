@@ -75,7 +75,9 @@
     "react/jsx-no-script-url": "error",
     "react/jsx-no-useless-fragment": "warn",
     "react/no-array-index-key": "error",
+    "react/refs": "off",
     "react/rules-of-hooks": "error",
+    "react/set-state-in-effect": "off",
     "sort-imports": [
       "warn",
       {
@@ -213,7 +215,8 @@
         "vitest/no-interpolation-in-snapshots": "error",
         "vitest/no-mocks-import": "error",
         "vitest/no-unneeded-async-expect-function": "error",
-        "vitest/prefer-called-exactly-once-with": "error"
+        "vitest/prefer-called-exactly-once-with": "error",
+        "react/globals": "off"
       }
     }
   ]

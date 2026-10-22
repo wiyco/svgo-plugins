@@ -3,8 +3,8 @@ import { resolve } from "node:path";
 import { defineConfig } from "vite";
 
 import { createPlaygroundPackageSourceAliases } from "../../scripts/playground-package-source-alias.mjs";
-import { preloadFontBuildOutputPlugin } from "./plugins/preload-font-build-output-plugin";
-import { restoreBackdropFilterBuildOutputPlugin } from "./plugins/restore-backdrop-filter-build-output-plugin";
+import { preloadFontBuildOutputPlugin } from "./plugins/preload-font-build-output-plugin.ts";
+import { restoreBackdropFilterBuildOutputPlugin } from "./plugins/restore-backdrop-filter-build-output-plugin.ts";
 
 const shouldPreloadInitialFont = process.env.SVGO_PRELOAD_INITIAL_FONT !== "0";
 

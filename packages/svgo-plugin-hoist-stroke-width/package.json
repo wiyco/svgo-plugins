@@ -37,15 +37,15 @@
     }
   },
   "scripts": {
-    "typecheck": "tsgo -b tsconfig.json",
+    "typecheck": "tsc -b tsconfig.json",
     "typecheck:tsc": "tsc -b tsconfig.json",
-    "build": "tsgo -b && tsdown"
+    "build": "tsc -b && tsdown"
   },
   "devDependencies": {
-    "svgo": "^4.0.1"
+    "svgo": "^4.1.0"
   },
   "peerDependencies": {
-    "svgo": "^4.0.1"
+    "svgo": "^4.1.0"
   },
   "engines": {
     "node": ">=24"

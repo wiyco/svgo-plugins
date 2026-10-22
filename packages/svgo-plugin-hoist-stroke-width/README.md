@@ -29,10 +29,10 @@
     <img alt="Node.js version" src="https://img.shields.io/badge/node-%3E%3D24-336633?style=flat&amp;labelColor=24292E&amp;logo=nodedotjs&amp;logoColor=white" />
   </a>
   <a href="https://github.com/wiyco/svgo-plugins/blob/main/pnpm-lock.yaml">
-    <img alt="pnpm version" src="https://img.shields.io/badge/pnpm-10.33.4-F69220?style=flat&amp;labelColor=24292E&amp;logo=pnpm&amp;logoColor=white" />
+    <img alt="pnpm version" src="https://img.shields.io/badge/pnpm-12.15.0-F69220?style=flat&amp;labelColor=24292E&amp;logo=pnpm&amp;logoColor=white" />
   </a>
   <a href="https://github.com/wiyco/svgo-plugins/blob/main/package.json">
-    <img alt="TypeScript version" src="https://img.shields.io/badge/typescript-7%20beta-3178C6?style=flat&amp;labelColor=24292E&amp;logo=typescript&amp;logoColor=white" />
+    <img alt="TypeScript version" src="https://img.shields.io/badge/typescript-7.0.2-3178C6?style=flat&amp;labelColor=24292E&amp;logo=typescript&amp;logoColor=white" />
   </a>
 </p>
 
@@ -41,6 +41,8 @@ An SVGO plugin that hoists descendant `stroke-width` attributes to the root `<sv
 This makes SVGR-generated React components much easier to customize, whether you are passing a `strokeWidth` prop or using Tailwind CSS utilities such as `stroke-2`.
 
 ## Install
+
+Requires Node.js 24 or later and SVGO `^4.1.0`. Version 1.0.1 raises the minimum SVGO version from 4.0.1 to 4.1.0; update SVGO alongside the plugin if you use SVGO 4.0.x.
 
 ```bash
 pnpm i -D @wiyco/svgo-plugin-hoist-stroke-width

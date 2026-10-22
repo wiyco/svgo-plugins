@@ -26,7 +26,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version-file: .node-version
+          node-version: "24.22.1"
           package-manager-cache: false
       - name: Validate release source
         run: |
@@ -59,7 +59,7 @@ jobs:
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version-file: .node-version
+          node-version: "24.22.1"
           package-manager-cache: false
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
@@ -123,9 +123,9 @@ jobs:
           node-version: "24.22.1"
           registry-url: "https://registry.npmjs.org"
           package-manager-cache: false
-      - name: Ensure npm staged publishing support
+      - name: Install pinned npm CLI
         run: |
-          if ! npm stage --help >/dev/null 2>&1; then
+          if [ "$(npm --version)" != "$NPM_STAGE_CLI_VERSION" ]; then
             npm install --global "npm@$NPM_STAGE_CLI_VERSION" --ignore-scripts --no-audit --no-fund
           fi
 

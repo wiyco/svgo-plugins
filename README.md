@@ -77,4 +77,6 @@ See the package README for the public API and usage examples.
 
 Type-checking and builds use the stable TypeScript 7 compiler through `tsc`. The `typecheck:tsc` commands remain aliases for `typecheck`. Node.js is pinned in `.node-version`, and pnpm is pinned in `package.json`.
 
+For VS Code, install the recommended [TypeScript 7 extension](https://marketplace.visualstudio.com/items?itemName=TypeScriptTeam.native-preview). The workspace settings enable its native language service and use the locally installed TypeScript package.
+
 React Compiler is not enabled. The new compiler checks `react/refs` and `react/set-state-in-effect` remain disabled for the existing ref and effect synchronization patterns; `react/globals` is disabled only in test harnesses that capture hook results during rendering.
